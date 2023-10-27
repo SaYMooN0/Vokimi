@@ -24,6 +24,14 @@
         Ages18Plus = 18,
         Ages21Plus = 21
     }
-
+    public enum TestTag
+    {
+        Tag1,
+        Tag2,
+        Tag3,
+        Tag4,
+        Tag5,
+        Tag6,
+    }
 
 }

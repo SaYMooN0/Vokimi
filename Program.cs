@@ -1,10 +1,12 @@
 using Vokimi.Services.Interfaces;
 using Vokimi.Services.Classes;
 using DotNetEnv;
+using Vokimi.Models.DataBaseClasses;
+using Vokimi.Models;
 
 internal class Program
 {
-    private static void Main(string[] args)
+    private static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
         builder.Services.AddControllersWithViews();
@@ -22,7 +24,6 @@ internal class Program
         }
         DataBase _db = new DataBase(databaseConnectionString);
         builder.Services.AddSingleton<Vokimi.Services.Interfaces.IDataBase, DataBase>(provider => _db);
-
 
         var app = builder.Build();
 
