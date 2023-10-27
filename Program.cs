@@ -1,14 +1,28 @@
+using Vokimi.Services.Interfaces;
+using Vokimi.Services.Classes;
+using DotNetEnv;
+
 internal class Program
 {
     private static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
         builder.Services.AddControllersWithViews();
-        var Logger = new Vokimi.Services.Classes.Logger();
-        builder.Services.AddSingleton
-            <Vokimi.Services.Interfaces.ILogger,
-            Vokimi.Services.Classes.Logger>
-            (provider => Logger);
+
+
+        Logger _logger = new Logger();
+        builder.Services.AddSingleton  <Vokimi.Services.Interfaces.ILogger, Logger>(provider => _logger);
+
+        Env.Load();
+        string databaseConnectionString = Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING");
+        if (string.IsNullOrEmpty(databaseConnectionString))
+        {
+            _logger.CriticalError("DatabaseConnectionString is null or empty");
+            return;
+        }
+        DataBase _db = new DataBase(databaseConnectionString);
+        builder.Services.AddSingleton<Vokimi.Services.Interfaces.IDataBase, DataBase>(provider => _db);
+
 
         var app = builder.Build();
 
