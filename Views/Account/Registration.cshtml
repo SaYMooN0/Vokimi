@@ -1,8 +1,7 @@
 ﻿@model Vokimi.Models.ViewModels.RegistrationViewModel
 
 <h1>registration page</h1>
-<p>Already have an account?</p>
-<a asp-action="Authorization">Go to the authorization page</a>
+
 
 
 <form asp-action="Registration" asp-controller="Account" method="post">
@@ -29,13 +28,14 @@
         <input asp-for="ConfirmPassword" class="form-control" />
     </div>
     @{
-        if (string.IsNullOrEmpty(Model.ErrorMessage))
+        if (!string.IsNullOrEmpty(Model.ErrorMessage))
         {
             <p class="text-danger">@Model.ErrorMessage</p>
         }
     }
     <button type="submit" class="btn btn-primary">Register</button>
-
 </form>
+<p>Already have an account?</p>
+<a asp-action="Authorization">Go to the authorization page</a>
 @{
 }

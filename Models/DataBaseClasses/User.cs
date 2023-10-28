@@ -19,7 +19,7 @@
             PinnedTestsId = pinnedTestsId;
             PreferredLanguages = preferredLanguages;
         }
-        public User(string name, string email, string password, DateTime birthDate, HashSet<Language> preferredLanguages) : this(
+        public User(string name, string email, string password, DateTime birthDate) : this(
             name,
             email,
             password,
@@ -28,8 +28,7 @@
             Role.None,
             DateTime.Now,
             null,
-            new List<uint>(), new List<uint>(), new List<uint>(), new List<uint>(), new List<uint>(),
-            preferredLanguages)
+            new List<uint>(), new List<uint>(), new List<uint>(), new List<uint>(), new List<uint>(), new HashSet<Language>())
         {
         }
         public uint Id { get; private set; }

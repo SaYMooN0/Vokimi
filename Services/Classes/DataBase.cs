@@ -4,11 +4,11 @@ using Vokimi.Models.DataBaseClasses;
 
 namespace Vokimi.Services.Classes
 {
-    public class DataBase: VokimiServices.IDataBase
+    public class DataBase : VokimiServices.IDataBase
     {
         private readonly string _connectionString;
 
-        public DataBase(string connectionString) { _connectionString = connectionString;}
+        public DataBase(string connectionString) { _connectionString = connectionString; }
         public async Task<int> AddUser(User user)
         {
             using (var connection = new SqlConnection(_connectionString))
@@ -17,21 +17,19 @@ namespace Vokimi.Services.Classes
                                    VALUES (@Name, @Email, @Password, @BirthDate, @IsBanned, @Role, @RegistrationDate, @Status);
                                    SELECT CAST(SCOPE_IDENTITY() as int)";
                 var userId = await connection.QuerySingleAsync<int>(insertUserQuery, user);
-                if (user.PreferredLanguages?.Any() == true)
-                {
-                    string insertLanguagesQuery = @"INSERT INTO UserPreferredLanguages (UserId, Language) VALUES (@UserId, @Language)";
-                    foreach (var language in user.PreferredLanguages)
-                    {
-                        await connection.ExecuteAsync(insertLanguagesQuery, new { UserId = userId, Language = (int)language });
-                    }
-                }
                 return userId;
             }
         }
-
-        public Task<bool> AnyUserWithSuchEmail(string email)
+        public async Task<bool> AnyUserWithSuchEmail(string email)
         {
-            throw new NotImplementedException();
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                string checkEmailQuery = @"SELECT COUNT(1) FROM Users WHERE Email = @Email";
+                int count = await connection.QuerySingleAsync<int>(checkEmailQuery, new { Email = email });
+
+                return count > 0;
+            }
         }
+
     }
 }
