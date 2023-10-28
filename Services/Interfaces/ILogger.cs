@@ -1,6 +1,6 @@
 ﻿// Ignore Spelling: Vokimi
 
-namespace Vokimi.Services.Interfaces
+namespace VokimiServices
 {
     public interface ILogger
     {

@@ -1,11 +1,10 @@
 ﻿using Dapper;
 using System.Data.SqlClient;
 using Vokimi.Models.DataBaseClasses;
-using Vokimi.Services.Interfaces;
 
 namespace Vokimi.Services.Classes
 {
-    public class DataBase:IDataBase
+    public class DataBase: VokimiServices.IDataBase
     {
         private readonly string _connectionString;
 
@@ -30,6 +29,9 @@ namespace Vokimi.Services.Classes
             }
         }
 
-
+        public Task<bool> AnyUserWithSuchEmail(string email)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

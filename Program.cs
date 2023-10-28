@@ -1,8 +1,5 @@
-using Vokimi.Services.Interfaces;
 using Vokimi.Services.Classes;
 using DotNetEnv;
-using Vokimi.Models.DataBaseClasses;
-using Vokimi.Models;
 
 internal class Program
 {
@@ -13,7 +10,7 @@ internal class Program
 
 
         Logger _logger = new Logger();
-        builder.Services.AddSingleton  <Vokimi.Services.Interfaces.ILogger, Logger>(provider => _logger);
+        builder.Services.AddSingleton<VokimiServices.ILogger, Logger>(provider => _logger);
 
         Env.Load();
         string databaseConnectionString = Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING");
@@ -23,7 +20,7 @@ internal class Program
             return;
         }
         DataBase _db = new DataBase(databaseConnectionString);
-        builder.Services.AddSingleton<Vokimi.Services.Interfaces.IDataBase, DataBase>(provider => _db);
+        builder.Services.AddSingleton<VokimiServices.IDataBase, DataBase>(provider => _db);
 
         var app = builder.Build();
 

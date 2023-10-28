@@ -1,6 +1,6 @@
 ﻿namespace Vokimi.Services.Classes
 {
-    public class Logger : Vokimi.Services.Interfaces.ILogger
+    public class Logger : VokimiServices.ILogger
     {
         private const string _logsFolder = "logs";
         private readonly string _runtimeFile, _logFile;
