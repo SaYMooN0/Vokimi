@@ -1,10 +1,13 @@
 using Vokimi.Services.Classes;
 using DotNetEnv;
+using Dapper;
+using Vokimi.Models;
 
 internal class Program
 {
     private static async Task Main(string[] args)
     {
+        SqlMapper.AddTypeHandler(new DateTypesHandler());
         var builder = WebApplication.CreateBuilder(args);
         builder.Services.AddControllersWithViews();
 

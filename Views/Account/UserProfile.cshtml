@@ -1,0 +1,21 @@
+﻿@model UserProfileViewModel
+
+<p>Id: @Model.Id</p>
+<p>Nickname: @Model.Nickname</p>
+<p>Status: @Model.Status</p>
+@if (Model.CreatedTests is null || Model.CreatedTests.Count == 0)
+{
+    <p>This user has not created any test yet</p>
+}
+else
+{
+    <p>Tests created by this user</p>
+    foreach(int id in Model.CreatedTests)
+    {
+        <p>@id</p>
+    }
+}
+@if(Model.LastTakenTest !is null)
+{
+    <p>Last taken test by this user: @Model.LastTakenTest</p>
+}

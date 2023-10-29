@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using System.Data.SqlClient;
 using Vokimi.Models.DataBaseClasses;
+using Vokimi.Models.ViewModels;
 
 namespace Vokimi.Services.Classes
 {
@@ -31,5 +32,34 @@ namespace Vokimi.Services.Classes
             }
         }
 
+        public async Task<UserProfileViewModel?> GetUserInfo(int userId)
+        {
+            UserProfileViewModel viewModel = new();
+
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                User? user = await connection.QueryFirstOrDefaultAsync<User>(
+                    "SELECT * FROM Users WHERE Id = @UserId",
+                    new { UserId = userId });
+                if (user is null)
+                    return null;
+
+                viewModel.Id = userId;
+                viewModel.Nickname = user.Name;
+                viewModel.Status = user.Status;
+               
+
+                var lastTakenTest = await connection.QueryFirstOrDefaultAsync<int?>(
+                    @"SELECT TOP 1 TestId FROM TestsTakings WHERE UserId = @UserId ORDER BY TakingDate DESC",
+                    new { UserId = userId });
+           
+                viewModel.LastTakenTest = lastTakenTest;
+                viewModel.CreatedTests = (await connection.QueryAsync<int>(
+                    "SELECT Id FROM Tests WHERE AuthorId = @UserId",
+                    new { UserId = userId })).ToList();
+
+                return viewModel;
+            }
+        }
     }
 }

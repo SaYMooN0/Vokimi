@@ -1,6 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Formatters;
-using System;
 using Vokimi.Models.DataBaseClasses;
 using Vokimi.Models.ViewModels;
 using VokimiServices;
@@ -43,7 +41,7 @@ namespace Vokimi.Controllers
             }
             if (model.IsValid())
             {
-                User user = new User(model.Nickname,model.Email,model.Password, DateTime.FromOADate(model.BirthDate.DayNumber));
+                User user = new User(model.Nickname,model.Email,model.Password, model.BirthDate);
                 int id = await _dataBase.AddUser(user);
                 _logger.Runtime($"User with params {model} and id={id} has registered successfully");
                 _logger.Info($"New user with params {model} and id={id} registered");
@@ -58,6 +56,19 @@ namespace Vokimi.Controllers
         public IActionResult MyAccount()
         {
             return View();
+        }
+        public IActionResult UserNotFound()
+        {
+            return View();
+        }
+        async public Task<IActionResult> UserProfile(int? id)
+        {
+            if (id is null || id<0)
+                return RedirectToAction("UserNotFound");
+            UserProfileViewModel? viewModel = await _dataBase.GetUserInfo((int)id);
+            if (viewModel == null)
+                return RedirectToAction("UserNotFound");
+            return View(viewModel);
         }
     }
 }

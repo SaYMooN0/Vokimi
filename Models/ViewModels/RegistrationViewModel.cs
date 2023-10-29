@@ -61,8 +61,7 @@ namespace Vokimi.Models.ViewModels
                 ErrorMessage = "Passwords don't match";
                 return false;
             }
-            var userDateTime = BirthDate.ToDateTime(TimeOnly.FromDateTime(DateTime.Now));
-            if (userDateTime > DateTime.Now || userDateTime.Year < 1900)
+            if (BirthDate.ToDateTime(TimeOnly.FromDateTime(DateTime.Now)) > DateTime.Now || BirthDate.Year < 1900)
             {
                 ErrorMessage = "Incorrect date of birth";
                 return false;
