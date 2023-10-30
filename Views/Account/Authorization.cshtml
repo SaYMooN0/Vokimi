@@ -1,4 +1,23 @@
-﻿
+﻿@model AuthorizationViewModel
+
 <h1>authorization page</h1>
+<form asp-action="Authorization" asp-controller="Account" method="post">
+    <div class="form-group">
+        <label asp-for="Email">Email</label>
+        <input asp-for="Email" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Password">Password</label>
+        <input asp-for="Password" class="form-control"/>
+    </div>
+    @{
+        if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <p class="text-danger">@Model.ErrorMessage</p>
+        }
+    }
+    <button type="submit" class="btn btn-primary">Login</button>
+</form>
 <p>Don`t have an account?</p>
 <a asp-action="Registration">Go to the registration page</a>

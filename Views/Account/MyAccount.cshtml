@@ -9,7 +9,7 @@
 </p>
 @if (Model.CreatedTests is null || Model.CreatedTests.Count == 0)
 {
-    <p>You have has not created any test yet</p>
+    <p>You have not created any test yet</p>
 }
 else
 {
@@ -51,3 +51,29 @@ else
 {
     <p>You have not pin any test yet</p>
 }
+<button onclick="logOut()">Log out</button>
+<script>
+    function logOut() {
+        fetch('/account/LogOut', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else if (response.status === 401) {
+                    throw new Error('Unauthorized');
+                } else {
+                    throw new Error('Failed to log out');
+                }
+            })
+            .then(data => {
+                window.location.href = "/account/Authorization";
+            })
+            .catch(error => {
+                alert('Error:', error.message);
+            });
+    }
+</script>

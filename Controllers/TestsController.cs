@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Vokimi.Models.Static;
 
 namespace Vokimi.Controllers
 {
@@ -10,6 +11,9 @@ namespace Vokimi.Controllers
         }
         public IActionResult NewTest()
         {
+            int id = HttpContext.GetUserIdFromIdentity();
+            if (id == -1)
+                return RedirectToAction("Authorization","Account");
             return View();
         }
     }

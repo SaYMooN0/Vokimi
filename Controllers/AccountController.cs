@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using Vokimi.Models.Static;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Vokimi.Models.DataBaseClasses;
 using Vokimi.Models.ViewModels;
 using VokimiServices;
+using Microsoft.AspNetCore.Authentication;
 
 namespace Vokimi.Controllers
 {
@@ -17,10 +18,30 @@ namespace Vokimi.Controllers
             _dataBase = dataBase;
             _logger = logger;
         }
-
+        [HttpGet]
         public IActionResult Authorization()
         {
-            return View();
+            if (HttpContext.GetUserIdFromIdentity() != -1)
+                return RedirectToAction("MyAccount");
+            return View(new AuthorizationViewModel());
+        }
+        [HttpPost]
+        async public Task<IActionResult> Authorization(AuthorizationViewModel model)
+        {
+            if (!await _dataBase.AnyUserWithSuchEmail(model.Email))
+            {
+                model.ErrorMessage = "Unregistered email";
+                return View(model);
+            }
+
+            User? user=await _dataBase.GetUserByEmailAndPasswordAsync(model.Email, model.Password);
+            if(user==null)
+            {
+                model.ErrorMessage = "Invalid password";
+                return View(model);
+            }
+            await TrySetAuthorizationCookiesAsync(user);
+            return RedirectToAction("Catalog","Tests");
         }
         [HttpGet]
         public IActionResult Registration()
@@ -57,7 +78,7 @@ namespace Vokimi.Controllers
         }
         async public Task<IActionResult> MyAccount()
         {
-            int userId = GetUserIdFromIdentity();
+            int userId = HttpContext.GetUserIdFromIdentity();
             if (userId == -1) return RedirectToAction("Authorization");
             MyAccountViewModel? viewModel = await _dataBase.GetMyAccountInfo(userId);
             return View(viewModel);
@@ -75,11 +96,24 @@ namespace Vokimi.Controllers
                 return RedirectToAction("UserNotFound");
             return View(viewModel);
         }
-        private async Task<bool> TrySetAuthorithationCookiesAsync(string email, string password)
+        [HttpPost]
+        async public Task<IActionResult> LogOut()
+        {
+            int userId = HttpContext.GetUserIdFromIdentity();
+            if (userId == -1)
+                return Unauthorized(new { message = "Unauthorized" });
+            await HttpContext.SignOutAsync(); 
+            return Ok(new { message = "Logged out successfully" });
+        }
+        private async Task<bool> TrySetAuthorizationCookiesAsync(string email, string password)
         {
             User? user = await _dataBase.GetUserByEmailAndPasswordAsync(email, password);
             if (user == null)
                 return false;
+            return await TrySetAuthorizationCookiesAsync(user);
+        }
+        private async Task<bool> TrySetAuthorizationCookiesAsync(User user)
+        {
             ClaimsIdentity identity = new ClaimsIdentity(new[]
                 {
                 new Claim("email", user.Email),
@@ -91,17 +125,6 @@ namespace Vokimi.Controllers
             var principal = new ClaimsPrincipal(identity);
             await HttpContext.SignInAsync(principal);
             return true;
-        }
-        private int GetUserIdFromIdentity()
-        {
-            var identity = HttpContext.User.Identities.FirstOrDefault(i => i.Claims.Any(c => c.Type == "userId"));
-            if (identity != null)
-            {
-                var claim = identity.Claims.FirstOrDefault(c => c.Type == "userId");
-                if (claim != null && Int32.TryParse(claim.Value, out int userId))
-                    return userId;
-            }
-            return -1;
         }
     }
 }

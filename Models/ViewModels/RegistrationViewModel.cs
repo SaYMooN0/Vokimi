@@ -1,5 +1,4 @@
-﻿using Sprache;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 
 namespace Vokimi.Models.ViewModels
@@ -15,23 +14,21 @@ namespace Vokimi.Models.ViewModels
             ConfirmPassword = string.Empty;
             ErrorMessage = string.Empty;
         }
-
-        [Required]
         public string Nickname { get; set; }
-        [Required]
+
         [DataType(DataType.Date)]
         public DateOnly BirthDate { get; set; }
 
-        [Required]
         [EmailAddress]
         public string Email { get; set; }
 
-        [Required]
         [DataType(DataType.Password)]
         public string Password { get; set; }
 
+
         [DataType(DataType.Password)]
         public string ConfirmPassword { get; set; }
+
         public string? ErrorMessage { get; set; }
         public bool IsValid()
         {
