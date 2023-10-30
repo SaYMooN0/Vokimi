@@ -1,3 +1,53 @@
-﻿<h1>MyAccount page</h1>
-@{
+﻿@model MyAccountViewModel
+
+<p>Id: @Model.Id</p>
+<p>Nickname: @Model.Nickname</p>
+<p>Email: @Model.Email</p>
+<p>
+    Status: @Model.Status
+    <button>edit</button>
+</p>
+@if (Model.CreatedTests is null || Model.CreatedTests.Count == 0)
+{
+    <p>You have has not created any test yet</p>
+}
+else
+{
+    <p>You created this tests</p>
+    foreach (int id in Model.CreatedTests)
+    {
+        <p>@id</p>
+    }
+}
+@if (Model.TakenTests != null && Model.TakenTests.Count > 0)
+{
+    <p>You have taken this tests</p>
+    @foreach (int id in Model.TakenTests)
+    {
+        <p>@id</p>
+    }
+    if (Model.RatedTests != null && Model.RatedTests.Count > 0)
+    {
+        <p>You have rated this tests</p>
+        @foreach (int id in Model.RatedTests)
+        {
+            <p>@id</p>
+        }
+    }
+}
+else
+{
+    <p>You have not taken any test yet</p>
+}
+@if (Model.PinnedTests != null && Model.PinnedTests.Count > 0)
+{
+    <p>You have pinned this tests</p>
+    @foreach (int id in Model.PinnedTests)
+    {
+        <p>@id</p>
+    }
+}
+else
+{
+    <p>You have not pin any test yet</p>
 }

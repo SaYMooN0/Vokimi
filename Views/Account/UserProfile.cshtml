@@ -10,12 +10,12 @@
 else
 {
     <p>Tests created by this user</p>
-    foreach(int id in Model.CreatedTests)
+    foreach (int id in Model.CreatedTests)
     {
         <p>@id</p>
     }
 }
-@if(Model.LastTakenTest !is null)
+@if (Model.LastTakenTest != null)
 {
     <p>Last taken test by this user: @Model.LastTakenTest</p>
 }

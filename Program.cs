@@ -2,6 +2,7 @@ using Vokimi.Services.Classes;
 using DotNetEnv;
 using Dapper;
 using Vokimi.Models;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 internal class Program
 {
@@ -24,6 +25,11 @@ internal class Program
         }
         DataBase _db = new DataBase(databaseConnectionString);
         builder.Services.AddSingleton<VokimiServices.IDataBase, DataBase>(provider => _db);
+
+        builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+        .AddCookie(options => { options.LoginPath = new PathString("/Account/Authorization"); });
+
+        builder.Services.AddSession(options => options.IdleTimeout = TimeSpan.FromDays(14));
 
         var app = builder.Build();
 
