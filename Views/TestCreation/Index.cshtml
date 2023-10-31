@@ -1,0 +1,36 @@
+﻿@model TestCreationData
+<h1>New test</h1>
+
+
+<form asp-action="SaveTestCreationInfo" asp-controller="TestCreation" method="post">
+
+    <div class="form-group">
+        <label for="TestName">Test Name:</label>
+        <input type="text" id="TestName" asp-for="TestName" class="form-control" required />
+    </div>
+
+    <div class="form-group">
+        <label for="Description">Description:</label>
+        <textarea id="Description" asp-for="Description" class="form-control"></textarea>
+    </div>
+
+    <div class="form-group">
+        <label for="AgeRestriction">Age Restriction:</label>
+        <select id="AgeRestriction" asp-for="AgeRestriction" asp-items="Html.GetEnumSelectList<AgeRestriction>()" class="form-control"></select>
+    </div>
+
+    <div class="form-group">
+        <label for="Language">Language:</label>
+        <select id="Language" asp-for="Language" asp-items="Html.GetEnumSelectList<Language>()" class="form-control"></select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+    <button type="button" class="btn btn-primary" onclick="goToQuestions()">Go to questions</button>
+
+</form>
+<script>
+    function goToQuestions()
+    {
+        console.log("goToQuestions");
+    }
+</script>

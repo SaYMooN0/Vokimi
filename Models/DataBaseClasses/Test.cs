@@ -4,6 +4,7 @@
     {
         public int Id { get; private set; }
         public string Name { get; private set; }
+        public string? ImagePath { get; private set; }
         public string? Description { get; private set; }
         public int AuthorId { get; private set; }
         public AgeRestriction AgeRestriction { get; private set; }

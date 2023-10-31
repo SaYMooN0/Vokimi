@@ -7,7 +7,7 @@
     }
     public enum Language
     {
-        nil = 0,
+        Unset = 0,
         ENG = 1,
         RUS = 2,
         SPA = 3,

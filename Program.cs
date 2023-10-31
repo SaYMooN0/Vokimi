@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 
 internal class Program
 {
-    private static async Task Main(string[] args)
+    private static void Main(string[] args)
     {
         SqlMapper.AddTypeHandler(new DateTypesHandler());
         var builder = WebApplication.CreateBuilder(args);
@@ -35,16 +35,19 @@ internal class Program
 
         if (!app.Environment.IsDevelopment())
         {
+            app.UseDeveloperExceptionPage();
             app.UseExceptionHandler("/Home/Error");
             app.UseHsts();
         }
 
         app.UseHttpsRedirection();
+
         app.UseStaticFiles();
-
+        app.UseSession();
         app.UseRouting();
-
+        app.UseAuthentication();
         app.UseAuthorization();
+
 
         app.MapControllerRoute(
             name: "default",
