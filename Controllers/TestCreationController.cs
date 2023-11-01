@@ -17,30 +17,42 @@ namespace Vokimi.Controllers
             return View(TestCreationData);
         }
         [HttpPost]
-        public IActionResult SaveTestCreationInfo(TestCreationData newData)
+        public IActionResult Index(TestCreationData newData)
         {
             int userId = HttpContext.GetUserIdFromIdentity();
             if (userId == -1)
                 return Unauthorized(new { message = "Make sure you are logged in to your account" });
 
-            if (TestCreationData == null) TestCreationData = new();
+            var currentData = TestCreationData;
 
-            TestCreationData.TestName = newData.TestName ?? TestCreationData.TestName;
-            TestCreationData.Description = newData.Description ?? TestCreationData.Description;
-            TestCreationData.AgeRestriction = newData.AgeRestriction;
-            TestCreationData.Language = newData.Language;
+            currentData.TestName = newData.TestName;
+            currentData.Description = newData.Description;
+            currentData.AgeRestriction = newData.AgeRestriction;
+            currentData.Language = newData.Language;
 
-            return Ok(new { message = "Success" });
+            TestCreationData = currentData;
+
+            return View(TestCreationData);
         }
-        [HttpPost]
-        public IActionResult Questions() { return View(QuestionsInSession); }
-        [HttpPost]
-        public IActionResult SaveQuestions(List<Question> questions)
+        [HttpGet]
+        public IActionResult Questions()
         {
-            QuestionsInSession = questions;
+            int userId = HttpContext.GetUserIdFromIdentity();
+            if (userId == -1)
+                return RedirectToAction("Authorization", "Account");
+            return View(QuestionsInSession);
+        }
+        [HttpPost("QuestionsSave")]
+        //public IActionResult Questions(List<Question> questions)
+        //{
+        //    QuestionsInSession = questions;
+        //    return Ok(new { message = "Success" });
+        //}
+        public IActionResult Questions(List<object> value)
+        {
+           
             return Ok(new { message = "Success" });
         }
-
         [HttpPost]
         public IActionResult Results() { return View(ResultsInSession); }
 

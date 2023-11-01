@@ -2,7 +2,7 @@
 <h1>New test</h1>
 
 
-<form asp-action="SaveTestCreationInfo" asp-controller="TestCreation" method="post">
+<form asp-action="Index" asp-controller="TestCreation" method="post" id="testForm">
 
     <div class="form-group">
         <label for="TestName">Test Name:</label>
@@ -29,8 +29,22 @@
 
 </form>
 <script>
-    function goToQuestions()
-    {
-        console.log("goToQuestions");
+    async function goToQuestions() {
+        const formData = new FormData(document.getElementById('testForm'));
+
+        try {
+            const response = await fetch('/TestCreation/Index', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'RequestVerificationToken': getAntiForgeryToken()
+                }
+            });
+
+            if (response.ok) { window.location.href = '/TestCreation/Questions'; }
+            else { alert('Error saving form:', response.status, response.statusText); }
+        }
+        catch (error) { console.error('Error:', error); }
     }
+    function getAntiForgeryToken() { return document.querySelector('input[name="__RequestVerificationToken"]').value; }
 </script>

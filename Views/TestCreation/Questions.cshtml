@@ -1,0 +1,81 @@
+﻿@model List<Question>
+<h1>Questions page</h1>
+
+<form asp-action="Questions" asp-controller="TestCreation" method="post" id="questionsForm">
+    <div id="questionsContainer">
+        @foreach (Question q in Model)
+        {
+            <div class="questionBlock">
+                <label>Question text:</label>
+                <input type="text" class="form-control" name="[@Model.IndexOf(q)].Text" required value="@q.Text" />
+                <div class="answers-container">
+                    @foreach (KeyValuePair<string, int> answ in q.AnswerOptions)
+                    {
+                        <p>
+                            Answer:
+                            <input type="text" name="[@Model.IndexOf(q)].AnswerOptions[@q.AnswerOptions.ToList().IndexOf(answ)].Key" value="@answ.Key" />
+                            -
+                            Points
+                            <input type="number" name="[@Model.IndexOf(q)].AnswerOptions[@q.AnswerOptions.ToList().IndexOf(answ)].Value" value="@answ.Value">
+                        </p>
+                    }
+                    <button type="button" onclick="addNewAnswer(this)">Add Answer</button>
+                </div>
+            </div>
+        }
+    </div>
+    <button type="button" onclick="addQuestion()">Add Question</button>
+    <button type="submit">Save</button>
+</form>
+<script>
+    function addQuestion() {
+        const questionsContainer = document.getElementById('questionsContainer');
+        const questionIndex = questionsContainer.children.length;
+
+        const questionBlock = document.createElement('div');
+        questionBlock.classList.add('questionBlock');
+
+        const questionLabel = document.createElement('label');
+        questionLabel.textContent = "Question text:";
+        questionBlock.appendChild(questionLabel);
+
+        const questionInput = document.createElement('input');
+        questionInput.setAttribute('type', 'text');
+        questionInput.setAttribute('class', 'form-control');
+        questionInput.setAttribute('name', `[${questionIndex}].Text`);
+        questionInput.setAttribute('required', '');
+        questionBlock.appendChild(questionInput);
+
+        const answersContainer = document.createElement('div');
+        answersContainer.classList.add('answersContainer');
+
+        const addAnswerButton = document.createElement('button');
+        addAnswerButton.setAttribute('type', 'button');
+        addAnswerButton.textContent = "Add Answer";
+        addAnswerButton.onclick = function () { addNewAnswer(addAnswerButton) };
+        answersContainer.appendChild(addAnswerButton);
+
+        questionBlock.appendChild(answersContainer);
+        questionsContainer.appendChild(questionBlock);
+    }
+
+    function addNewAnswer(element) {
+        const answersContainer = element.parentElement;
+        const answerIndex = answersContainer.children.length - 1;
+        const answerHtml = `
+            <p>
+                Answer:
+                <input type="text" name="AnswerOptions[${answerIndex}].Key" value=""/>
+                -
+                Points:
+                <input type="number" name="AnswerOptions[${answerIndex}].Value" value="">
+            </p>
+        `;
+
+        const div = document.createElement('div');
+        div.innerHTML = answerHtml.trim();
+        answersContainer.insertBefore(div.firstChild, answersContainer.lastChild);
+    }
+
+
+</script>
