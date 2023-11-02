@@ -5,7 +5,7 @@ namespace Vokimi.Controllers
 {
     public class TestsController : Controller
     {
-        public IActionResult Catalog()
+        public IActionResult Index()
         {
             return View();
         }

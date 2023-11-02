@@ -42,18 +42,15 @@ namespace Vokimi.Controllers
                 return RedirectToAction("Authorization", "Account");
             return View(QuestionsInSession);
         }
-        [HttpPost("QuestionsSave")]
         //public IActionResult Questions(List<Question> questions)
         //{
         //    QuestionsInSession = questions;
         //    return Ok(new { message = "Success" });
         //}
-        public IActionResult Questions(List<object> value)
-        {
-           
-            return Ok(new { message = "Success" });
-        }
         [HttpPost]
+        public IActionResult SaveQuestions(IFormCollection value) { return Ok(new { message = "Success" }); }
+
+        [HttpGet]
         public IActionResult Results() { return View(ResultsInSession); }
 
         [HttpPost]

@@ -1,4 +1,30 @@
 ﻿
-Results
-@{
-}
+<h1>Results</h1>
+<form asp-action="SaveResults" asp-controller="TestCreation" method="post" id="resultsForm">
+  
+    <button type="submit" class="btn btn-primary">Save</button>
+    <button type="button" class="btn btn-primary" onclick="goToMain()">Go to main</button>
+    <button type="button" class="btn btn-primary" onclick="goToQuestions()">Go to questions</button>
+</form>
+<script>
+    async function sendFormDataAndRedirect(redirectUrl) {
+        const formData = new FormData(document.getElementById('resultsForm'));
+
+        try {
+            const response = await fetch('/TestCreation/SaveResults', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'RequestVerificationToken': getAntiForgeryToken()
+                }
+            });
+
+            if (response.ok) { window.location.href = redirectUrl; }
+            else { alert('Error saving form:', response.status, response.statusText); }
+        }
+        catch (error) { console.error('Error:', error); }
+    }
+    function goToQuestions() { sendFormDataAndRedirect('/TestCreation/Questions'); }
+    function goToMain() { window.location.href = '/TestCreation'; }
+    function getAntiForgeryToken() { return document.querySelector('input[name="__RequestVerificationToken"]').value; }
+</script>
