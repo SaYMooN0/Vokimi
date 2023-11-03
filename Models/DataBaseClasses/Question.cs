@@ -5,7 +5,7 @@ namespace Vokimi.Models.DataBaseClasses
 {
     public class Question
     {
-        public uint Id { get; private set; }
+        public int Id { get; private set; }
         public string ImagePath { get; private set; }
         public string Text { get; private set; }
         private string answerOptionString { get; set; }
@@ -14,6 +14,11 @@ namespace Vokimi.Models.DataBaseClasses
         {
             get { return string.IsNullOrEmpty(answerOptionString) ? new() : JsonConvert.DeserializeObject<Dictionary<string, int>>(answerOptionString); }
             set { answerOptionString = JsonConvert.SerializeObject(value); }
+        }
+        public Question(string text, Dictionary<string, int> answerOptions)
+        {
+            Text = text;
+            AnswerOptions = answerOptions;
         }
     }
 }

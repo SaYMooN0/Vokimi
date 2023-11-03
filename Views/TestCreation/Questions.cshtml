@@ -1,29 +1,37 @@
-﻿@model List<Question>
+﻿@model TestCreationQuestionsViewModel
 <h1>Questions page</h1>
 
-<form asp-action="SaveQuestions" asp-controller="TestCreation" method="post" id="questionsForm">
+<form asp-action="Questions" asp-controller="TestCreation" method="post" id="questionsForm">
     <div id="questionsContainer">
-        @foreach (Question q in Model)
+        @for (int i = 0; i < Model.Questions.Count; i++)
         {
             <div class="questionBlock">
                 <label>Question text:</label>
-                <input type="text" class="form-control" name="[@Model.IndexOf(q)].Text" required value="@q.Text" />
-                <div class="answers-container">
-                    @foreach (KeyValuePair<string, int> answ in q.AnswerOptions)
+                <input type="text" class="form-control" name="Questions[@i].Text" required value="@Model.Questions[i].Text" />
+
+                <div class="answersContainer">
+                    @{
+                        var answerOptions = Model.Questions[i].AnswerOptions.ToList();
+                    }
+                    @for (int j = 0; j < answerOptions.Count; j++)
                     {
                         <p>
                             Answer:
-                            <input type="text" name="[@Model.IndexOf(q)].AnswerOptions[@q.AnswerOptions.ToList().IndexOf(answ)].Key" value="@answ.Key" />
+                            <input type="text" name="Questions[@i].AnswerOptions[@j].Key" value="@answerOptions[j].Key" required />
                             -
-                            Points
-                            <input type="number" name="[@Model.IndexOf(q)].AnswerOptions[@q.AnswerOptions.ToList().IndexOf(answ)].Value" value="@answ.Value">
+                            Points:
+                            <input type="number" name="Questions[@i].AnswerOptions[@j].Value" value="@answerOptions[j].Value" required min="-90" max="90">
                         </p>
                     }
-                    <button type="button" onclick="addNewAnswer(this)">Add Answer</button>
+                    <button type="button" onclick="addNewAnswer(this, @i)">Add Answer</button>
                 </div>
             </div>
         }
     </div>
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <p class="text-danger">@Model.ErrorMessage</p>
+    }
     <button type="button" onclick="addQuestion()">Add Question</button>
     <button type="submit" class="btn btn-primary">Save</button>
     <button type="button" class="btn btn-primary" onclick="goToMain()">Go to main</button>
@@ -44,7 +52,7 @@
         const questionInput = document.createElement('input');
         questionInput.setAttribute('type', 'text');
         questionInput.setAttribute('class', 'form-control');
-        questionInput.setAttribute('name', `[${questionIndex}].Text`);
+        questionInput.setAttribute('name', `Questions[${questionIndex}].Text`);
         questionInput.setAttribute('required', '');
         questionBlock.appendChild(questionInput);
 
@@ -54,35 +62,34 @@
         const addAnswerButton = document.createElement('button');
         addAnswerButton.setAttribute('type', 'button');
         addAnswerButton.textContent = "Add Answer";
-        addAnswerButton.onclick = function () { addNewAnswer(addAnswerButton) };
+        addAnswerButton.onclick = function () { addNewAnswer(addAnswerButton, questionIndex) };
         answersContainer.appendChild(addAnswerButton);
 
         questionBlock.appendChild(answersContainer);
         questionsContainer.appendChild(questionBlock);
     }
 
-    function addNewAnswer(element) {
+    function addNewAnswer(element, questionIndex) {
         const answersContainer = element.parentElement;
         const answerIndex = answersContainer.children.length - 1;
-        const answerHtml = `
-            <p>
-                Answer:
-                <input type="text" name="AnswerOptions[${answerIndex}].Key" value=""/>
-                -
-                Points:
-                <input type="number" name="AnswerOptions[${answerIndex}].Value" value="">
-            </p>
-        `;
 
+        const answerHtml = `
+                <p>
+                    Answer: <input type="text" name="Questions[${questionIndex}].AnswerOptions[${answerIndex}].Key" value="" required/>
+                    -
+                    Points:  <input type="number" name="Questions[${questionIndex}].AnswerOptions[${answerIndex}].Value" value="" required min="-90" max="90">
+                </p>
+            `;
         const div = document.createElement('div');
         div.innerHTML = answerHtml.trim();
         answersContainer.insertBefore(div.firstChild, answersContainer.lastChild);
     }
+
     async function sendFormDataAndRedirect(redirectUrl) {
         const formData = new FormData(document.getElementById('questionsForm'));
 
         try {
-            const response = await fetch('/TestCreation/SaveQuestions', {
+            const response = await fetch('/TestCreation/Questions', {
                 method: 'POST',
                 body: formData,
                 headers: {

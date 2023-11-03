@@ -41,7 +41,7 @@ namespace Vokimi.Controllers
                 return View(model);
             }
             await TrySetAuthorizationCookiesAsync(user);
-            return RedirectToAction("Catalog","Tests");
+            return RedirectToAction("Index","Tests");
         }
         [HttpGet]
         public IActionResult Registration()
