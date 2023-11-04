@@ -87,13 +87,15 @@ namespace Vokimi.Controllers
             return View(questionsDataViewModel);
         }
         [HttpGet]
-        public IActionResult Results() { return View(ResultsInSession); }
+        public IActionResult Results()
+        {
+            return View(new TestCreationResultsViewModel());
+        }
 
         [HttpPost]
-        public IActionResult SaveResults(List<Result> results)
+        public IActionResult Results(TestCreationResultsViewModel res)
         {
-            ResultsInSession = results;
-            return Ok(new { message = "Success" });
+            return View(new TestCreationResultsViewModel());
         }
         private TestCreationData TestCreationData
         {
@@ -104,14 +106,15 @@ namespace Vokimi.Controllers
         }
         private List<Question> QuestionsInSession
         {
-            get { 
+            get
+            {
                 return TestCreationData?.Questions ?? new List<Question>();
             }
             set
             {
                 TestCreationData newData = TestCreationData ?? new();
                 newData.Questions = value;
-                TestCreationData=newData;
+                TestCreationData = newData;
             }
         }
         private List<Result> ResultsInSession
