@@ -15,12 +15,13 @@
                     }
                     @for (int j = 0; j < answerOptions.Count; j++)
                     {
-                        <p>
+                        <p class="answerBlock">
                             Answer:
                             <input type="text" name="Questions[@i].AnswerOptions[@j].Key" value="@answerOptions[j].Key" required />
                             -
                             Points:
                             <input type="number" name="Questions[@i].AnswerOptions[@j].Value" value="@answerOptions[j].Value" required min="-90" max="90">
+                            <button type="button" onclick="deleteAnswer(this)">Delete</button>
                         </p>
                     }
                     <button type="button" onclick="addNewAnswer(this, @i)">Add Answer</button>
@@ -42,68 +43,72 @@
         const questionsContainer = document.getElementById('questionsContainer');
         const questionIndex = questionsContainer.children.length;
 
-        const questionBlock = document.createElement('div');
-        questionBlock.classList.add('questionBlock');
+        const htmlContent = `
+                <div class="questionBlock">
+                  <label>Question text:</label>
+                  <input type="text" class="form-control" name="Questions[${questionIndex}].Text" required>
+                  <div class="answersContainer">
+                    <button type="button" onclick="addNewAnswer(this, ${questionIndex})">Add Answer</button>
+                  </div>
+                </div>
+              `;
 
-        const questionLabel = document.createElement('label');
-        questionLabel.textContent = "Question text:";
-        questionBlock.appendChild(questionLabel);
-
-        const questionInput = document.createElement('input');
-        questionInput.setAttribute('type', 'text');
-        questionInput.setAttribute('class', 'form-control');
-        questionInput.setAttribute('name', `Questions[${questionIndex}].Text`);
-        questionInput.setAttribute('required', '');
-        questionBlock.appendChild(questionInput);
-
-        const answersContainer = document.createElement('div');
-        answersContainer.classList.add('answersContainer');
-
-        const addAnswerButton = document.createElement('button');
-        addAnswerButton.setAttribute('type', 'button');
-        addAnswerButton.textContent = "Add Answer";
-        addAnswerButton.onclick = function () { addNewAnswer(addAnswerButton, questionIndex) };
-        answersContainer.appendChild(addAnswerButton);
-
-        questionBlock.appendChild(answersContainer);
-        questionsContainer.appendChild(questionBlock);
+        questionsContainer.insertAdjacentHTML('beforeend', htmlContent);
     }
-
-    function addNewAnswer(element, questionIndex) {
-        const answersContainer = element.parentElement;
+    function addNewAnswer(buttonElement, questionIndex) {
+        const answersContainer = buttonElement.parentElement;
         const answerIndex = answersContainer.children.length - 1;
-
         const answerHtml = `
-                <p>
+                <p class="answerBlock">
                     Answer: <input type="text" name="Questions[${questionIndex}].AnswerOptions[${answerIndex}].Key" value="" required/>
                     -
-                    Points:  <input type="number" name="Questions[${questionIndex}].AnswerOptions[${answerIndex}].Value" value="" required min="-90" max="90">
+                    Points: <input type="number" name="Questions[${questionIndex}].AnswerOptions[${answerIndex}].Value" value="" required min="-90" max="90">
+                    <button type="button" onclick="deleteAnswer(this)">Delete</button>
                 </p>
             `;
-        const div = document.createElement('div');
-        div.innerHTML = answerHtml.trim();
-        answersContainer.insertBefore(div.firstChild, answersContainer.lastChild);
+        buttonElement.insertAdjacentHTML('beforebegin', answerHtml);
+    }
+    function deleteAnswer(deleteButton) {
+        const questionsContainer = document.getElementById('questionsContainer');
+        const answerBlock = deleteButton.closest('.answerBlock');
+        const questionBlock = deleteButton.closest('.questionBlock');
+        const questionIndex = Array.from(questionsContainer.children).indexOf(questionBlock);
+        answerBlock.remove();
+        updateAnswerIndexes(questionBlock, questionIndex);
     }
 
-    async function sendFormDataAndRedirect(redirectUrl) {
-        const formData = new FormData(document.getElementById('questionsForm'));
+    function updateAnswerIndexes(questionBlock, questionIndex) {
+        const answerBlocks = questionBlock.querySelectorAll('.answerBlock');
+        answerBlocks.forEach((block, answerIndex) => {
+            const inputKey = block.querySelector('input[type="text"]');
+            const inputValue = block.querySelector('input[type="number"]');
 
-        try {
-            const response = await fetch('/TestCreation/Questions', {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'RequestVerificationToken': getAntiForgeryToken()
-                }
-            });
+            if (inputKey) {
+                inputKey.name = `Questions[${questionIndex}].AnswerOptions[${answerIndex}].Key`;
+            }
 
-            if (response.ok) { window.location.href = redirectUrl; }
-            else { alert('Error saving form:', response.status, response.statusText); }
-        }
-        catch (error) { console.error('Error:', error); }
+            if (inputValue) {
+                inputValue.name = `Questions[${questionIndex}].AnswerOptions[${answerIndex}].Value`;
+            }
+        });
     }
-    function goToResults() { sendFormDataAndRedirect('/TestCreation/Results'); }
+
+    function updateAllIndexes() {
+        const questionsContainer = document.getElementById('questionsContainer');
+        const questionBlocks = questionsContainer.querySelectorAll('.questionBlock');
+
+        questionBlocks.forEach((questionBlock, questionIndex) => {
+            const inputText = questionBlock.querySelector('input[type="text"].form-control');
+            const answersContainer = questionBlock.querySelector('.answersContainer');
+
+            if (inputText) {
+                inputText.name = `Questions[${questionIndex}].Text`;
+            }
+
+            updateAnswerIndexes(answersContainer, questionIndex);
+        });
+    }
+    function goToResults() { window.location.href = '/TestCreation/Results' }
     function goToMain() { window.location.href = '/TestCreation'; }
-    function getAntiForgeryToken() { return document.querySelector('input[name="__RequestVerificationToken"]').value; }
 
 </script>

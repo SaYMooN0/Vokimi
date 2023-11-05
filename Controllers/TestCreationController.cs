@@ -89,13 +89,24 @@ namespace Vokimi.Controllers
         [HttpGet]
         public IActionResult Results()
         {
-            return View(new TestCreationResultsViewModel());
+            int minPoints= CalculateMinimumPointsForQuestions(),
+                maxPoints= CalculateMaximumPointsForQuestions();
+
+            var vm = new TestCreationResultsViewModel(
+                maxPoints,
+                minPoints,
+                ResultsInSession);
+
+            if (minPoints == maxPoints)
+                vm.ErrorMessage = "Please create questions first";
+
+            return View(vm);
         }
 
         [HttpPost]
-        public IActionResult Results(TestCreationResultsViewModel res)
+        public IActionResult Results(TestCreationResultsViewModel? res)
         {
-            return View(new TestCreationResultsViewModel());
+            return View(res);
         }
         private TestCreationData TestCreationData
         {
@@ -127,6 +138,26 @@ namespace Vokimi.Controllers
                 TestCreationData = newData;
             }
         }
+        private int CalculateMinimumPointsForQuestions()
+        {
+            int minPoints = 0;
+            foreach (var question in QuestionsInSession)
+            {
+                minPoints += question.AnswerOptions.Values.Min();
+            }
+            return minPoints;
+        }
+
+        private int CalculateMaximumPointsForQuestions()
+        {
+            int maxPoints = 0;
+            foreach (var question in QuestionsInSession)
+            {
+                maxPoints += question.AnswerOptions.Values.Max();
+            }
+            return maxPoints;
+        }
+
 
     }
 

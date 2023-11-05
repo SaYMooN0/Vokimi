@@ -1,40 +1,47 @@
 ﻿@model TestCreationResultsViewModel
+
 <form asp-action="Results" asp-controller="TestCreation" method="post" id="resultsForm">
+
     <h3>The minimum number of points available to receive: @Model.MinAvailablePoints</h3>
     <h3>The minimum number of points available to receive: @Model.MaxAvailablePoints</h3>
 
     <input type="hidden" value="@Model.MinAvailablePoints" name="MinAvailablePoints">
     <input type="hidden" value="@Model.MaxAvailablePoints" name="MaxAvailablePoints">
+    
     @if (!string.IsNullOrEmpty(Model.ErrorMessage))
     {
         <p class="text-danger">@Model.ErrorMessage</p>
     }
-    <div id="result-items-container">
+    @if (Model.MaxAvailablePoints != Model.MinAvailablePoints)
+    {
+        <div id="result-items-container">
 
-        @for (int i = 0; i < Model.ResultItems.Count; i++)
-        {
-            <div class="resultItem">
-                <p class="main-text" value="New result">Main text:</p>
-                <input type="text" name="ResultItems[@i].MainText" required value="@Model.ResultItems[i].MainText" />
-                <p>
-                <p>
-                    From: <input type="number" name="ResultItems[@i].From" value="@Model.ResultItems[i].From" required />
-                    To: <input type="number" name="ResultItems[@i].To" value="@Model.ResultItems[i].To" required />
-                </p>
-                <p>Description:</p>
-                <p> <input class="answer-description-input" name="ResultItems[@i].Description" value="@Model.ResultItems[i].Description" /></p>
-                <button type="button" class="delete-button">Delete</button>
-                <!-- <button class="load-image-button">Load image</button> -->
-            </div>
-        }
-    </div>
-    <p>
-        <button type="button" class="btn btn-primary">Add new result</button>
-    </p>
-    <button type="submit" class="btn btn-primary">Save</button>
+            @for (int i = 0; i < Model.ResultItems.Count; i++)
+            {
+                <div class="resultItem">
+                    <p class="main-text" value="New result">Main text:</p>
+                    <input type="text" name="ResultItems[@i].MainText" required value="@Model.ResultItems[i].MainText" />
+                    <p>
+                    <p>
+                        From: <input type="number" name="ResultItems[@i].From" value="@Model.ResultItems[i].From" required />
+                        To: <input type="number" name="ResultItems[@i].To" value="@Model.ResultItems[i].To" required />
+                    </p>
+                    <p>Description:</p>
+                    <p> <input class="answer-description-input" name="ResultItems[@i].Description" value="@Model.ResultItems[i].Description" /></p>
+                    <button type="button" class="delete-button">Delete</button>
+                    <!-- <button class="load-image-button">Load image</button> -->
+                </div>
+            }
+        </div>
+        <p>
+            <button type="button" class="btn btn-primary">Add new result</button>
+        </p>
+        <button type="submit" class="btn btn-primary">Save</button>
+    }
     <button type="button" class="btn btn-primary" onclick="goToMain()">Go to main</button>
     <button type="button" class="btn btn-primary" onclick="goToQuestions()">Go to questions</button>
 </form>
+
 <script>
     document.querySelector('.btn.btn-primary').addEventListener('click', function () {
         const resultsContainer = document.getElementById('result-items-container');
@@ -54,27 +61,8 @@
 
         resultsContainer.insertAdjacentHTML('beforeend', resultItemHtml);
     });
-
-    async function sendFormDataAndRedirect(redirectUrl) {
-        const formData = new FormData(document.getElementById('resultsForm'));
-
-        try {
-            const response = await fetch('/TestCreation/Results', {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'RequestVerificationToken': getAntiForgeryToken()
-                }
-            });
-
-            if (response.ok) { window.location.href = redirectUrl; }
-            else { alert('Error saving form:', response.status, response.statusText); }
-        }
-        catch (error) { console.error('Error:', error); }
-    }
-    function goToQuestions() { sendFormDataAndRedirect('/TestCreation/Questions'); }
+    function goToQuestions() { window.location.href = '/TestCreation/Questions' }
     function goToMain() { window.location.href = '/TestCreation'; }
-    function getAntiForgeryToken() { return document.querySelector('input[name="__RequestVerificationToken"]').value; }
 
 
 </script>

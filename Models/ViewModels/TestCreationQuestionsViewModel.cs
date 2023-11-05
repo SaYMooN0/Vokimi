@@ -11,7 +11,8 @@ namespace Vokimi.Models.ViewModels
             TestCreationQuestionsViewModel _vm = new();
             foreach (Question q in questions)
             {
-                _vm.Questions.Add(new QuestionData { Text = q.Text, AnswerOptions = q.AnswerOptions });
+                if (q != null)
+                    _vm.Questions.Add(new QuestionData { Text = q.Text, AnswerOptions = q.AnswerOptions });
             }
             return _vm;
         }
