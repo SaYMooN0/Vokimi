@@ -47,50 +47,26 @@ namespace Vokimi.Controllers
         [HttpPost]
         public IActionResult Questions(TestCreationQuestionsViewModel questionsDataViewModel)
         {
-            List<Question> _newQuestions = new List<Question>();
-            questionsDataViewModel.ErrorMessage = String.Empty;
-            foreach (QuestionData question in questionsDataViewModel.Questions)
+            questionsDataViewModel.ErrorMessage = QuestionsValidationString(questionsDataViewModel);
+
+            if (!string.IsNullOrEmpty(questionsDataViewModel.ErrorMessage))
             {
-                if (string.IsNullOrEmpty(question.Text) || question.Text.Length < 5 || question.Text.Length > 250)
-                {
-                    questionsDataViewModel.ErrorMessage =
-                        "Error: Failed to save questions. The length of question cannot be less than 5 or more than 250 characters. " +
-                        $"The length of the question number {questionsDataViewModel.Questions.IndexOf(question) + 1} is {question.Text?.Length ?? 0} characters";
-                    return View(questionsDataViewModel);
-                }
-                if (question.AnswerOptions.Count < 2 || question.AnswerOptions.Count > 15)
-                {
-                    questionsDataViewModel.ErrorMessage =
-                        "Error: Failed to save questions. The number of answers to one question cannot be less than 2 or more than 15. " +
-                        $"Question number {questionsDataViewModel.Questions.IndexOf(question) + 1} has {question.AnswerOptions.Count} answer options";
-                    return View(questionsDataViewModel);
-                }
-                foreach (var answerOption in question.AnswerOptions)
-                {
-                    if (string.IsNullOrEmpty(answerOption.Key) || answerOption.Key.Length < 1 || answerOption.Key.Length > 220)
-                    {
-                        questionsDataViewModel.ErrorMessage =
-                            "Error: Failed to save questions. The length of answer cannot be less than 1 or more than 220 characters. " +
-                            $"The length of one of the answer for the question number {questionsDataViewModel.Questions.IndexOf(question) + 1} is {answerOption.Key?.Length ?? 0} characters";
-                        return View(questionsDataViewModel);
-                    }
-                    if (answerOption.Value > 90 || answerOption.Value < -90)
-                    {
-                        questionsDataViewModel.ErrorMessage =
-                            "Error: Failed to save questions. The number of points that can be obtained for the answer can not be less than -90 and more than 90";
-                        return View(questionsDataViewModel);
-                    }
-                }
-                _newQuestions.Add(new(question.Text, question.AnswerOptions));
+                return View(questionsDataViewModel);
             }
+
+            List<Question> _newQuestions = questionsDataViewModel.Questions
+                .Select(q => new Question(q.Text, q.AnswerOptions))
+                .ToList();
+
             QuestionsInSession = _newQuestions;
+
             return View(questionsDataViewModel);
         }
         [HttpGet]
         public IActionResult Results()
         {
-            int minPoints= CalculateMinimumPointsForQuestions(),
-                maxPoints= CalculateMaximumPointsForQuestions();
+            int minPoints = CalculateMinimumPointsForQuestions(),
+                maxPoints = CalculateMaximumPointsForQuestions();
 
             var vm = new TestCreationResultsViewModel(
                 maxPoints,
@@ -106,8 +82,22 @@ namespace Vokimi.Controllers
         [HttpPost]
         public IActionResult Results(TestCreationResultsViewModel? res)
         {
+            if (res == null)
+                return Results();
+
+            res.ErrorMessage = ResultsValidationString(res.ResultItems);
+
+            if (!string.IsNullOrEmpty(res.ErrorMessage))
+                return View(res);
+            List<Result> _newResults = new();
+            foreach (var item in res.ResultItems)
+            {
+                _newResults.Add(new(item.MainText, item.Description, item.From, item.To));
+            }
+            ResultsInSession = _newResults;
             return View(res);
         }
+
         private TestCreationData TestCreationData
         {
             get => HttpContext.Session.GetString("_viewModel") is string jsonData
@@ -157,7 +147,78 @@ namespace Vokimi.Controllers
             }
             return maxPoints;
         }
+        private string ResultsValidationString(List<ResultData> resultItems)
+        {
+            if (resultItems.Count < 2)
+                return "There cannot be less than 2 results for the test.";
+            if (resultItems == null || !resultItems.Any())
+                return "No results to validate.";
+            int minPoints = CalculateMinimumPointsForQuestions(),
+               maxPoints = CalculateMaximumPointsForQuestions();
+            if (resultItems.Any(r => r.From < minPoints))
+                return "The value of \"From\" cannot be less than the minimum number of points that can be obtained for answering questions.";
 
+            if (resultItems.Any(r => r.To > maxPoints))
+                return "The value of \"To\" cannot be greater than the maximum number of points that can be obtained for answering questions.";
+
+            foreach (var result in resultItems)
+            {
+                if (result.From >= result.To)
+                {
+                    return "The value of \"From\" must be less than the value of \"To\" for each result.";
+                }
+            }
+
+            var sortedResults = resultItems.OrderBy(r => r.From).ToList();
+            int previousTo = minPoints - 1;
+
+            foreach (var result in sortedResults)
+            {
+                if (result.From <= previousTo)
+                {
+                    return "The ranges of results cannot overlap.";
+                }
+                if (result.From > previousTo + 1)
+                {
+                    return "There should be no gaps between the ranges of results.";
+                }
+                previousTo = result.To;
+            }
+
+            if (previousTo < maxPoints)
+                return "There should be no gaps between the last range and the maximum points possible.";
+
+            return string.Empty;
+        }
+        private string QuestionsValidationString(TestCreationQuestionsViewModel questionsDataViewModel)
+        {
+            foreach (QuestionData question in questionsDataViewModel.Questions)
+            {
+                if (string.IsNullOrEmpty(question.Text) || question.Text.Length < 5 || question.Text.Length > 250)
+                {
+                    return $"Error: Failed to save questions. The length of question cannot be less than 5 or more than 250 characters. " +
+                           $"The length of the question number {questionsDataViewModel.Questions.IndexOf(question) + 1} is {question.Text?.Length ?? 0} characters.";
+                }
+                if (question.AnswerOptions.Count < 2 || question.AnswerOptions.Count > 15)
+                {
+                    return $"Error: Failed to save questions. The number of answers to one question cannot be less than 2 or more than 15. " +
+                           $"Question number {questionsDataViewModel.Questions.IndexOf(question) + 1} has {question.AnswerOptions.Count} answer options.";
+                }
+                foreach (var answerOption in question.AnswerOptions)
+                {
+                    if (string.IsNullOrEmpty(answerOption.Key) || answerOption.Key.Length < 1 || answerOption.Key.Length > 220)
+                    {
+                        return $"Error: Failed to save questions. The length of answer cannot be less than 1 or more than 220 characters. " +
+                               $"The length of one of the answer for the question number {questionsDataViewModel.Questions.IndexOf(question) + 1} is {answerOption.Key?.Length ?? 0} characters.";
+                    }
+                    if (answerOption.Value > 90 || answerOption.Value < -90)
+                    {
+                        return "Error: Failed to save questions. The number of points that can be obtained for the answer cannot be less than -90 and more than 90.";
+                    }
+                }
+            }
+            return string.Empty;
+        }
 
     }
 

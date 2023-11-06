@@ -15,10 +15,13 @@ namespace Vokimi.Models.DataBaseClasses
             get { return string.IsNullOrEmpty(answerOptionString) ? new() : JsonConvert.DeserializeObject<Dictionary<string, int>>(answerOptionString); }
             set { answerOptionString = JsonConvert.SerializeObject(value); }
         }
+        [JsonConstructor]
         public Question(string text, Dictionary<string, int> answerOptions)
         {
             Text = text;
             AnswerOptions = answerOptions;
         }
+
+        public Question(){}
     }
 }

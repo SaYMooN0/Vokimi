@@ -19,10 +19,16 @@ namespace Vokimi.Models.ViewModels
                     ResultItems.Add(new ResultData(r.Text, r.GapMin, r.GapMax, r.Description));
             }
         }
+
+        public TestCreationResultsViewModel()
+        {
+        }
     }
 
     public class ResultData
     {
+        public ResultData(){ }
+
         public ResultData(string mainText, int from, int to, string? description)
         {
             MainText = mainText;

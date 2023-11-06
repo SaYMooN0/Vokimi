@@ -29,29 +29,55 @@
             </div>
         }
     </div>
-    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    @if (string.IsNullOrEmpty(Model.ErrorMessage))
     {
-        <p class="text-danger">@Model.ErrorMessage</p>
+        Model.ErrorMessage = "";
     }
+    <p class="text-danger" id="error-message">@Model.ErrorMessage</p>
     <button type="button" onclick="addQuestion()">Add Question</button>
     <button type="submit" class="btn btn-primary">Save</button>
     <button type="button" class="btn btn-primary" onclick="goToMain()">Go to main</button>
     <button type="button" class="btn btn-primary" onclick="goToResults()">Go to results</button>
 </form>
 <script>
+    document.getElementById('questionsForm').onsubmit = function (event) {
+        var questionBlocks = document.querySelectorAll('.questionBlock');
+        var error = false;
+        var errorMessage = "";
+
+        questionBlocks.forEach(function (block, index) {
+            var answers = block.querySelectorAll('.answerBlock input[type="text"]');
+            var answerTexts = new Set();
+
+            answers.forEach(function (answer) {
+                var text = answer.value.trim();
+                if (answerTexts.has(text)) {
+                    error = true;
+                    errorMessage = "Duplicate answers detected in question " + (index + 1) + ".";
+                }
+                answerTexts.add(text);
+            });
+        });
+
+        if (error) {
+            event.preventDefault();
+            document.getElementById("error-message").innerText = errorMessage;
+            return false;
+        }
+    };
     function addQuestion() {
         const questionsContainer = document.getElementById('questionsContainer');
         const questionIndex = questionsContainer.children.length;
 
         const htmlContent = `
-                <div class="questionBlock">
-                  <label>Question text:</label>
-                  <input type="text" class="form-control" name="Questions[${questionIndex}].Text" required>
-                  <div class="answersContainer">
-                    <button type="button" onclick="addNewAnswer(this, ${questionIndex})">Add Answer</button>
-                  </div>
-                </div>
-              `;
+                    <div class="questionBlock">
+                      <label>Question text:</label>
+                      <input type="text" class="form-control" name="Questions[${questionIndex}].Text" required>
+                      <div class="answersContainer">
+                        <button type="button" onclick="addNewAnswer(this, ${questionIndex})">Add Answer</button>
+                      </div>
+                    </div>
+                  `;
 
         questionsContainer.insertAdjacentHTML('beforeend', htmlContent);
     }
@@ -59,13 +85,13 @@
         const answersContainer = buttonElement.parentElement;
         const answerIndex = answersContainer.children.length - 1;
         const answerHtml = `
-                <p class="answerBlock">
-                    Answer: <input type="text" name="Questions[${questionIndex}].AnswerOptions[${answerIndex}].Key" value="" required/>
-                    -
-                    Points: <input type="number" name="Questions[${questionIndex}].AnswerOptions[${answerIndex}].Value" value="" required min="-90" max="90">
-                    <button type="button" onclick="deleteAnswer(this)">Delete</button>
-                </p>
-            `;
+                    <p class="answerBlock">
+                        Answer: <input type="text" name="Questions[${questionIndex}].AnswerOptions[${answerIndex}].Key" value="" required/>
+                        -
+                        Points: <input type="number" name="Questions[${questionIndex}].AnswerOptions[${answerIndex}].Value" value="" required min="-90" max="90">
+                        <button type="button" onclick="deleteAnswer(this)">Delete</button>
+                    </p>
+                `;
         buttonElement.insertAdjacentHTML('beforebegin', answerHtml);
     }
     function deleteAnswer(deleteButton) {
