@@ -1,6 +1,6 @@
 ﻿using Dapper;
 using System.Data.SqlClient;
-using System.Security.Claims;
+using Vokimi.Models;
 using Vokimi.Models.DataBaseClasses;
 using Vokimi.Models.ViewModels;
 
@@ -97,7 +97,77 @@ namespace Vokimi.Services.Classes
                 return await connection.QuerySingleOrDefaultAsync<User>(userSelectString, new { Email = email, Password = password });
             }
         }
+        public Task<int> AddNewTest(TestCreationData testCreationData)
+        {
+            throw new NotImplementedException();
+        }
 
+        public async Task<int> AddNewResult(Result result)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var query = @"
+INSERT INTO Results (Text, Description, ImagePath, GapMin, GapMax) 
+VALUES (@Text, @Description, @ImagePath, @GapMin, @GapMax);
+
+SELECT CAST(SCOPE_IDENTITY() as int);";
+
+                var parameters = new
+                {
+                    result.Text,
+                    result.Description,
+                    result.ImagePath,
+                    result.GapMin,
+                    result.GapMax
+                };
+
+                int insertedId = await connection.QuerySingleAsync<int>(query, parameters);
+                return insertedId;
+            }
+        }
+        public async Task<int> AddNewQuestion(Question question)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var query = @"
+INSERT INTO Questions (ImagePath, AnswerOptionString, Text) 
+VALUES (@ImagePath, @AnswerOptionString, @Text);
+
+SELECT CAST(SCOPE_IDENTITY() as int);";
+
+                var parameters = new
+                {
+                    question.ImagePath,
+                    AnswerOptionString = question.answerOptionString,
+                    question.Text
+                };
+
+                int insertedId = await connection.QuerySingleAsync<int>(query, parameters);
+                return insertedId;
+            }
+        }
+
+
+        public async Task<int> AddNewTag(int testId, TestTag tag)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var query = @"
+INSERT INTO TestTags (TestId, Tag) 
+VALUES (@TestId, @Tag);
+
+SELECT CAST(SCOPE_IDENTITY() as int);";
+
+                var parameters = new
+                {
+                    TestId = testId,
+                    Tag = (int)tag
+                };
+
+                int insertedId = await connection.QuerySingleAsync<int>(query, parameters);
+                return insertedId;
+            }
+        }
 
     }
 }

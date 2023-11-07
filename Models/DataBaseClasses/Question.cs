@@ -8,7 +8,7 @@ namespace Vokimi.Models.DataBaseClasses
         public int Id { get; private set; }
         public string ImagePath { get; private set; }
         public string Text { get; private set; }
-        private string answerOptionString { get; set; }
+        public string answerOptionString { get; private set; }
         [NotMapped]
         public Dictionary<string, int> AnswerOptions
         {

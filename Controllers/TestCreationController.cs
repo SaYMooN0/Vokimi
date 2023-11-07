@@ -4,11 +4,19 @@ using Vokimi.Models;
 using Vokimi.Models.DataBaseClasses;
 using Vokimi.Models.Static;
 using Vokimi.Models.ViewModels;
+using VokimiServices;
 
 namespace Vokimi.Controllers
 {
     public class TestCreationController : Controller
     {
+        private IDataBase _dataBase;
+        private VokimiServices.ILogger _logger;
+        public TestCreationController(IDataBase dataBase, VokimiServices.ILogger logger)
+        {
+            _dataBase = dataBase;
+            _logger = logger;
+        }
         [HttpGet]
         public IActionResult Index()
         {
@@ -50,9 +58,7 @@ namespace Vokimi.Controllers
             questionsDataViewModel.ErrorMessage = QuestionsValidationString(questionsDataViewModel);
 
             if (!string.IsNullOrEmpty(questionsDataViewModel.ErrorMessage))
-            {
                 return View(questionsDataViewModel);
-            }
 
             List<Question> _newQuestions = questionsDataViewModel.Questions
                 .Select(q => new Question(q.Text, q.AnswerOptions))
@@ -97,6 +103,23 @@ namespace Vokimi.Controllers
             ResultsInSession = _newResults;
             return View(res);
         }
+        [HttpPost]
+        public IActionResult FinishCreation()
+        {
+            int userId = HttpContext.GetUserIdFromIdentity();
+            if (userId == -1)
+                return RedirectToAction("Authorization", "Account");
+
+            if (string.IsNullOrEmpty(TestCreationData.TestName))
+                return BadRequest("Please fill in the main information about the test.");
+            if(QuestionsInSession is null || QuestionsInSession.Count<1)
+                return BadRequest("Please create questions for the test.");
+            if (ResultsInSession is null || ResultsInSession.Count < 1)
+                return BadRequest("Please create results for the test.");
+
+            //_dataBase.AddNewTest();
+            return Ok();
+        }
 
         private TestCreationData TestCreationData
         {
@@ -108,9 +131,7 @@ namespace Vokimi.Controllers
         private List<Question> QuestionsInSession
         {
             get
-            {
-                return TestCreationData?.Questions ?? new List<Question>();
-            }
+            { return TestCreationData?.Questions ?? new List<Question>(); }
             set
             {
                 TestCreationData newData = TestCreationData ?? new();
@@ -137,7 +158,6 @@ namespace Vokimi.Controllers
             }
             return minPoints;
         }
-
         private int CalculateMaximumPointsForQuestions()
         {
             int maxPoints = 0;
@@ -164,9 +184,7 @@ namespace Vokimi.Controllers
             foreach (var result in resultItems)
             {
                 if (result.From >= result.To)
-                {
                     return "The value of \"From\" must be less than the value of \"To\" for each result.";
-                }
             }
 
             var sortedResults = resultItems.OrderBy(r => r.From).ToList();
@@ -175,13 +193,9 @@ namespace Vokimi.Controllers
             foreach (var result in sortedResults)
             {
                 if (result.From <= previousTo)
-                {
                     return "The ranges of results cannot overlap.";
-                }
                 if (result.From > previousTo + 1)
-                {
                     return "There should be no gaps between the ranges of results.";
-                }
                 previousTo = result.To;
             }
 
@@ -195,31 +209,26 @@ namespace Vokimi.Controllers
             foreach (QuestionData question in questionsDataViewModel.Questions)
             {
                 if (string.IsNullOrEmpty(question.Text) || question.Text.Length < 5 || question.Text.Length > 250)
-                {
                     return $"Error: Failed to save questions. The length of question cannot be less than 5 or more than 250 characters. " +
                            $"The length of the question number {questionsDataViewModel.Questions.IndexOf(question) + 1} is {question.Text?.Length ?? 0} characters.";
-                }
+                
                 if (question.AnswerOptions.Count < 2 || question.AnswerOptions.Count > 15)
-                {
                     return $"Error: Failed to save questions. The number of answers to one question cannot be less than 2 or more than 15. " +
                            $"Question number {questionsDataViewModel.Questions.IndexOf(question) + 1} has {question.AnswerOptions.Count} answer options.";
-                }
+                
                 foreach (var answerOption in question.AnswerOptions)
                 {
                     if (string.IsNullOrEmpty(answerOption.Key) || answerOption.Key.Length < 1 || answerOption.Key.Length > 220)
-                    {
                         return $"Error: Failed to save questions. The length of answer cannot be less than 1 or more than 220 characters. " +
                                $"The length of one of the answer for the question number {questionsDataViewModel.Questions.IndexOf(question) + 1} is {answerOption.Key?.Length ?? 0} characters.";
-                    }
+                    
                     if (answerOption.Value > 90 || answerOption.Value < -90)
-                    {
                         return "Error: Failed to save questions. The number of points that can be obtained for the answer cannot be less than -90 and more than 90.";
-                    }
+                    
                 }
             }
             return string.Empty;
         }
-
     }
 
 }

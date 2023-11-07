@@ -7,7 +7,7 @@
 
     <input type="hidden" value="@Model.MinAvailablePoints" name="MinAvailablePoints">
     <input type="hidden" value="@Model.MaxAvailablePoints" name="MaxAvailablePoints">
-    
+
     @if (!string.IsNullOrEmpty(Model.ErrorMessage))
     {
         <p class="text-danger">@Model.ErrorMessage</p>
@@ -37,27 +37,48 @@
             <button type="button" class="btn btn-primary">Add new result</button>
         </p>
         <button type="submit" class="btn btn-primary">Save</button>
+
     }
     <button type="button" class="btn btn-primary" onclick="goToMain()">Go to main</button>
     <button type="button" class="btn btn-primary" onclick="goToQuestions()">Go to questions</button>
+    <button type="button" class="btn btn-primary" onclick="finishCreation()">Finish creation</button>
 </form>
 
 <script>
+    function finishCreation() {
+        fetch('/testcreation/finishcreation', {
+            method: 'POST'
+        })
+            .then(response => {
+                if (!response.ok) {
+                    // Если сервер вернул HTTP статус ошибки, получаем текст ошибки
+                    return response.text().then(text => { throw new Error(text) });
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert(Ok);
+            })
+            .catch((error) => {
+                alert(error.message);
+            });
+    }
+
     document.querySelector('.btn.btn-primary').addEventListener('click', function () {
         const resultsContainer = document.getElementById('result-items-container');
         const resultIndex = resultsContainer.children.length;
 
         const resultItemHtml = `
-            <div class="resultItem">
-                <p class="main-text">Main text:</p>
-                    <input type="text" name="ResultItems[${resultIndex}].MainText" required />
-                    <p>From: <input type="number" name="ResultItems[${resultIndex}].From" required /></p>
-                    <p>To: <input type="number" name="ResultItems[${resultIndex}].To" required /></p>
-                <p>Description:</p>
-                    <input class="answer-description-input" name="ResultItems[${resultIndex}].Description" />
-                <button type="button" class="delete-button">Delete</button>
-            </div>
-        `;
+                    <div class="resultItem">
+                        <p class="main-text">Main text:</p>
+                            <input type="text" name="ResultItems[${resultIndex}].MainText" required />
+                            <p>From: <input type="number" name="ResultItems[${resultIndex}].From" required /></p>
+                            <p>To: <input type="number" name="ResultItems[${resultIndex}].To" required /></p>
+                        <p>Description:</p>
+                            <input class="answer-description-input" name="ResultItems[${resultIndex}].Description" />
+                        <button type="button" class="delete-button">Delete</button>
+                    </div>
+                `;
 
         resultsContainer.insertAdjacentHTML('beforeend', resultItemHtml);
     });
