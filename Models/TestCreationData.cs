@@ -10,6 +10,6 @@ namespace Vokimi.Models
         public Language Language { get; set; } = Language.Unset;
         public List<Question> Questions { get; set; } = new();
         public List<Result> Results { get; set; } = new();
-        public HashSet<TestTag> Tag= new();
+        public HashSet<TestTag> Tags= new();
     }
 }

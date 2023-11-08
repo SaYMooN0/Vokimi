@@ -65,7 +65,7 @@ namespace Vokimi.Controllers
             if (model.IsValid())
             {
                 User user = new User(model.Nickname, model.Email, model.Password, model.BirthDate);
-                int id = await _dataBase.AddUser(user);
+                int id = await _dataBase.AddNewUser(user);
                 _logger.Runtime($"User with params {model} and id={id} has registered successfully");
                 _logger.Info($"New user with params {model} and id={id} registered");
                 return RedirectToAction("SuccessfulRegistration");
