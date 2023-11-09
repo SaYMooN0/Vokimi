@@ -1,6 +1,7 @@
-﻿using Vokimi.Models;
+﻿using System.Data.SqlClient;
+using Vokimi.Models;
 using Vokimi.Models.DataBaseClasses;
-using Vokimi.Models.ViewModels;
+using Vokimi.Models.ViewModels.Account;
 
 namespace VokimiServices
 {
@@ -19,6 +20,7 @@ namespace VokimiServices
         public Task<UserProfileViewModel?> GetUserInfo(int id);
         public Task<MyAccountViewModel?> GetMyAccountInfo(int userId);
         public Task<User?> GetUserByEmailAndPasswordAsync(string email, string password);
+        public Task<Test?> GetTestByIdAsync(int testId);
 
 
     }

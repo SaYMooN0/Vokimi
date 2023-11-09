@@ -1,4 +1,4 @@
-﻿namespace Vokimi.Models.ViewModels
+﻿namespace Vokimi.Models.ViewModels.Account
 {
     public class MyAccountViewModel : UserProfileViewModel
     {

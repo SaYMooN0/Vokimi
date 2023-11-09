@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 using Vokimi.Models;
 using Vokimi.Models.DataBaseClasses;
 using Vokimi.Models.Static;
-using Vokimi.Models.ViewModels;
+using Vokimi.Models.ViewModels.TestCreation;
 using VokimiServices;
 
 namespace Vokimi.Controllers
@@ -104,7 +104,7 @@ namespace Vokimi.Controllers
             return View(res);
         }
         [HttpPost]
-        public IActionResult FinishCreation()
+        async public Task<IActionResult> FinishCreation()
         {
             int userId = HttpContext.GetUserIdFromIdentity();
             if (userId == -1)
@@ -117,10 +117,9 @@ namespace Vokimi.Controllers
             if (ResultsInSession is null || ResultsInSession.Count < 1)
                 return BadRequest("Please create results for the test.");
 
-            //_dataBase.AddNewTest();
-            return Ok();
+            int testId=await _dataBase.CreateNewTest(TestCreationData, userId);
+            return RedirectToAction("Test","Tests", testId);
         }
-
         private TestCreationData TestCreationData
         {
             get => HttpContext.Session.GetString("_viewModel") is string jsonData

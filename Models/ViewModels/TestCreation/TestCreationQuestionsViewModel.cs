@@ -1,6 +1,6 @@
 ﻿using Vokimi.Models.DataBaseClasses;
 
-namespace Vokimi.Models.ViewModels
+namespace Vokimi.Models.ViewModels.TestCreation
 {
     public class TestCreationQuestionsViewModel
     {

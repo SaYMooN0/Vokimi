@@ -1,8 +1,8 @@
-﻿namespace Vokimi.Models.ViewModels
+﻿namespace Vokimi.Models.ViewModels.Account
 {
     public class UserProfileViewModel
     {
-        public int Id { get; set; } 
+        public int Id { get; set; }
         public string Nickname { get; set; }
         public string? Status { get; set; }
         public int? LastTakenTest { get; set; }
@@ -11,7 +11,7 @@
         {
             Id = id;
             Nickname = nickname;
-            Status = status==null ? "" : status;
+            Status = status == null ? "" : status;
         }
     }
 }

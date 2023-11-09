@@ -2,7 +2,7 @@
 using System.Data.SqlClient;
 using Vokimi.Models;
 using Vokimi.Models.DataBaseClasses;
-using Vokimi.Models.ViewModels;
+using Vokimi.Models.ViewModels.Account;
 
 namespace Vokimi.Services.Classes
 {
@@ -128,9 +128,9 @@ SELECT CAST(SCOPE_IDENTITY() as int);";
             Test newTest =
                 new Test(testCreationData.TestName, null, testCreationData.Description, authorId, testCreationData.AgeRestriction, testCreationData.Language, testCreationData.Tags);
             int testId = await AddNewTest(newTest);
-            int[] resultsId = (await AddNewResults(testCreationData.Results, testId)).ToArray();
-            int[] questionsId = (await AddNewQuestions(testCreationData.Questions, testId)).ToArray();
-            int[] tagsId = (await AddTagsForTest(testCreationData.Tags, testId)).ToArray();
+            await AddNewResults(testCreationData.Results, testId);
+            await AddNewQuestions(testCreationData.Questions, testId);
+            await AddTagsForTest(testCreationData.Tags, testId);
             return testId;
         }
 
@@ -272,7 +272,15 @@ SELECT CAST(SCOPE_IDENTITY() as int);";
             }
             return ids;
         }
-
+        public async Task<Test?> GetTestByIdAsync(int testId)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var query = "SELECT * FROM Tests WHERE Id = @TestId";
+                Test? test = await connection.QuerySingleOrDefaultAsync<Test>(query, new { TestId = testId });
+                return test;
+            }
+        }
 
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 
-namespace Vokimi.Models.ViewModels
+namespace Vokimi.Models.ViewModels.Account
 {
     public class RegistrationViewModel
     {

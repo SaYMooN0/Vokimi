@@ -1,6 +1,6 @@
 ﻿using Vokimi.Models.DataBaseClasses;
 
-namespace Vokimi.Models.ViewModels
+namespace Vokimi.Models.ViewModels.TestCreation
 {
     public class TestCreationResultsViewModel
     {
@@ -13,9 +13,9 @@ namespace Vokimi.Models.ViewModels
             MaxAvailablePoints = maxAvailablePoints;
             MinAvailablePoints = minAvailablePoints;
             ResultItems = new();
-            foreach(Result r in resultItems)
+            foreach (Result r in resultItems)
             {
-                if(r!=null)
+                if (r != null)
                     ResultItems.Add(new ResultData(r.Text, r.GapMin, r.GapMax, r.Description));
             }
         }
@@ -27,7 +27,7 @@ namespace Vokimi.Models.ViewModels
 
     public class ResultData
     {
-        public ResultData(){ }
+        public ResultData() { }
 
         public ResultData(string mainText, int from, int to, string? description)
         {

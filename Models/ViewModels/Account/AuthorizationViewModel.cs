@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Vokimi.Models.ViewModels
+namespace Vokimi.Models.ViewModels.Account
 {
     public class AuthorizationViewModel
     {

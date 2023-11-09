@@ -2,9 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Vokimi.Models.DataBaseClasses;
-using Vokimi.Models.ViewModels;
 using VokimiServices;
 using Microsoft.AspNetCore.Authentication;
+using Vokimi.Models.ViewModels.Account;
 
 namespace Vokimi.Controllers
 {
