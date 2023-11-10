@@ -109,16 +109,15 @@ namespace Vokimi.Controllers
             int userId = HttpContext.GetUserIdFromIdentity();
             if (userId == -1)
                 return RedirectToAction("Authorization", "Account");
-
             if (string.IsNullOrEmpty(TestCreationData.TestName))
                 return BadRequest("Please fill in the main information about the test.");
-            if(QuestionsInSession is null || QuestionsInSession.Count<1)
+            if (QuestionsInSession is null || QuestionsInSession.Count < 1)
                 return BadRequest("Please create questions for the test.");
             if (ResultsInSession is null || ResultsInSession.Count < 1)
                 return BadRequest("Please create results for the test.");
 
-            int testId=await _dataBase.CreateNewTest(TestCreationData, userId);
-            return RedirectToAction("Test","Tests", testId);
+            int testId = await _dataBase.CreateNewTest(TestCreationData, userId);
+            return Ok(testId);
         }
         private TestCreationData TestCreationData
         {

@@ -3,6 +3,7 @@ using System.Data.SqlClient;
 using Vokimi.Models;
 using Vokimi.Models.DataBaseClasses;
 using Vokimi.Models.ViewModels.Account;
+using Vokimi.Models.ViewModels.Tests;
 
 namespace Vokimi.Services.Classes
 {
@@ -133,7 +134,6 @@ SELECT CAST(SCOPE_IDENTITY() as int);";
             await AddTagsForTest(testCreationData.Tags, testId);
             return testId;
         }
-
         public async Task<int> AddNewResult(Result result, int testId)
         {
             using (var connection = new SqlConnection(_connectionString))
@@ -158,7 +158,6 @@ SELECT CAST(SCOPE_IDENTITY() as int);";
                 return insertedId;
             }
         }
-
         public async Task<int> AddNewQuestion(Question question, int testId)
         {
             using (var connection = new SqlConnection(_connectionString))
@@ -181,9 +180,6 @@ SELECT CAST(SCOPE_IDENTITY() as int);";
                 return insertedId;
             }
         }
-
-
-
         public async Task<int> AddTagForTest(TestTag tag, int testId)
         {
             using (var connection = new SqlConnection(_connectionString))
@@ -204,7 +200,6 @@ SELECT CAST(SCOPE_IDENTITY() as int);";
                 return insertedId;
             }
         }
-
         public async Task<IEnumerable<int>> AddNewResults(IEnumerable<Result> results, int testId)
         {
             var tasks = results.Select(async result =>
@@ -276,11 +271,42 @@ SELECT CAST(SCOPE_IDENTITY() as int);";
         {
             using (var connection = new SqlConnection(_connectionString))
             {
-                var query = "SELECT * FROM Tests WHERE Id = @TestId";
-                Test? test = await connection.QuerySingleOrDefaultAsync<Test>(query, new { TestId = testId });
+                var testQuery = "SELECT * FROM Tests WHERE Id = @TestId";
+                var test = await connection.QuerySingleOrDefaultAsync<Test>(testQuery, new { TestId = testId });
+
+                if (test != null)
+                {
+                    var tagsQuery = "SELECT Tag FROM TestTags WHERE TestId = @TestId";
+                    var tags = await connection.QueryAsync<int>(tagsQuery, new { TestId = testId });
+                    test.Tags = new HashSet<TestTag>(tags.Select(tag => (TestTag)tag));
+
+                    var commentsQuery = "SELECT * FROM Comments WHERE TestId = @TestId";
+                    var comments = await connection.QueryAsync<Comment>(commentsQuery, new { TestId = testId });
+                    test.Comments = comments.ToList();
+
+                    var takingsQuery = "SELECT * FROM TestsTakings WHERE TestId = @TestId";
+                    var takings = await connection.QueryAsync<TestsTaking>(takingsQuery, new { TestId = testId });
+                    test.Takings = takings.ToList();
+
+                    var ratingsQuery = "SELECT * FROM TestsRatings WHERE TestId = @TestId";
+                    var ratings = await connection.QueryAsync<TestsRating>(ratingsQuery, new { TestId = testId });
+                    test.Ratings = ratings.ToList();
+
+                    var questionsQuery = "SELECT * FROM Questions WHERE TestId = @TestId";
+                    var questions = await connection.QueryAsync<Question>(questionsQuery, new { TestId = testId });
+                    test.Questions = questions.ToList();
+
+                    var resultsQuery = "SELECT * FROM Results WHERE TestId = @TestId";
+                    var results = await connection.QueryAsync<Result>(resultsQuery, new { TestId = testId });
+                    test.Results = results.ToList();
+                }
+
                 return test;
             }
         }
-
+        public Task<List<TestMainInfo>> GetAllTestsMainInfoAsync()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

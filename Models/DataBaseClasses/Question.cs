@@ -23,6 +23,13 @@ namespace Vokimi.Models.DataBaseClasses
             AnswerOptions = answerOptions;
         }
 
-        public Question(){}
+        public Question(int id, string imagePath, string answerOptionString, string text, int testId)
+        {
+            Id = id;
+            TestId = testId;
+            ImagePath = imagePath;
+            Text = text;
+            this.answerOptionString = answerOptionString;
+        }
     }
 }

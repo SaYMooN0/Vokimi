@@ -2,6 +2,7 @@
 using Vokimi.Models;
 using Vokimi.Models.DataBaseClasses;
 using Vokimi.Models.ViewModels.Account;
+using Vokimi.Models.ViewModels.Tests;
 
 namespace VokimiServices
 {
@@ -21,6 +22,7 @@ namespace VokimiServices
         public Task<MyAccountViewModel?> GetMyAccountInfo(int userId);
         public Task<User?> GetUserByEmailAndPasswordAsync(string email, string password);
         public Task<Test?> GetTestByIdAsync(int testId);
+        public Task<List<TestMainInfo>> GetAllTestsMainInfoAsync();
 
 
     }

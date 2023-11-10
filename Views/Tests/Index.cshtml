@@ -1,5 +1,26 @@
-﻿
-<h1>Test catalog</h1>
+﻿@model CatalogViewModel
 
+<div class="main-container">
+    @if (Model.Tests.Count > 0)
+    {
+        <div class="test-container">
+            @foreach (TestMainInfo t in Model.Tests)
+            {
+                <a asp-controller="Tests" asp-action="Test" asp-route-id="@t.Id" class="test-info">
+                    <img src="@t.ImagePath" style="width:130px; height:130px;" />
+                    <label>@t.Name</label>
+                </a>
+            }
+        </div>
+
+    }
+    else
+    {
+        <p>We have not found a single test that could satisfy all filters :(</p>
+    }
+</div>
+<div class="filter-container">
+
+</div>
 @{
 }

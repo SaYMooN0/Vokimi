@@ -13,5 +13,12 @@ namespace Vokimi.Models.ViewModels.Tests
         public HashSet<string> Tags { get; set; } = new();
         public Double AverageRating { get; set; }
         public List<Comment> Comments { get; set; } = new();
+        public TestViewModel()
+        {
+        }
+        public TestViewModel(Test test)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

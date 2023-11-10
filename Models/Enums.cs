@@ -33,5 +33,11 @@
         Tag5,
         Tag6,
     }
+    public enum SortType
+    {
+       Date,
+       Name,
+       Author
+    }
 
 }

@@ -15,14 +15,24 @@ namespace Vokimi.Controllers
             _dataBase = dataBase;
             _logger = logger;
         }
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            CatalogViewModel vm = new();
+            //vm.Tests = await _dataBase.GetAllTestsMainInfoAsync();
+            return View(vm);
+        }
+        [HttpPost]
+        public async Task<IActionResult> Index(CatalogViewModel vm)
+        {
+            //vm.Tests = await _dataBase.GetAllTestsMainInfoAsync();
+            vm.FilterTests(); 
+            return View(vm);
         }
         public IActionResult TestNotFound()
         {
             return View();
         }
+        
         async public Task<IActionResult> Test(int? id)
         {
             if (id is null)
