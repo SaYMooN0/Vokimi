@@ -4,6 +4,7 @@ using Vokimi.Models;
 using Vokimi.Models.DataBaseClasses;
 using Vokimi.Models.ViewModels.Account;
 using Vokimi.Models.ViewModels.Tests;
+using VokimiServices;
 
 namespace Vokimi.Services.Classes
 {
@@ -304,9 +305,80 @@ SELECT CAST(SCOPE_IDENTITY() as int);";
                 return test;
             }
         }
-        public Task<List<TestMainInfo>> GetAllTestsMainInfoAsync()
+        public async Task<IEnumerable<TestMainInfo>> GetAllTestsMainInfoAsync()
         {
-            throw new NotImplementedException();
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var query = @"
+SELECT 
+    t.Id, 
+    t.Name, 
+    t.ImagePath,
+    (SELECT COUNT(*) FROM Questions WHERE TestId = t.Id) AS QuestionsCount,
+    (SELECT COUNT(*) FROM Comments WHERE TestId = t.Id) AS CommentsCount,
+    (SELECT COUNT(*) FROM TestsTakings WHERE TestId = t.Id) AS TakingsCount,
+    (SELECT AVG(Rating) FROM TestsRatings WHERE TestId = t.Id) AS AverageRating
+FROM Tests t";
+
+                var testMainInfos = await connection.QueryAsync<TestMainInfo>(query);
+
+                foreach (var testMainInfo in testMainInfos)
+                {
+                    var tags = await GetTagsForTestAsync(testMainInfo.Id);
+                    testMainInfo.Tags = tags.Select(tag => tag.ToString()).ToList();
+                }
+                return testMainInfos;
+            }
+        }
+
+
+        public async Task<IEnumerable<Question>> GetQuestionsForTestAsync(int testId)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var query = "SELECT * FROM Questions WHERE TestId = @TestId";
+                return await connection.QueryAsync<Question>(query, new { TestId = testId });
+            }
+        }
+        public async Task<IEnumerable<Result>> GetResultsForTestAsync(int testId)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var query = "SELECT * FROM Results WHERE TestId = @TestId";
+                return await connection.QueryAsync<Result>(query, new { TestId = testId });
+            }
+        }
+        public async Task<IEnumerable<Comment>> GetCommentsForTestAsync(int testId)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var query = "SELECT * FROM Comments WHERE TestId = @TestId";
+                return await connection.QueryAsync<Comment>(query, new { TestId = testId });
+            }
+        }
+        public async Task<IEnumerable<TestTag>> GetTagsForTestAsync(int testId)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var query = "SELECT Tag FROM TestTags WHERE TestId = @TestId";
+                return await connection.QueryAsync<TestTag>(query, new { TestId = testId });
+            }
+        }
+        public async Task<IEnumerable<TestsTaking>> GetTestsTakingsForTestAsync(int testId)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var query = "SELECT * FROM TestsTakings WHERE TestId = @TestId";
+                return await connection.QueryAsync<TestsTaking>(query, new { TestId = testId });
+            }
+        }
+        public async Task<IEnumerable<TestsRating>> GetTestsRatingsForTestAsync(int testId)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var query = "SELECT * FROM TestsRatings WHERE TestId = @TestId";
+                return await connection.QueryAsync<TestsRating>(query, new { TestId = testId });
+            }
         }
     }
 }

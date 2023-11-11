@@ -16,9 +16,18 @@ namespace Vokimi.Models.ViewModels.Tests
         public TestViewModel()
         {
         }
-        public TestViewModel(Test test)
+        public TestViewModel(Test test, string author)
         {
-            throw new NotImplementedException();
+            Id = test.Id;
+            TestName = test.Name;
+            ImagePath = test.ImagePath ?? "default";
+            Description = test.Description ?? "";
+            Author = author;
+            AuthorId = test.AuthorId;
+            Tags= test.Tags.Select(tag => tag.ToString()).ToHashSet();
+            AverageRating = test.AverageRating();
+            Comments = test.Comments;
         }
+
     }
 }

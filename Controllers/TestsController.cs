@@ -18,13 +18,13 @@ namespace Vokimi.Controllers
         public async Task<IActionResult> Index()
         {
             CatalogViewModel vm = new();
-            //vm.Tests = await _dataBase.GetAllTestsMainInfoAsync();
+            vm.Tests = (await _dataBase.GetAllTestsMainInfoAsync()).ToList();
             return View(vm);
         }
         [HttpPost]
         public async Task<IActionResult> Index(CatalogViewModel vm)
         {
-            //vm.Tests = await _dataBase.GetAllTestsMainInfoAsync();
+            vm.Tests = (await _dataBase.GetAllTestsMainInfoAsync()).ToList();
             vm.FilterTests(); 
             return View(vm);
         }

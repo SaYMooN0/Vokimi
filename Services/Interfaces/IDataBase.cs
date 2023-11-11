@@ -1,8 +1,6 @@
-﻿using System.Data.SqlClient;
-using Vokimi.Models;
+﻿using Vokimi.Models;
 using Vokimi.Models.DataBaseClasses;
 using Vokimi.Models.ViewModels.Account;
-using Vokimi.Models.ViewModels.Tests;
 
 namespace VokimiServices
 {
@@ -22,7 +20,13 @@ namespace VokimiServices
         public Task<MyAccountViewModel?> GetMyAccountInfo(int userId);
         public Task<User?> GetUserByEmailAndPasswordAsync(string email, string password);
         public Task<Test?> GetTestByIdAsync(int testId);
-        public Task<List<TestMainInfo>> GetAllTestsMainInfoAsync();
+        public Task<IEnumerable<TestMainInfo>> GetAllTestsMainInfoAsync();
+        public Task<IEnumerable<Question>> GetQuestionsForTestAsync(int testId);
+        public Task<IEnumerable<Result>> GetResultsForTestAsync(int testId);
+        public Task<IEnumerable<Comment>> GetCommentsForTestAsync(int testId);
+        public Task<IEnumerable<TestTag>> GetTagsForTestAsync(int testId);
+        public Task<IEnumerable<TestsTaking>> GetTestsTakingsForTestAsync(int testId); 
+        public Task<IEnumerable<TestsRating>> GetTestsRatingsForTestAsync(int testId);
 
 
     }

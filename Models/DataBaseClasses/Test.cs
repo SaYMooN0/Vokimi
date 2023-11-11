@@ -43,5 +43,6 @@
             Language = language;
             CreationTime = creationTime;
         }
+        public double AverageRating() =>Ratings.Any() ? Ratings.Average(rating => rating.Rating) : 0.0;
     }
 }
