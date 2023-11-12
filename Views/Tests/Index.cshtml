@@ -1,5 +1,10 @@
 ﻿@model CatalogViewModel
-
+<p class="sort-block" id="sortBlock">
+    <label>Sort Type:</label>
+    <select id="sortType" asp-for="SortType" asp-items="Html.GetEnumSelectList<SortType>()"></select>
+    <label>Sort Ascending:</label>
+    <input id="isSortAscending" asp-for="IsSortAscending" type="checkbox" />
+</p>
 <div class="main-container">
     @if (Model.Tests.Count > 0)
     {
@@ -19,8 +24,72 @@
         <p>We have not found a single test that could satisfy all filters :(</p>
     }
 </div>
-<div class="filter-container">
 
-</div>
-@{
-}
+<form method="post" onsubmit="submitForm">
+    <div>
+        <p>Questions Count</p>
+        <p>
+            From:
+            <input asp-for="Filter.MinQuestionsCount" type="number" />
+            To:
+            <input asp-for="Filter.MaxQuestionsCount" type="number" />
+        </p>
+    </div>
+    <div>
+        <p>Comments Count</p>
+        <p>
+            From:
+            <input asp-for="Filter.MinCommentsCount" type="number" />
+            To:
+            <input asp-for="Filter.MaxCommentsCount" type="number" />
+        </p>
+    </div>
+
+    <div>
+        <p>Passings Count</p>
+        <p>
+            From:
+            <input asp-for="Filter.MinPassingsCount" type="number" />
+            To:
+            <input asp-for="Filter.MaxPassingsCount" type="number" />
+        </p>
+    </div>
+
+    <div>
+        <p>Average Rating</p>
+        <p>
+            From:
+            <input asp-for="Filter.MinAverageRating" type="number" />
+            To:
+            <input asp-for="Filter.MaxAverageRating" type="number" />
+        </p>
+    </div>
+    <div>
+        <label>Only Pinned:</label>
+        <input asp-for="Filter.OnlyPinned" type="checkbox" />
+    </div>
+    <button type="submit">Apply Filters</button>
+</form>
+
+<script>
+    document.getElementById('sortType').addEventListener('change', submitForm);
+    document.getElementById('isSortAscending').addEventListener('change', submitForm);
+
+    function submitForm() {
+        var formData = new FormData(document.getElementById('filterForm'));
+        var sortType = document.getElementById('sortType').value;
+        var isSortAscending = document.getElementById('isSortAscending').checked;
+        formData.append('SortType', sortType);
+        formData.append('IsSortAscending', isSortAscending);
+
+        fetch('/Tests/Index', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+        })
+        .catch(error => console.error('Error:', error));
+    }
+</script>

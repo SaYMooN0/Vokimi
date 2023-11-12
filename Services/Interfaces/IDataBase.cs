@@ -20,13 +20,14 @@ namespace VokimiServices
         public Task<MyAccountViewModel?> GetMyAccountInfo(int userId);
         public Task<User?> GetUserByEmailAndPasswordAsync(string email, string password);
         public Task<Test?> GetTestByIdAsync(int testId);
-        public Task<IEnumerable<TestMainInfo>> GetAllTestsMainInfoAsync();
+        public Task<IEnumerable<TestMainInfo>> GetAllTestsMainInfoAsync(int? userId);
         public Task<IEnumerable<Question>> GetQuestionsForTestAsync(int testId);
         public Task<IEnumerable<Result>> GetResultsForTestAsync(int testId);
         public Task<IEnumerable<Comment>> GetCommentsForTestAsync(int testId);
         public Task<IEnumerable<TestTag>> GetTagsForTestAsync(int testId);
         public Task<IEnumerable<TestsTaking>> GetTestsTakingsForTestAsync(int testId); 
         public Task<IEnumerable<TestsRating>> GetTestsRatingsForTestAsync(int testId);
+        public Task<bool> IsTestPinnedByUserAsync(int testId, int userId);
 
 
     }

@@ -5,6 +5,7 @@
         public int Id { get; set; }
         public string Name { get; set; }
         public string ImagePath { get; set; }
+        public bool IsPinned { get; set; }
         public List<string> Tags { get; set; } = new();
         public int QuestionsCount { get; set; }
         public int CommentsCount { get; set; }

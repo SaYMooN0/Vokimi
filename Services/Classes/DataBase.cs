@@ -305,8 +305,9 @@ SELECT CAST(SCOPE_IDENTITY() as int);";
                 return test;
             }
         }
-        public async Task<IEnumerable<TestMainInfo>> GetAllTestsMainInfoAsync()
+        public async Task<IEnumerable<TestMainInfo>> GetAllTestsMainInfoAsync(int? userId)
         {
+            if(userId is null) userId = 0;
             using (var connection = new SqlConnection(_connectionString))
             {
                 var query = @"
@@ -327,11 +328,26 @@ FROM Tests t";
                     var tags = await GetTagsForTestAsync(testMainInfo.Id);
                     testMainInfo.Tags = tags.Select(tag => tag.ToString()).ToList();
                 }
+                foreach (var testMainInfo in testMainInfos)
+                {
+                    testMainInfo.Tags = (await GetTagsForTestAsync(testMainInfo.Id))
+                        .Select(tag => tag.ToString()).ToList();
+
+                    testMainInfo.IsPinned = await IsTestPinnedByUserAsync(testMainInfo.Id, (int)userId);
+                }
+
                 return testMainInfos;
             }
         }
-
-
+        public async Task<bool> IsTestPinnedByUserAsync(int testId, int userId)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var query = "SELECT COUNT(1) FROM PinnedTests WHERE TestId = @TestId AND UserId = @UserId";
+                var count = await connection.ExecuteScalarAsync<int>(query, new { TestId = testId, UserId = userId });
+                return count > 0;
+            }
+        }
         public async Task<IEnumerable<Question>> GetQuestionsForTestAsync(int testId)
         {
             using (var connection = new SqlConnection(_connectionString))

@@ -20,17 +20,21 @@ namespace Vokimi.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            int id = HttpContext.GetUserIdFromIdentity();
-            if (id == -1)
+            int userId = HttpContext.GetUserIdFromIdentity();
+            if (userId == -1)
                 return RedirectToAction("Authorization", "Account");
             return View(TestCreationData);
         }
         [HttpPost]
         public IActionResult Index(TestCreationData newData)
         {
+
             int userId = HttpContext.GetUserIdFromIdentity();
+
             if (userId == -1)
                 return Unauthorized(new { message = "Make sure you are logged in to your account" });
+
+            _logger.Runtime($"User {userId} trying to test main info");
 
             var currentData = TestCreationData;
 
@@ -40,7 +44,8 @@ namespace Vokimi.Controllers
             currentData.Language = newData.Language;
 
             TestCreationData = currentData;
-
+            _logger.Runtime($"User {userId} saved the test main info");
+            _logger.Info($"User {userId} saved the test main info");
             return View(TestCreationData);
         }
         [HttpGet]
@@ -55,6 +60,9 @@ namespace Vokimi.Controllers
         [HttpPost]
         public IActionResult Questions(TestCreationQuestionsViewModel questionsDataViewModel)
         {
+            int userId = HttpContext.GetUserIdFromIdentity();
+
+            _logger.Runtime($"User {userId} trying to save questions");
             questionsDataViewModel.ErrorMessage = QuestionsValidationString(questionsDataViewModel);
 
             if (!string.IsNullOrEmpty(questionsDataViewModel.ErrorMessage))
@@ -65,7 +73,8 @@ namespace Vokimi.Controllers
                 .ToList();
 
             QuestionsInSession = _newQuestions;
-
+            _logger.Runtime($"User {userId} saved the test questions");
+            _logger.Info($"User {userId} saved the test questions");
             return View(questionsDataViewModel);
         }
         [HttpGet]
@@ -88,6 +97,8 @@ namespace Vokimi.Controllers
         [HttpPost]
         public IActionResult Results(TestCreationResultsViewModel? res)
         {
+            int userId = HttpContext.GetUserIdFromIdentity();
+            _logger.Runtime($"User {userId} trying to save results");
             if (res == null)
                 return Results();
 
@@ -101,6 +112,8 @@ namespace Vokimi.Controllers
                 _newResults.Add(new(item.MainText, item.Description, item.From, item.To));
             }
             ResultsInSession = _newResults;
+            _logger.Runtime($"User {userId} saved the test results");
+            _logger.Info($"User {userId} saved the test results");
             return View(res);
         }
         [HttpPost]
@@ -109,6 +122,7 @@ namespace Vokimi.Controllers
             int userId = HttpContext.GetUserIdFromIdentity();
             if (userId == -1)
                 return RedirectToAction("Authorization", "Account");
+            _logger.Runtime($"User {HttpContext.GetUserIdFromIdentity()} trying to finish test creation");
             if (string.IsNullOrEmpty(TestCreationData.TestName))
                 return BadRequest("Please fill in the main information about the test.");
             if (QuestionsInSession is null || QuestionsInSession.Count < 1)
@@ -116,7 +130,10 @@ namespace Vokimi.Controllers
             if (ResultsInSession is null || ResultsInSession.Count < 1)
                 return BadRequest("Please create results for the test.");
 
+            _logger.Runtime($"User {HttpContext.GetUserIdFromIdentity()} trying to write new test into db");
             int testId = await _dataBase.CreateNewTest(TestCreationData, userId);
+            _logger.Runtime($"User {HttpContext.GetUserIdFromIdentity()} create new test wit id {testId}");
+            _logger.Info($"User {HttpContext.GetUserIdFromIdentity()} create new test wit id {testId}");
             return Ok(testId);
         }
         private TestCreationData TestCreationData
@@ -209,20 +226,20 @@ namespace Vokimi.Controllers
                 if (string.IsNullOrEmpty(question.Text) || question.Text.Length < 5 || question.Text.Length > 250)
                     return $"Error: Failed to save questions. The length of question cannot be less than 5 or more than 250 characters. " +
                            $"The length of the question number {questionsDataViewModel.Questions.IndexOf(question) + 1} is {question.Text?.Length ?? 0} characters.";
-                
+
                 if (question.AnswerOptions.Count < 2 || question.AnswerOptions.Count > 15)
                     return $"Error: Failed to save questions. The number of answers to one question cannot be less than 2 or more than 15. " +
                            $"Question number {questionsDataViewModel.Questions.IndexOf(question) + 1} has {question.AnswerOptions.Count} answer options.";
-                
+
                 foreach (var answerOption in question.AnswerOptions)
                 {
                     if (string.IsNullOrEmpty(answerOption.Key) || answerOption.Key.Length < 1 || answerOption.Key.Length > 220)
                         return $"Error: Failed to save questions. The length of answer cannot be less than 1 or more than 220 characters. " +
                                $"The length of one of the answer for the question number {questionsDataViewModel.Questions.IndexOf(question) + 1} is {answerOption.Key?.Length ?? 0} characters.";
-                    
+
                     if (answerOption.Value > 90 || answerOption.Value < -90)
                         return "Error: Failed to save questions. The number of points that can be obtained for the answer cannot be less than -90 and more than 90.";
-                    
+
                 }
             }
             return string.Empty;

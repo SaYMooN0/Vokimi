@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Vokimi.Models.DataBaseClasses;
+using Vokimi.Models.Static;
 using Vokimi.Models.ViewModels.Tests;
 using VokimiServices;
 
@@ -18,14 +19,15 @@ namespace Vokimi.Controllers
         public async Task<IActionResult> Index()
         {
             CatalogViewModel vm = new();
-            vm.Tests = (await _dataBase.GetAllTestsMainInfoAsync()).ToList();
+            
+            vm.Tests = (await _dataBase.GetAllTestsMainInfoAsync(HttpContext.GetUserIdFromIdentity())).ToList();
             return View(vm);
         }
         [HttpPost]
         public async Task<IActionResult> Index(CatalogViewModel vm)
         {
-            vm.Tests = (await _dataBase.GetAllTestsMainInfoAsync()).ToList();
-            vm.FilterTests(); 
+            vm.Tests = (await _dataBase.GetAllTestsMainInfoAsync(HttpContext.GetUserIdFromIdentity())).ToList();
+            //vm.FilterTests(); 
             return View(vm);
         }
         public IActionResult TestNotFound()
