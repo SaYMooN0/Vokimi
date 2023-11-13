@@ -11,11 +11,11 @@
         public int CommentsCount { get; set; }
         public int TakingsCount { get; set; }
         public int AverageRating { get; set; }
-        public TestMainInfo(int id, string name, string imagePath, int questionsCount, int commentsCount, int takingsCount, int averageRating)
+        public TestMainInfo(int id, string name, string? imagePath, int questionsCount, int commentsCount, int takingsCount, int averageRating)
         {
             Id = id;
             Name = name;
-            ImagePath = imagePath;
+            ImagePath = imagePath ?? "default";
             QuestionsCount = questionsCount;
             CommentsCount = commentsCount;
             TakingsCount = takingsCount;

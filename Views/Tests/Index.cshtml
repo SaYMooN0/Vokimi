@@ -25,7 +25,7 @@
     }
 </div>
 
-<form method="post" onsubmit="submitForm">
+<form method="post" asp-action="Index" asp-controller="Tests" id="filterForm">
     <div>
         <p>Questions Count</p>
         <p>
@@ -70,26 +70,66 @@
     </div>
     <button type="submit">Apply Filters</button>
 </form>
-
+@{
+    var jsonData = Newtonsoft.Json.JsonConvert.SerializeObject(Model.Tests);
+}
 <script>
-    document.getElementById('sortType').addEventListener('change', submitForm);
-    document.getElementById('isSortAscending').addEventListener('change', submitForm);
+    var testsData = @Html.Raw(jsonData);
+    function sortTestsData() {
+        const sortType = document.getElementById('sortType').value;
+        const isAscending = document.getElementById('isSortAscending').checked;
+        testsData.sort((a, b) => {
+            let valA, valB;
+            switch (sortType) {
+                case 'Date':
+                    valA = new Date(a.CreationTime);
+                    valB = new Date(b.CreationTime);
+                    break;
+                case 'Name':
+                    valA = a.Name;
+                    valB = b.Name;
+                    break;
+                case 'Author':
+                    valA = a.AuthorId;
+                    valB = b.AuthorId;
+                    break;
+                default:
+                    return 0;
+            }
 
-    function submitForm() {
-        var formData = new FormData(document.getElementById('filterForm'));
-        var sortType = document.getElementById('sortType').value;
-        var isSortAscending = document.getElementById('isSortAscending').checked;
-        formData.append('SortType', sortType);
-        formData.append('IsSortAscending', isSortAscending);
-
-        fetch('/Tests/Index', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log(data);
-        })
-        .catch(error => console.error('Error:', error));
+            if (isAscending) {
+                return valA < valB ? -1 : valA > valB ? 1 : 0;
+            } else {
+                return valA > valB ? -1 : valA < valB ? 1 : 0;
+            }
+        });
     }
+
+    function displayTests() {
+        console.log(testsData);
+        sortTestsData();
+        const container = document.querySelector('.test-container');
+        container.innerHTML = '';
+
+        testsData.forEach(test => {
+            const testElement = document.createElement('a');
+            testElement.setAttribute('href', `/Tests/Test/${test.Id}`);
+            testElement.className = 'test-info';
+
+            const image = document.createElement('img');
+            image.src = test.ImagePath;
+            image.style.width = '130px';
+            image.style.height = '130px';
+
+            const label = document.createElement('label');
+            label.textContent = test.Name;
+
+            testElement.appendChild(image);
+            testElement.appendChild(label);
+
+            container.appendChild(testElement);
+        });
+    }
+    document.getElementById('sortType').addEventListener('change', displayTests());
+    document.getElementById('isSortAscending').addEventListener('change', displayTests());
 </script>

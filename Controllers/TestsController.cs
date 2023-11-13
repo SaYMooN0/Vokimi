@@ -19,7 +19,6 @@ namespace Vokimi.Controllers
         public async Task<IActionResult> Index()
         {
             CatalogViewModel vm = new();
-            
             vm.Tests = (await _dataBase.GetAllTestsMainInfoAsync(HttpContext.GetUserIdFromIdentity())).ToList();
             return View(vm);
         }
