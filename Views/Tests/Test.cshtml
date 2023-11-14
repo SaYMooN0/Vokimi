@@ -1,4 +1,54 @@
 ﻿@model TestViewModel
-@Model.Id
-@Model.TestName
-@Model.AuthorId
+<div class="main-container">
+    <img src="@Model.ImagePath"/>
+    <button onclick="pinTest(@Model.Id)"></button>
+    <p>
+        <h1>@Model.TestName </h1>
+        by <a asp-controller="Account" asp-action="UserProfile" asp-route-id="@Model.AuthorId">@Model.Author</a>
+    </p>
+    @if (Model.Tags is null || Model.Tags.Count==0)
+    {
+        <label>No tags for this test</label>
+    }
+    else
+    {
+        foreach(string t in Model.Tags)
+        {
+            <a asp-controller="Tests" asp-action="Index" asp-route-id="@t">@t</a>
+        }
+    }
+    <p>@Model.Description</p>
+    <p>Average rating: @Model.AverageRating</p>
+    @if (Model.CurrentUserRating is not null)
+    {
+        <label>My rating: @Model.CurrentUserRating</label>
+    }
+    else
+    {
+        <p>
+            Rate:
+            <input type="number" min="1" max="10" />
+            <button onclick="rate">Rate</button>
+        </p>
+    }
+    
+</div>
+<div class="comments-section">
+    <input type="text" placeholder="Leave a comment"/>
+    <button>Leave</button>
+    @if(Model.Comments is null || Model.Comments.Count==0)
+    {
+        <p>The test has no comments yet</p>
+    }
+    else
+    {
+        foreach (CommentInfo c in Model.Comments)
+        {
+            <div class="comment" >
+                <label>@c.Author</label> 
+                <label>@c.LeavingDate.ToLongTimeString()</label>
+                <p>@c.Text</p>
+            </div>
+        }
+    }
+</div>

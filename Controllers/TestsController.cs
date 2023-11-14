@@ -20,6 +20,8 @@ namespace Vokimi.Controllers
         {
             CatalogViewModel vm = new();
             vm.Tests = (await _dataBase.GetAllTestsMainInfoAsync(HttpContext.GetUserIdFromIdentity())).ToList();
+            //author
+            //comments
             return View(vm);
         }
         [HttpPost]
@@ -29,11 +31,20 @@ namespace Vokimi.Controllers
             //vm.FilterTests(); 
             return View(vm);
         }
+        [HttpPost]
+        public async Task<IActionResult> Index(string tag)
+        {
+            CatalogViewModel vm = new();
+            vm.Tests = (await _dataBase.GetAllTestsMainInfoAsync(HttpContext.GetUserIdFromIdentity())).ToList();
+            vm.Filter.ChosenTags = new() { tag };
+            //vm.FilterTests(); 
+            return View(vm);
+        }
         public IActionResult TestNotFound()
         {
             return View();
         }
-        
+
         async public Task<IActionResult> Test(int? id)
         {
             if (id is null)
@@ -41,12 +52,12 @@ namespace Vokimi.Controllers
             Test? t = await _dataBase.GetTestByIdAsync((int)id);
             if (t is null)
                 return RedirectToAction("TestNotFound");
-            TestViewModel vm=new TestViewModel()
+            TestViewModel vm = new TestViewModel()
             {
-                Id=t.Id,
-                TestName=t.Name,
-                AuthorId=t.AuthorId,
-            
+                Id = t.Id,
+                TestName = t.Name,
+                AuthorId = t.AuthorId,
+
             };
             return View(vm);
         }

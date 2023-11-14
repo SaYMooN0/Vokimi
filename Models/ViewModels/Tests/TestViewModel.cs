@@ -10,9 +10,11 @@ namespace Vokimi.Models.ViewModels.Tests
         public string Description { get; set; } = "No description";
         public string Author { get; set; }
         public int AuthorId { get; set; }
+        public bool IsPinned { get; set; } = false;
+        public int? CurrentUserRating { get; set; }
         public HashSet<string> Tags { get; set; } = new();
-        public Double AverageRating { get; set; }
-        public List<Comment> Comments { get; set; } = new();
+        public double AverageRating { get; set; }
+        public List<CommentInfo> Comments { get; set; } = new();
         public TestViewModel()
         {
         }
@@ -26,8 +28,19 @@ namespace Vokimi.Models.ViewModels.Tests
             AuthorId = test.AuthorId;
             Tags= test.Tags.Select(tag => tag.ToString()).ToHashSet();
             AverageRating = test.AverageRating();
-            Comments = test.Comments;
         }
 
+    }
+    public class CommentInfo
+    {
+        public string Author { get; set; }
+        public string Text { get; set; }
+        public DateTime LeavingDate { get; set; }
+        public CommentInfo(string author, string text, DateTime leavingDate)
+        {
+            Author = author;
+            Text = text;
+            LeavingDate = leavingDate;
+        }
     }
 }
