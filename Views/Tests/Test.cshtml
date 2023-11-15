@@ -34,8 +34,12 @@
     
 </div>
 <div class="comments-section">
-    <input type="text" placeholder="Leave a comment"/>
-    <button>Leave</button>
+    <form method="post" asp-action="NewComment" asp-controller="Tests">
+        <input type="text" placeholder="Leave a comment" name="CommentText"/>
+        <input type="hidden" value="@Model.Id" name="TestId"/>
+        <button>Leave</button>
+    </form>
+  
     @if(Model.Comments is null || Model.Comments.Count==0)
     {
         <p>The test has no comments yet</p>

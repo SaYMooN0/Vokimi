@@ -15,9 +15,6 @@ namespace Vokimi.Models.ViewModels.Tests
         public HashSet<string> Tags { get; set; } = new();
         public double AverageRating { get; set; }
         public List<CommentInfo> Comments { get; set; } = new();
-        public TestViewModel()
-        {
-        }
         public TestViewModel(Test test, string author)
         {
             Id = test.Id;

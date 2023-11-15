@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Vokimi.Models;
 using Vokimi.Models.DataBaseClasses;
 using Vokimi.Models.Static;
 using Vokimi.Models.ViewModels.Tests;
@@ -20,8 +21,7 @@ namespace Vokimi.Controllers
         {
             CatalogViewModel vm = new();
             vm.Tests = (await _dataBase.GetAllTestsMainInfoAsync(HttpContext.GetUserIdFromIdentity())).ToList();
-            //author
-            //comments
+            //vm.FilterTests(); 
             return View(vm);
         }
         [HttpPost]
@@ -52,14 +52,19 @@ namespace Vokimi.Controllers
             Test? t = await _dataBase.GetTestByIdAsync((int)id);
             if (t is null)
                 return RedirectToAction("TestNotFound");
-            TestViewModel vm = new TestViewModel()
-            {
-                Id = t.Id,
-                TestName = t.Name,
-                AuthorId = t.AuthorId,
 
-            };
+            string author = await _dataBase.GetUserNameById(t.AuthorId);
+            TestViewModel vm = new TestViewModel(t, author);
+            //comments
             return View(vm);
+        }
+        async public Task<IActionResult> NewComment(int testId, string commentText)
+        {
+            int userId = HttpContext.GetUserIdFromIdentity();
+            if (userId == -1)
+                return RedirectToAction("Authorization", "Account");
+            await _dataBase.AddCommentForTest(testId, commentText, userId);
+            return RedirectToAction("Test", new { id = testId });
         }
     }
 }

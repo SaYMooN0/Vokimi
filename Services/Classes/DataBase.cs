@@ -396,5 +396,38 @@ FROM Tests t";
                 return await connection.QueryAsync<TestsRating>(query, new { TestId = testId });
             }
         }
+
+        public async Task<int> AddCommentForTest(int testId, string text, int userId)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var query = @"
+INSERT INTO Comments (UserId, TestId, Text, LeavingDate) 
+VALUES (@UserId, @TestId, @Text, @LeavingDate);
+
+SELECT CAST(SCOPE_IDENTITY() as int);";
+
+                var parameters = new
+                {
+                    UserId = userId,
+                    TestId = testId,
+                    Text = text,
+                    LeavingDate = DateTime.Now
+                };
+
+                connection.Open();
+                return await connection.QuerySingleAsync<int>(query, parameters);
+            }
+        }
+        public async Task<string> GetUserNameById(int userId)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var query = "SELECT Name FROM Users WHERE Id = @UserId";
+
+                connection.Open();
+                return await connection.QuerySingleOrDefaultAsync<string>(query, new { UserId = userId });
+            }
+        }
     }
 }

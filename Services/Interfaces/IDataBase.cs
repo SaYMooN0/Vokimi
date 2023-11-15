@@ -15,6 +15,7 @@ namespace VokimiServices
         public Task<IEnumerable<int>> AddNewQuestions(IEnumerable<Question> question, int testId);
         public Task<int> AddTagForTest(TestTag tag, int testId);
         public Task<IEnumerable<int>> AddTagsForTest(IEnumerable<TestTag> tags, int testId);
+        public Task<int> AddCommentForTest(int testId, string Text, int userId);
         public Task<bool> AnyUserWithSuchEmail(string email);
         public Task<UserProfileViewModel?> GetUserInfo(int id);
         public Task<MyAccountViewModel?> GetMyAccountInfo(int userId);
@@ -28,6 +29,7 @@ namespace VokimiServices
         public Task<IEnumerable<TestsTaking>> GetTestsTakingsForTestAsync(int testId); 
         public Task<IEnumerable<TestsRating>> GetTestsRatingsForTestAsync(int testId);
         public Task<bool> IsTestPinnedByUserAsync(int testId, int userId);
+        public Task<string> GetUserNameById(int userId);
 
 
     }
