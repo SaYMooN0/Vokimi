@@ -1,6 +1,7 @@
 ﻿using Vokimi.Models;
 using Vokimi.Models.DataBaseClasses;
 using Vokimi.Models.ViewModels.Account;
+using Vokimi.Models.ViewModels.Tests;
 
 namespace VokimiServices
 {
@@ -30,6 +31,7 @@ namespace VokimiServices
         public Task<IEnumerable<TestsRating>> GetTestsRatingsForTestAsync(int testId);
         public Task<bool> IsTestPinnedByUserAsync(int testId, int userId);
         public Task<string> GetUserNameById(int userId);
+        public Task<IEnumerable<CommentInfo>> GetCommentsInfoForTest(int testId);
 
 
     }

@@ -1,18 +1,18 @@
 ﻿@model TestViewModel
-<div class="main-container">
-    <img src="@Model.ImagePath"/>
+<div class="main-container" data-test-id="@Model.Id">
+    <img src="@Model.ImagePath" />
     <button onclick="pinTest(@Model.Id)"></button>
     <p>
         <h1>@Model.TestName </h1>
         by <a asp-controller="Account" asp-action="UserProfile" asp-route-id="@Model.AuthorId">@Model.Author</a>
     </p>
-    @if (Model.Tags is null || Model.Tags.Count==0)
+    @if (Model.Tags is null || Model.Tags.Count == 0)
     {
         <label>No tags for this test</label>
     }
     else
     {
-        foreach(string t in Model.Tags)
+        foreach (string t in Model.Tags)
         {
             <a asp-controller="Tests" asp-action="Index" asp-route-id="@t">@t</a>
         }
@@ -21,26 +21,26 @@
     <p>Average rating: @Model.AverageRating</p>
     @if (Model.CurrentUserRating is not null)
     {
-        <label>My rating: @Model.CurrentUserRating</label>
+        <label id="ratingLabelBlock">>My rating: @Model.CurrentUserRating</label>
     }
     else
     {
-        <p>
+        <p id="ratingInputBlock">
             Rate:
-            <input type="number" min="1" max="10" />
-            <button onclick="rate">Rate</button>
+            <input type="number" min="1" max="10" id="testRating" />
+            <button onclick="rateTest()">Rate</button>
         </p>
     }
-    
+
 </div>
 <div class="comments-section">
     <form method="post" asp-action="NewComment" asp-controller="Tests">
-        <input type="text" placeholder="Leave a comment" name="CommentText"/>
-        <input type="hidden" value="@Model.Id" name="TestId"/>
+        <input type="text" placeholder="Leave a comment" name="CommentText" />
+        <input type="hidden" value="@Model.Id" name="TestId" />
         <button>Leave</button>
     </form>
-  
-    @if(Model.Comments is null || Model.Comments.Count==0)
+
+    @if (Model.Comments is null || Model.Comments.Count == 0)
     {
         <p>The test has no comments yet</p>
     }
@@ -48,11 +48,51 @@
     {
         foreach (CommentInfo c in Model.Comments)
         {
-            <div class="comment" >
-                <label>@c.Author</label> 
-                <label>@c.LeavingDate.ToLongTimeString()</label>
+            <div class="comment">
+                <label>@c.Author</label>
+                <label>@c.LeavingDate.ToLongDateString()</label>
                 <p>@c.Text</p>
             </div>
         }
     }
 </div>
+<script>
+    function rateTest() {
+        const testRating = document.getElementById("testRating").value;
+        if(testRating > 10 || testRating < 0)
+        {
+            alert("test rating can't be more than 10 or less than 0");
+            return;
+        }
+        const testId = document.querySelector('.main-container').dataset.testId;
+        console.log(testId, testRating);
+        fetch('/tests/ratetest', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+                testId: testId,
+                rating: testRating
+            })
+        })
+            .then(response => {
+                if (response.status === 401) {
+                    window.location.href = '/account/login';
+                } else if (!response.ok) {
+                    throw new Error('Something went wrong');
+                }
+                return response.json();
+            })
+            .then(data => {
+                const ratingLabel = document.querySelector('label');
+                if (ratingLabel) {
+                    console.log(data);
+                    ratingLabel.textContent = `My rating: ${data}`;
+                }
+            })
+            .catch(error => {
+                alert(error.message);
+            });
+    }
+</script>

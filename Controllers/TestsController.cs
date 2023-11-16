@@ -55,7 +55,7 @@ namespace Vokimi.Controllers
 
             string author = await _dataBase.GetUserNameById(t.AuthorId);
             TestViewModel vm = new TestViewModel(t, author);
-            //comments
+            vm.Comments = (await _dataBase.GetCommentsInfoForTest(t.Id)).ToList();
             return View(vm);
         }
         async public Task<IActionResult> NewComment(int testId, string commentText)
@@ -66,5 +66,12 @@ namespace Vokimi.Controllers
             await _dataBase.AddCommentForTest(testId, commentText, userId);
             return RedirectToAction("Test", new { id = testId });
         }
+        [HttpPost]
+        public async Task<IActionResult> RateTest(int testId, int rating)
+        {
+            return Ok(new { CurrentUserRating = rating });
+        }
+
+
     }
 }

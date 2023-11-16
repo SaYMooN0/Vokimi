@@ -429,5 +429,21 @@ SELECT CAST(SCOPE_IDENTITY() as int);";
                 return await connection.QuerySingleOrDefaultAsync<string>(query, new { UserId = userId });
             }
         }
+        public async Task<IEnumerable<CommentInfo>> GetCommentsInfoForTest(int testId)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var query = @"
+SELECT u.Name AS Author, c.Text, c.LeavingDate 
+FROM Comments c
+JOIN Users u ON c.UserId = u.Id
+WHERE c.TestId = @TestId
+ORDER BY c.LeavingDate DESC";
+
+                connection.Open();
+                return await connection.QueryAsync<CommentInfo>(query, new { TestId = testId });
+            }
+        }
+
     }
 }
