@@ -27,11 +27,12 @@ namespace VokimiServices
         public Task<IEnumerable<Result>> GetResultsForTestAsync(int testId);
         public Task<IEnumerable<Comment>> GetCommentsForTestAsync(int testId);
         public Task<IEnumerable<TestTag>> GetTagsForTestAsync(int testId);
-        public Task<IEnumerable<TestsTaking>> GetTestsTakingsForTestAsync(int testId); 
+        public Task<IEnumerable<TestsTaking>> GetTestsTakingsForTestAsync(int testId);  
         public Task<IEnumerable<TestsRating>> GetTestsRatingsForTestAsync(int testId);
         public Task<bool> IsTestPinnedByUserAsync(int testId, int userId);
         public Task<string> GetUserNameById(int userId);
         public Task<IEnumerable<CommentInfo>> GetCommentsInfoForTest(int testId);
+        public Task RateTestAsync(int testId, short rating, int userId);
 
 
     }

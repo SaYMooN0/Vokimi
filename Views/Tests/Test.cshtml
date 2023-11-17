@@ -19,18 +19,21 @@
     }
     <p>@Model.Description</p>
     <p>Average rating: @Model.AverageRating</p>
-    @if (Model.CurrentUserRating is not null)
-    {
-        <label id="ratingLabelBlock">>My rating: @Model.CurrentUserRating</label>
-    }
-    else
-    {
-        <p id="ratingInputBlock">
-            Rate:
-            <input type="number" min="1" max="10" id="testRating" />
-            <button onclick="rateTest()">Rate</button>
-        </p>
-    }
+    <div class="ratingBlock">
+        @if (Model.CurrentUserRating is not null)
+        {
+            <label id="ratingLabelBlock">>My rating: @Model.CurrentUserRating</label>
+        }
+        else
+        {
+            <p id="ratingInputBlock">
+                Rate:
+                <input type="number" min="1" max="10" id="testRating" />
+                <button onclick="rateTest()">Rate</button>
+            </p>
+        }
+    </div>
+
 
 </div>
 <div class="comments-section">
@@ -59,19 +62,23 @@
 <script>
     function rateTest() {
         const testRating = document.getElementById("testRating").value;
-        if(testRating > 10 || testRating < 0)
-        {
+        if (testRating > 10 || testRating < 0) {
             alert("test rating can't be more than 10 or less than 0");
             return;
         }
         const testId = document.querySelector('.main-container').dataset.testId;
-        console.log(testId, testRating);
-        fetch('/tests/ratetest', {
+        
+        const queryBody = {
+            testId: +testId,
+            rating: +testRating
+        };
+        console.log(queryBody);
+        fetch('/tests/RateTest', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ 
+            body: JSON.stringify({
                 testId: testId,
                 rating: testRating
             })
@@ -85,10 +92,10 @@
                 return response.json();
             })
             .then(data => {
-                const ratingLabel = document.querySelector('label');
+                const ratingLabel = document.querySelector('.ratingBlock');
                 if (ratingLabel) {
                     console.log(data);
-                    ratingLabel.textContent = `My rating: ${data}`;
+                    ratingLabel.innerHTML = ` <label id="ratingLabelBlock"> My rating: ${data.currentUserRating} </label>`;
                 }
             })
             .catch(error => {

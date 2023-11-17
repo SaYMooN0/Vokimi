@@ -24,6 +24,7 @@ namespace Vokimi.Models.ViewModels.Tests
         public int? MinAverageRating { get; set; }
         public int? MaxAverageRating { get; set; }
         public List<string> ChosenTags { get; set; } = new();
+        public List<Language> ChosenLanguages { get; set; }=new();
         public bool OnlyPinned { get; set; } = false;
     }
 }

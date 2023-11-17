@@ -445,5 +445,19 @@ ORDER BY c.LeavingDate DESC";
             }
         }
 
+        public async Task RateTestAsync(int testId, short rating, int userId)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var query = @"
+IF EXISTS (SELECT 1 FROM TestsRatings WHERE UserId = @UserId AND TestId = @TestId)
+    UPDATE TestsRatings SET Rating = @Rating WHERE UserId = @UserId AND TestId = @TestId;
+ELSE
+    INSERT INTO TestsRatings (UserId, TestId, Rating) VALUES (@UserId, @TestId, @Rating);";
+
+                connection.Open();
+                await connection.ExecuteAsync(query, new { UserId = userId, TestId = testId, Rating = rating });
+            }
+        }
     }
 }

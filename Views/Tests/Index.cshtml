@@ -25,7 +25,7 @@
     }
 </div>
 
-<form method="post" asp-action="Index" asp-controller="Tests" id="filterForm">
+<form method="post" asp-action="Index" asp-controller="Tests" id="filterForm" class="filter-form">
     <div>
         <p>Questions Count</p>
         <p>
@@ -68,6 +68,21 @@
         <label>Only Pinned:</label>
         <input asp-for="Filter.OnlyPinned" type="checkbox" />
     </div>
+
+    <div class="languages-zone">
+        <label>Chosen languages:</label>
+        @foreach (var language in Enum.GetValues(typeof(Language)).Cast<Language>())
+        {
+            if (language != Language.Unset)
+            {
+                <div>
+                    <label asp-for="@language">@language.ToString()</label>
+                    <input type="checkbox" value="@language" />
+                </div>
+            }
+        }
+    </div>
+    <button type="button">Choose tags</button>
     <button type="submit">Apply Filters</button>
 </form>
 @{
@@ -133,3 +148,30 @@
     document.getElementById('sortType').addEventListener('change', displayTests());
     document.getElementById('isSortAscending').addEventListener('change', displayTests());
 </script>
+<style>
+    .sort-block
+    {
+        position:fixed;
+        width:calc(93vw - 220px);
+        left: 20px;
+    }
+    .filter-form
+    {
+        position:fixed;
+        height:calc(90vh - 40px);
+        width:calc(7vw + 200px);
+        right:20px;
+        top:8vh;
+        overflow-y:auto;
+    }
+    .filter-form input[type="number"]{
+        width:60px;
+    }
+    .main-container
+    {
+        position:absolute;
+        top: calc(10vh + 40px);
+        left:20px;
+        overflow-y: auto;
+    }
+</style>

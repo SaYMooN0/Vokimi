@@ -67,11 +67,18 @@ namespace Vokimi.Controllers
             return RedirectToAction("Test", new { id = testId });
         }
         [HttpPost]
-        public async Task<IActionResult> RateTest(int testId, int rating)
+        public async Task<IActionResult> RateTest([FromBody] TestRatingData testRating)
         {
-            return Ok(new { CurrentUserRating = rating });
+            int userId = HttpContext.GetUserIdFromIdentity();
+            if (userId == -1)
+                return RedirectToAction("Authorization", "Account");
+            await _dataBase.RateTestAsync(testRating.TestId,testRating.Rating, userId);
+            return Ok(new { CurrentUserRating = testRating.Rating });
         }
-
-
+    }
+    public class TestRatingData
+    {
+        public int TestId { get; set; }
+        public short Rating { get; set; }
     }
 }
