@@ -28,16 +28,17 @@ namespace Vokimi.Controllers
         public async Task<IActionResult> Index(CatalogViewModel vm)
         {
             vm.Tests = (await _dataBase.GetAllTestsMainInfoAsync(HttpContext.GetUserIdFromIdentity())).ToList();
-            //vm.FilterTests(); 
+            vm.FilterTests(); 
             return View(vm);
         }
         [HttpPost]
+        [Route("Index/tag={tag}")]
         public async Task<IActionResult> Index(string tag)
         {
             CatalogViewModel vm = new();
             vm.Tests = (await _dataBase.GetAllTestsMainInfoAsync(HttpContext.GetUserIdFromIdentity())).ToList();
             vm.Filter.ChosenTags = new() { tag };
-            //vm.FilterTests(); 
+            vm.FilterByTags(); 
             return View(vm);
         }
         public IActionResult TestNotFound()

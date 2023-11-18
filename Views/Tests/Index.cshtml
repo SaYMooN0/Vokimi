@@ -71,14 +71,18 @@
 
     <div class="languages-zone">
         <label>Chosen languages:</label>
-        @foreach (var language in Enum.GetValues(typeof(Language)).Cast<Language>())
-        {
-            if (language != Language.Unset)
+        @{
+            Language[] langs= Enum.GetValues(typeof(Language)).Cast<Language>().ToArray();
+            for(int i=0;i<langs.Count();i++)
             {
-                <div>
-                    <label asp-for="@language">@language.ToString()</label>
-                    <input type="checkbox" value="@language" />
-                </div>
+                if(langs[i]!=Language.Unset)
+                {
+                    <div>
+                        <label>@langs[i].ToString()</label>
+                        <input type="checkbox" value="@langs[i].ToString()" name="Filter.ChosenLanguages"/>
+                    </div>
+                }
+                
             }
         }
     </div>
@@ -125,7 +129,6 @@
         sortTestsData();
         const container = document.querySelector('.test-container');
         container.innerHTML = '';
-
         testsData.forEach(test => {
             const testElement = document.createElement('a');
             testElement.setAttribute('href', `/Tests/Test/${test.Id}`);
