@@ -315,6 +315,8 @@ SELECT
     t.Id, 
     t.Name, 
     t.ImagePath,
+    t.Language,
+    t.AgeRestriction,
     (SELECT COUNT(*) FROM Questions WHERE TestId = t.Id) AS QuestionsCount,
     (SELECT COUNT(*) FROM Comments WHERE TestId = t.Id) AS CommentsCount,
     (SELECT COUNT(*) FROM TestsTakings WHERE TestId = t.Id) AS TakingsCount,

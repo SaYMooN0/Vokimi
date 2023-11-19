@@ -1,4 +1,5 @@
-﻿using Vokimi.Models.DataBaseClasses;
+﻿using System.Reflection.Emit;
+using Vokimi.Models.DataBaseClasses;
 
 namespace Vokimi.Models.ViewModels.Tests
 {
@@ -7,7 +8,7 @@ namespace Vokimi.Models.ViewModels.Tests
         public List<TestMainInfo> Tests { get; set; } = new();
         public TestsFilter Filter { get; set; } = new();
         public SortType SortType { get; set; } = SortType.Date;
-        public bool IsSortAscending { get; set;  } = true;
+        public bool IsSortAscending { get; set; } = true;
         public void FilterTests()
         {
             FilterByQuestionsCount();
@@ -16,6 +17,7 @@ namespace Vokimi.Models.ViewModels.Tests
             FilterByAverageRating();
             FilterByTags();
             FilterByLanguages();
+            FilterByAge();
 
         }
         private void FilterByQuestionsCount()
@@ -48,10 +50,27 @@ namespace Vokimi.Models.ViewModels.Tests
                 Tests = Tests.Where(test => test.AverageRating <= Filter.MaxAverageRating.Value).ToList();
         }
 
-        public void FilterByTags() {
+        public void FilterByTags()
+        {
+            if (Filter.ChosenTags is null || Filter.ChosenTags.Count() < 1)
+                return;
+
         }
-        private void FilterByLanguages() {
-        
+        private void FilterByLanguages()
+        {
+            if (Filter.ChosenLanguages is null || Filter.ChosenLanguages.Count() < 1)
+                return;
+            Tests = Tests.Where(test =>
+                Filter.ChosenLanguages.Any(language => language == test.Language
+                    )).ToList();
+        }
+        private void FilterByAge()
+        {
+            if (Filter.ChosenAges is null || Filter.ChosenAges.Count() < 1)
+                return;
+            Tests = Tests.Where(test =>
+                Filter.ChosenAges.Any(age => age == test.AgeRestriction
+                    )).ToList();
         }
     }
     public class TestsFilter
@@ -65,7 +84,8 @@ namespace Vokimi.Models.ViewModels.Tests
         public int? MinAverageRating { get; set; }
         public int? MaxAverageRating { get; set; }
         public List<string> ChosenTags { get; set; } = new();
-        public List<string> ChosenLanguages { get; set; }=new();
+        public List<Language> ChosenLanguages { get; set; } = new();
+        public List<AgeRestriction> ChosenAges { get; set; } = new();
         public bool OnlyPinned { get; set; } = false;
     }
 }
