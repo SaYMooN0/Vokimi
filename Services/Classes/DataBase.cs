@@ -461,5 +461,26 @@ ELSE
                 await connection.ExecuteAsync(query, new { UserId = userId, TestId = testId, Rating = rating });
             }
         }
+        public async Task<bool> PinUnpinTestForUser(int testId, int userId)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var checkQuery = "SELECT COUNT(1) FROM PinnedTests WHERE UserId = @UserId AND TestId = @TestId";
+                var count = await connection.ExecuteScalarAsync<int>(checkQuery, new { UserId = userId, TestId = testId });
+
+                if (count > 0)
+                {
+                    var unpinQuery = "DELETE FROM PinnedTests WHERE UserId = @UserId AND TestId = @TestId";
+                    await connection.ExecuteAsync(unpinQuery, new { UserId = userId, TestId = testId });
+                    return false;
+                }
+                else
+                {
+                    var pinQuery = "INSERT INTO PinnedTests (UserId, TestId) VALUES (@UserId, @TestId)";
+                    await connection.ExecuteAsync(pinQuery, new { UserId = userId, TestId = testId });
+                    return true;
+                }
+            }
+        }
     }
 }

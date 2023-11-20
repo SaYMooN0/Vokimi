@@ -32,47 +32,29 @@
         <label>Chosen languages:</label>
         @{
             Language[] langs = Enum.GetValues(typeof(Language)).Cast<Language>().ToArray();
-            for (int i = 0; i < langs.Count(); i++)
+            foreach (Language lang in langs)
             {
-                if (langs[i] != Language.Unset)
+                if (lang != Language.Unset)
                 {
                     <div>
-                        <label>@langs[i].ToString()</label>
-                        @if (Model.Filter.ChosenLanguages.Contains(langs[i]))
-                        {
-                            <input type="checkbox" value="@langs[i]" name="Filter.ChosenLanguages" checked />
-                        }
-                        else
-                        {
-                            <input type="checkbox" value="@langs[i]" name="Filter.ChosenLanguages" />
-                        }
-
+                        <label>@lang.ToString()</label>
+                        <input type="checkbox" value="@lang" name="Filter.ChosenLanguages" @(Model.Filter.ChosenLanguages.Contains(lang) ? "checked" : "") />
                     </div>
                 }
-
             }
         }
     </div>
+
     <div class="age-restriction-zone">
         <label>Age rating:</label>
         @{
             AgeRestriction[] ages = Enum.GetValues(typeof(AgeRestriction)).Cast<AgeRestriction>().ToArray();
-            for (int i = 0; i < ages.Count(); i++)
+            foreach (AgeRestriction age in ages)
             {
                 <div>
-                    <label>@ages[i].ToReadableString()</label>
-                    @if (Model.Filter.ChosenAges.Contains(ages[i]))
-                    {
-                        <input type="checkbox" value="@ages[i]" name="Filter.ChosenAges" checked />
-                    }
-                    else
-                    {
-                        <input type="checkbox" value="@ages[i]" name="Filter.ChosenAges" />
-                    }
-
+                    <label>@age.ToReadableString()</label>
+                    <input type="checkbox" value="@age" name="Filter.ChosenAges" @(Model.Filter.ChosenAges.Contains(age) ? "checked" : "") />
                 </div>
-
-
             }
         }
     </div>

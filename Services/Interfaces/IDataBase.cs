@@ -33,6 +33,7 @@ namespace VokimiServices
         public Task<string> GetUserNameById(int userId);
         public Task<IEnumerable<CommentInfo>> GetCommentsInfoForTest(int testId);
         public Task RateTestAsync(int testId, short rating, int userId);
+        public Task<bool> PinUnpinTestForUser(int testId,int userId);
 
 
     }

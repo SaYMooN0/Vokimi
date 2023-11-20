@@ -1,7 +1,10 @@
 ﻿@model TestViewModel
 <div class="main-container" data-test-id="@Model.Id">
     <img src="@Model.ImagePath" />
-    <button onclick="pinTest(@Model.Id)"></button>
+    <button onclick="pinUnpinTest(@Model.Id)" id="pinUnpinBtn">
+        @(Model.IsPinned ? "Unpin test" : "Pin test")
+    </button>
+
     <p>
         <h1>@Model.TestName </h1>
         by <a asp-controller="Account" asp-action="UserProfile" asp-route-id="@Model.AuthorId">@Model.Author</a>
@@ -67,7 +70,7 @@
             return;
         }
         const testId = document.querySelector('.main-container').dataset.testId;
-        
+
         const queryBody = {
             testId: +testId,
             rating: +testRating
@@ -102,4 +105,30 @@
                 alert(error.message);
             });
     }
+    async function pinUnpinTest(testId) {
+        try {
+            const response = await fetch('/Tests/PinUnpinTest', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: testId
+            });
+
+            if (response.ok) {
+
+
+                const data = await response.json();
+                const button = document.getElementById('pinUnpinBtn');
+                if (button) {
+                    button.innerHTML = data.wasPinned ? 'Unpin test' : 'Pin test';
+                }
+            } else {
+                console.error('Error in pinning/unpinning test');
+            }
+        } catch (error) {
+            console.error('Fetch error:', error);
+        }
+    }
+
 </script>

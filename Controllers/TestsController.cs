@@ -20,14 +20,14 @@ namespace Vokimi.Controllers
         public async Task<IActionResult> Index()
         {
             CatalogViewModel vm = new();
-            vm.Tests = (await _dataBase.GetAllTestsMainInfoAsync(HttpContext.GetUserIdFromIdentity())).ToList(); 
+            vm.Tests = (await _dataBase.GetAllTestsMainInfoAsync(HttpContext.GetUserIdFromIdentity())).ToList();
             return View(vm);
         }
         [HttpPost]
         public async Task<IActionResult> Index(CatalogViewModel vm)
         {
             vm.Tests = (await _dataBase.GetAllTestsMainInfoAsync(HttpContext.GetUserIdFromIdentity())).ToList();
-            vm.FilterTests(); 
+            vm.FilterTests();
             return View(vm);
         }
         [HttpPost]
@@ -37,7 +37,7 @@ namespace Vokimi.Controllers
             CatalogViewModel vm = new();
             vm.Tests = (await _dataBase.GetAllTestsMainInfoAsync(HttpContext.GetUserIdFromIdentity())).ToList();
             vm.Filter.ChosenTags = new() { tag };
-            vm.FilterByTags(); 
+            vm.FilterByTags();
             return View(vm);
         }
         public IActionResult TestNotFound()
@@ -56,6 +56,7 @@ namespace Vokimi.Controllers
             string author = await _dataBase.GetUserNameById(t.AuthorId);
             TestViewModel vm = new TestViewModel(t, author);
             vm.Comments = (await _dataBase.GetCommentsInfoForTest(t.Id)).ToList();
+            vm.IsPinned = await _dataBase.IsTestPinnedByUserAsync((int)id, t.AuthorId);
             return View(vm);
         }
         async public Task<IActionResult> NewComment(int testId, string commentText)
@@ -72,9 +73,20 @@ namespace Vokimi.Controllers
             int userId = HttpContext.GetUserIdFromIdentity();
             if (userId == -1)
                 return RedirectToAction("Authorization", "Account");
-            await _dataBase.RateTestAsync(testRating.TestId,testRating.Rating, userId);
+            await _dataBase.RateTestAsync(testRating.TestId, testRating.Rating, userId);
             return Ok(new { CurrentUserRating = testRating.Rating });
         }
+
+        [HttpPost]
+        public async Task<IActionResult> PinUnpinTest([FromBody] int testId)
+        {
+            int userId = HttpContext.GetUserIdFromIdentity();
+            if (userId == -1)
+                return RedirectToAction("Authorization", "Account");
+            bool wasPinned = await _dataBase.PinUnpinTestForUser(testId, userId);
+            return Ok(new { wasPinned });
+        }
+
     }
     public class TestRatingData
     {
