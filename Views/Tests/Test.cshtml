@@ -25,7 +25,7 @@
     <div class="ratingBlock">
         @if (Model.CurrentUserRating is not null)
         {
-            <label id="ratingLabelBlock">>My rating: @Model.CurrentUserRating</label>
+            <label id="ratingLabelBlock">My rating: @Model.CurrentUserRating</label>
         }
         else
         {
@@ -40,6 +40,7 @@
 
 </div>
 <div class="comments-section">
+    <p class="comments-count">@Model.Comments.Count() Comments</p>
     <form method="post" asp-action="NewComment" asp-controller="Tests">
         <input type="text" placeholder="Leave a comment" name="CommentText" />
         <input type="hidden" value="@Model.Id" name="TestId" />

@@ -34,6 +34,7 @@ namespace VokimiServices
         public Task<IEnumerable<CommentInfo>> GetCommentsInfoForTest(int testId);
         public Task RateTestAsync(int testId, short rating, int userId);
         public Task<bool> PinUnpinTestForUser(int testId,int userId);
+        public Task<IEnumerable<int>> GetPinnedTestsForUser(int userId);
 
 
     }

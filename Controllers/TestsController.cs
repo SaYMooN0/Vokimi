@@ -28,6 +28,17 @@ namespace Vokimi.Controllers
         {
             vm.Tests = (await _dataBase.GetAllTestsMainInfoAsync(HttpContext.GetUserIdFromIdentity())).ToList();
             vm.FilterTests();
+            if (vm.Filter.OnlyPinned)
+            {
+                int userId = HttpContext.GetUserIdFromIdentity();
+                if (userId == -1)
+                {
+                    vm.TopMessage = "The only pinned field was not considered in filtering. Log in to your account";
+                    return View(vm);
+                }
+                IEnumerable<int> pinnedTests = await _dataBase.GetPinnedTestsForUser(userId);
+                vm.FilterByInEnumerable(pinnedTests);
+            }
             return View(vm);
         }
         [HttpPost]
@@ -57,6 +68,12 @@ namespace Vokimi.Controllers
             TestViewModel vm = new TestViewModel(t, author);
             vm.Comments = (await _dataBase.GetCommentsInfoForTest(t.Id)).ToList();
             vm.IsPinned = await _dataBase.IsTestPinnedByUserAsync((int)id, t.AuthorId);
+            
+            
+            int userId = HttpContext.GetUserIdFromIdentity();
+            if (userId == -1) return View(vm);
+            
+            vm.CurrentUserRating=t.Ratings.FirstOrDefault(r=>r.UserId== userId).Rating;
             return View(vm);
         }
         async public Task<IActionResult> NewComment(int testId, string commentText)

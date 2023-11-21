@@ -25,6 +25,7 @@ namespace Vokimi.Models.ViewModels.Tests
             AuthorId = test.AuthorId;
             Tags= test.Tags.Select(tag => tag.ToString()).ToHashSet();
             AverageRating = test.AverageRating();
+
         }
 
     }

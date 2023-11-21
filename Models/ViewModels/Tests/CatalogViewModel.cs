@@ -9,6 +9,7 @@ namespace Vokimi.Models.ViewModels.Tests
         public TestsFilter Filter { get; set; } = new();
         public SortType SortType { get; set; } = SortType.Date;
         public bool IsSortAscending { get; set; } = true;
+        public string TopMessage { get; set; } = "";
         public void FilterTests()
         {
             FilterByQuestionsCount();
@@ -71,6 +72,10 @@ namespace Vokimi.Models.ViewModels.Tests
             Tests = Tests.Where(test =>
                 Filter.ChosenAges.Any(age => age == test.AgeRestriction
                     )).ToList();
+        }
+        public void FilterByInEnumerable(IEnumerable<int> items)
+        {
+            Tests = Tests.Where(test => items.Any(i => i == test.Id)).ToList();
         }
     }
     public class TestsFilter

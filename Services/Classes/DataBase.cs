@@ -482,5 +482,15 @@ ELSE
                 }
             }
         }
+        public async Task<IEnumerable<int>> GetPinnedTestsForUser(int userId)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var query = "SELECT TestId FROM PinnedTests WHERE UserId = @UserId";
+
+                connection.Open();
+                return await connection.QueryAsync<int>(query, new { UserId = userId });
+            }
+        }
     }
 }
