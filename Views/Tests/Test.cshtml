@@ -1,6 +1,7 @@
 ﻿@model TestViewModel
 <div class="main-container" data-test-id="@Model.Id">
     <img src="@Model.ImagePath" />
+    <a asp-controller="TestTaking" asp-action="Test" asp-route-id="@Model.Id">Take test</a>
     <button onclick="pinUnpinTest(@Model.Id)" id="pinUnpinBtn">
         @(Model.IsPinned ? "Unpin test" : "Pin test")
     </button>
