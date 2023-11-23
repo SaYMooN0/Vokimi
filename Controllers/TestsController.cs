@@ -72,9 +72,8 @@ namespace Vokimi.Controllers
             
             int userId = HttpContext.GetUserIdFromIdentity();
             if (userId == -1) return View(vm);
-
-            TestsRating? testsRating = t.Ratings.FirstOrDefault(r => r.UserId == userId);
-            vm.CurrentUserRating = testsRating!=null? testsRating.Rating : null;
+            
+            vm.CurrentUserRating=t.Ratings.FirstOrDefault(r=>r.UserId== userId).Rating;
             return View(vm);
         }
         async public Task<IActionResult> NewComment(int testId, string commentText)
