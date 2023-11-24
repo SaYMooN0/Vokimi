@@ -35,6 +35,7 @@ namespace VokimiServices
         public Task RateTestAsync(int testId, short rating, int userId);
         public Task<bool> PinUnpinTestForUser(int testId,int userId);
         public Task<IEnumerable<int>> GetPinnedTestsForUser(int userId);
+        public Task<int> AddNewTestTaking(int userId, int testId, int resultPoints, DateTime takingDate);
 
 
     }

@@ -492,5 +492,19 @@ ELSE
                 return await connection.QueryAsync<int>(query, new { UserId = userId });
             }
         }
+        public async Task<int> AddNewTestTaking(int userId, int testId, int resultPoints, DateTime takingDate)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var query = @"
+INSERT INTO TestsTakings (UserId, TestId, ResultPoints, TakingDate) 
+VALUES (@UserId, @TestId, @ResultPoints, @TakingDate);
+
+SELECT CAST(SCOPE_IDENTITY() as int);";
+
+                connection.Open();
+                return await connection.QuerySingleAsync<int>(query, new { UserId = userId, TestId = testId, ResultPoints = resultPoints, TakingDate = takingDate });
+            }
+        }
     }
 }

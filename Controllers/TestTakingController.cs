@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Vokimi.Models.DataBaseClasses;
+using Vokimi.Models.Static;
 using Vokimi.Models.ViewModels.TestTaking;
 using VokimiServices;
 
@@ -18,7 +19,7 @@ namespace Vokimi.Controllers
         public async Task<IActionResult> Test(int id)
         {
             TestTakingViewModel vm = new();
-            Test t= await _dataBase.GetTestByIdAsync(id);
+            Test t = await _dataBase.GetTestByIdAsync(id);
             vm.TestId = t.Id;
             vm.Questions = (await _dataBase.GetQuestionsForTestAsync(id)).ToList();
             return View(vm);
@@ -29,13 +30,28 @@ namespace Vokimi.Controllers
             int sum = 0;
             foreach (int item in answers)
                 sum += item;
-            return RedirectToAction("Result", new Tuple<int, int>(sum, testId));
+            int userId = HttpContext.GetUserIdFromIdentity();
+
+            if (userId == -1) userId = 1; //for unauthorized users
+
+            _dataBase.AddNewTestTaking(userId, testId, sum, DateTime.Now);
+            return RedirectToAction("Result", new ResultData(testId, sum));
+
         }
         [HttpGet]
-        public IActionResult Result(Tuple<int, int> tuple)
+        public async Task<ActionResult> Result(ResultData data)
         {
-            return View(tuple);
+            Test? t = await _dataBase.GetTestByIdAsync(data.TestId);
+            if (t is null) RedirectToAction("Error");
+
+            Result? result = t.Results.FirstOrDefault(res => res.GapMin <= data.Points && res.GapMax >= data.Points);
+
+            if (result is null) RedirectToAction("Error");
+            ResultViewModel vm = new(t.Id, t.Name,result, t.Results);
+            return View(vm);
         }
+
+        public record ResultData(int TestId, int Points);
 
     }
 }
