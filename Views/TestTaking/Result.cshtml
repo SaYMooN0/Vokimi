@@ -1,4 +1,40 @@
 ﻿@model ResultViewModel
-<h4>
-    @Newtonsoft.Json.JsonConvert.SerializeObject(Model)
-</h4>
+
+<div class="your-result-container">
+    <h4>Your result</h4>
+    <h1>@Model.ReceivedResult.Text</h1>
+    <img src="@Model.ReceivedResult.ImagePath" class="your-result-img" />
+    <h5>@Model.ReceivedResult.Description</h5>
+</div>
+<div class="other-results-container">
+    <h5>All results:</h5>
+    <ul>
+        @foreach (Result res in Model.AllResults)
+        {
+            <li class="result-line">
+                @res.Text
+                <img src="@res.ImagePath" />
+
+            </li>
+        }
+    </ul>
+</div>
+<style>
+    .your-result-img {
+        width: 160px;
+        aspect-ratio: 1/1;
+        object-fit: contain;
+        border-radius: calc(5px + 0.35vh + 0.2vw);
+    }
+
+    .result-line {
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+    }
+
+    .result-img {
+        width: 50px;
+        aspect-ratio: 1/1;
+    }
+</style>

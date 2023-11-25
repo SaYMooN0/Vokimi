@@ -492,19 +492,34 @@ ELSE
                 return await connection.QueryAsync<int>(query, new { UserId = userId });
             }
         }
-        public async Task<int> AddNewTestTaking(int userId, int testId, int resultPoints, DateTime takingDate)
+        public async Task<int> AddTestTakingAsync(int userId, int testId, int resultId, DateTime takingDate)
         {
             using (var connection = new SqlConnection(_connectionString))
             {
                 var query = @"
-INSERT INTO TestsTakings (UserId, TestId, ResultPoints, TakingDate) 
-VALUES (@UserId, @TestId, @ResultPoints, @TakingDate);
+INSERT INTO TestsTakings (UserId, TestId, ResultId, TakingDate) 
+VALUES (@UserId, @TestId, @ResultId, @TakingDate);
 
 SELECT CAST(SCOPE_IDENTITY() as int);";
 
                 connection.Open();
-                return await connection.QuerySingleAsync<int>(query, new { UserId = userId, TestId = testId, ResultPoints = resultPoints, TakingDate = takingDate });
+                return await connection.QuerySingleAsync<int>(query, new { UserId = userId, TestId = testId, ResultId = resultId, TakingDate = takingDate });
             }
         }
+        public async Task<int?> GetResultIdByTestAndPoints(int testId, int points)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var query = @"
+SELECT Id FROM Results 
+WHERE TestId = @TestId 
+AND @Points >= GapMin 
+AND @Points <= GapMax";
+
+                connection.Open();
+                return await connection.QuerySingleOrDefaultAsync<int?>(query, new { TestId = testId, Points = points });
+            }
+        }
+
     }
 }
