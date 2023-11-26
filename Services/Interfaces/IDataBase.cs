@@ -37,6 +37,7 @@ namespace VokimiServices
         public Task<IEnumerable<int>> GetPinnedTestsForUser(int userId);
         public Task<int> AddTestTakingAsync(int userId, int testId, int resultId, DateTime takingDate);
         public Task<int?> GetResultIdByTestAndPoints(int testId, int points);
+        public Task<Dictionary<int, int>> GetResultsIdWithFrequencyForTest(int testId);
 
     }
 }

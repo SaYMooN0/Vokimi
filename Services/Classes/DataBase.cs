@@ -520,6 +520,28 @@ AND @Points <= GapMax";
                 return await connection.QuerySingleOrDefaultAsync<int?>(query, new { TestId = testId, Points = points });
             }
         }
+        public async Task<Dictionary<int, int>> GetResultsIdWithFrequencyForTest(int testId)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var query = @"
+SELECT ResultId, COUNT(*) as Frequency 
+FROM TestsTakings 
+WHERE TestId = @TestId 
+GROUP BY ResultId";
+
+                connection.Open();
+                var results = await connection.QueryAsync(query, new { TestId = testId });
+
+                var resultDict = new Dictionary<int, int>();
+                foreach (var result in results)
+                {
+                    resultDict.Add(result.ResultId, result.Frequency);
+                }
+
+                return resultDict;
+            }
+        }
 
     }
 }

@@ -9,6 +9,7 @@ namespace Vokimi.Models.ViewModels.TestTaking
         public Result ReceivedResult { get; set; }  
         public List<Result> AllResults { get; set; }
         public Dictionary<int, int> ResultsFrequency { get; set; }
+        public int TestTakingsCount { get; set; }   
         public ResultViewModel(int testId, string testName, Result receivedResult, List<Result> allResults)
         {
             TestId = testId;

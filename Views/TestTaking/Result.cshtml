@@ -11,14 +11,18 @@
     <ul>
         @foreach (Result res in Model.AllResults)
         {
-            <li class="result-line">
-                @res.Text
-                <img src="@res.ImagePath" />
+            Model.ResultsFrequency.TryGetValue(res.Id, out int frequency);
 
+            <li class="result-line">
+                @res.Text - @frequency %
+                <img src="@res.ImagePath" />
             </li>
         }
+
+
     </ul>
 </div>
+<h4>All the test was passed @Model.TestTakingsCount times</h4>
 <style>
     .your-result-img {
         width: 160px;

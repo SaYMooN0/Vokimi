@@ -51,6 +51,14 @@ namespace Vokimi.Controllers
 
             if (result is null) RedirectToAction("Error");
             ResultViewModel vm = new(t.Id, t.Name, result, t.Results);
+            vm.ResultsFrequency = await _dataBase.GetResultsIdWithFrequencyForTest(t.Id);
+            vm.TestTakingsCount = vm.ResultsFrequency.Values.Sum();
+            foreach (var res in vm.ResultsFrequency)
+            {
+                double p= (double)res.Value / (double)vm.TestTakingsCount;
+                double p1 = Math.Round(p * 100);
+                vm.ResultsFrequency[res.Key] = (int)p1;
+            }
             return View(vm);
         }
 
