@@ -13,6 +13,47 @@ namespace Vokimi.Services.Classes
         private readonly string _connectionString;
 
         public DataBase(string connectionString) { _connectionString = connectionString; }
+        public async Task<User?> GetUserById(int userId)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var userQuery = "SELECT * FROM Users WHERE Id = @UserId";
+                var user = await connection.QueryFirstOrDefaultAsync<User>(userQuery, new { UserId = userId });
+
+                if (user == null)
+                    return null;
+                var createdTestsQuery = "SELECT Id FROM Tests WHERE AuthorId = @UserId";
+                var createdTestsId = (await connection.QueryAsync<int>(createdTestsQuery, new { UserId = userId })).ToList();
+                var ratedTestsQuery = "SELECT TestId FROM TestsRatings WHERE UserId = @UserId";
+                var ratedTestsId = (await connection.QueryAsync<int>(ratedTestsQuery, new { UserId = userId })).ToList();
+                var pinnedTestsQuery = "SELECT TestId FROM PinnedTests WHERE UserId = @UserId";
+                var pinnedTestsId = (await connection.QueryAsync<int>(pinnedTestsQuery, new { UserId = userId })).ToList();
+                var takenTestsQuery = "SELECT TestId FROM TestsTakings WHERE UserId = @UserId";
+                var takenTestsId = (await connection.QueryAsync<int>(takenTestsQuery, new { UserId = userId })).ToList();
+
+                var preferredLanguagesRaw = await connection.QueryAsync<int>("SELECT Language FROM UserPreferredLanguages WHERE UserId = @UserId", new { UserId = userId });
+                var preferredLanguages = new HashSet<Language>(preferredLanguagesRaw.Select(lang => (Language)lang));
+
+                return new User(
+                    user.Name,
+                    user.Email,
+                    user.Password,
+                    user.BirthDate,
+                    user.IsBanned,
+                    user.Role,
+                    user.RegistrationDate,
+                    user.Status,
+                    commentsId: new List<int>(),
+                    takenTestsId: takenTestsId,
+                    ratedTestsId: ratedTestsId,
+                    createdTestsId: createdTestsId,
+                    pinnedTestsId: pinnedTestsId,
+                    preferredLanguages: preferredLanguages
+                );
+            }
+        }
+
+
         public async Task<int> AddNewUser(User user)
         {
             using (var connection = new SqlConnection(_connectionString))
@@ -65,58 +106,44 @@ SELECT CAST(SCOPE_IDENTITY() as int);";
         {
             using (var connection = new SqlConnection(_connectionString))
             {
-                User? user = await connection.QueryFirstOrDefaultAsync<User>(
-                    "SELECT * FROM Users WHERE Id = @UserId",
-                    new { UserId = userId });
+                User? user = await GetUserById(userId);
+
                 if (user is null)
                     return null;
 
                 UserProfileViewModel viewModel = new(userId, user.Name, user.Status);
-
-                var lastTakenTest = await connection.QueryFirstOrDefaultAsync<int?>(
-                    @"SELECT TOP 1 TestId FROM TestsTakings WHERE UserId = @UserId ORDER BY TakingDate DESC",
-                    new { UserId = userId });
-
-                viewModel.LastTakenTest = lastTakenTest;
-                viewModel.CreatedTests = (await connection.QueryAsync<int>(
-                    "SELECT Id FROM Tests WHERE AuthorId = @UserId",
-                    new { UserId = userId })).ToList();
-
+                viewModel.LastTakenTest = (await GetTestsMainInfoListAsync(user.TakenTestsId, userId)).FirstOrDefault();
+                viewModel.CreatedTests = await GetTestsMainInfoListAsync(user.CreatedTestsId, userId);
                 return viewModel;
             }
+        }
+        private async Task<List<TestMainInfo>> GetTestsMainInfoListAsync(List<int> testIds, int? userId)
+        {
+            var tasks = testIds.Select(id => GetTestMainInfoAsync(id, userId));
+            var testMainInfos = await Task.WhenAll(tasks);
+            return testMainInfos.ToList();
         }
         public async Task<MyAccountViewModel?> GetMyAccountInfo(int userId)
         {
             using (var connection = new SqlConnection(_connectionString))
             {
-                User? user = await connection.QueryFirstOrDefaultAsync<User>(
-                    "SELECT * FROM Users WHERE Id = @UserId",
-                    new { UserId = userId });
+                User? user = await GetUserById(userId);
 
                 if (user is null)
                     return null;
 
                 MyAccountViewModel viewModel = new(userId, user.Name, user.Email, user.Status);
 
-                viewModel.TakenTests = (await connection.QueryAsync<int>(
-                    "SELECT TestId FROM TestsTakings WHERE UserId = @UserId ORDER BY TakingDate DESC",
-                    new { UserId = userId })).ToList();
-
+                viewModel.TakenTests = await GetTestsMainInfoListAsync(user.TakenTestsId, userId);
                 viewModel.LastTakenTest = viewModel.TakenTests.FirstOrDefault();
-
-                viewModel.CreatedTests = (await connection.QueryAsync<int>(
-                    "SELECT Id FROM Tests WHERE AuthorId = @UserId", new { UserId = userId })).ToList();
-
-                viewModel.RatedTests = (await connection.QueryAsync<int>(
-                    "SELECT TestId FROM TestsRatings WHERE UserId = @UserId", new { UserId = userId })).ToList();
-
-                viewModel.PinnedTests = (await connection.QueryAsync<int>(
-                    "SELECT TestId FROM PinnedTests WHERE UserId = @UserId",
-                    new { UserId = userId })).ToList();
+                viewModel.CreatedTests = await GetTestsMainInfoListAsync(user.CreatedTestsId, userId);
+                viewModel.RatedTests = await GetTestsMainInfoListAsync(user.RatedTestsId, userId);
+                viewModel.PinnedTests = await GetTestsMainInfoListAsync(user.PinnedTestsId, userId);
 
                 return viewModel;
             }
         }
+
         async public Task<User?> GetUserByEmailAndPasswordAsync(string email, string password)
         {
             using (var connection = new SqlConnection(_connectionString))
@@ -305,9 +332,8 @@ SELECT CAST(SCOPE_IDENTITY() as int);";
                 return test;
             }
         }
-        public async Task<IEnumerable<TestMainInfo>> GetAllTestsMainInfoAsync(int? userId)
+        public async Task<TestMainInfo> GetTestMainInfoAsync(int testId, int? userId)
         {
-            if(userId is null) userId = 0;
             using (var connection = new SqlConnection(_connectionString))
             {
                 var query = @"
@@ -321,26 +347,34 @@ SELECT
     (SELECT COUNT(*) FROM Comments WHERE TestId = t.Id) AS CommentsCount,
     (SELECT COUNT(*) FROM TestsTakings WHERE TestId = t.Id) AS TakingsCount,
     (SELECT AVG(Rating) FROM TestsRatings WHERE TestId = t.Id) AS AverageRating
-FROM Tests t";
+FROM Tests t
+WHERE t.Id = @TestId";
 
-                var testMainInfos = await connection.QueryAsync<TestMainInfo>(query);
+                var testMainInfo = await connection.QuerySingleOrDefaultAsync<TestMainInfo>(query, new { TestId = testId });
 
-                foreach (var testMainInfo in testMainInfos)
+                if (testMainInfo != null)
                 {
                     var tags = await GetTagsForTestAsync(testMainInfo.Id);
                     testMainInfo.Tags = tags.Select(tag => tag.ToString()).ToList();
+                    testMainInfo.IsPinned = userId.HasValue && await IsTestPinnedByUserAsync(testMainInfo.Id, userId.Value);
                 }
-                foreach (var testMainInfo in testMainInfos)
-                {
-                    testMainInfo.Tags = (await GetTagsForTestAsync(testMainInfo.Id))
-                        .Select(tag => tag.ToString()).ToList();
 
-                    testMainInfo.IsPinned = await IsTestPinnedByUserAsync(testMainInfo.Id, (int)userId);
-                }
+                return testMainInfo;
+            }
+        }
+        public async Task<IEnumerable<TestMainInfo>> GetAllTestsMainInfoAsync(int? userId)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var testIds = await connection.QueryAsync<int>("SELECT Id FROM Tests");
+
+                var tasks = testIds.Select(testId => GetTestMainInfoAsync(testId, userId));
+                var testMainInfos = await Task.WhenAll(tasks);
 
                 return testMainInfos;
             }
         }
+
         public async Task<bool> IsTestPinnedByUserAsync(int testId, int userId)
         {
             using (var connection = new SqlConnection(_connectionString))

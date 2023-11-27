@@ -14,37 +14,53 @@
 else
 {
     <p>You created this tests</p>
-    foreach (int id in Model.CreatedTests)
+    foreach (TestMainInfo test in Model.CreatedTests)
     {
-        <p>@id</p>
+        <a asp-controller="Tests" asp-action="Test" asp-route-id="@test.Id" class="test-ref">
+            <img src="@test.ImagePath" class="test-img" />
+            <label class="test-name-label">@test.Name</label>
+            <label class="test-lang">@test.Language.ToString()</label>
+        </a>
     }
 }
 @if (Model.TakenTests != null && Model.TakenTests.Count > 0)
 {
     <p>You have taken this tests</p>
-    @foreach (int id in Model.TakenTests)
+    foreach (TestMainInfo test in Model.TakenTests)
     {
-        <p>@id</p>
-    }
-    if (Model.RatedTests != null && Model.RatedTests.Count > 0)
-    {
-        <p>You have rated this tests</p>
-        @foreach (int id in Model.RatedTests)
-        {
-            <p>@id</p>
-        }
+        <a asp-controller="Tests" asp-action="Test" asp-route-id="@test.Id" class="test-ref">
+            <img src="@test.ImagePath" class="test-img" />
+            <label class="test-name-label">@test.Name</label>
+            <label class="test-lang">@test.Language.ToString()</label>
+        </a>
     }
 }
 else
 {
     <p>You have not taken any test yet</p>
 }
+@if (Model.RatedTests != null && Model.RatedTests.Count > 0)
+{
+    <p>You have rated this tests</p>
+    foreach (TestMainInfo test in Model.RatedTests)
+    {
+        <a asp-controller="Tests" asp-action="Test" asp-route-id="@test.Id" class="test-ref">
+            <img src="@test.ImagePath" class="test-img" />
+            <label class="test-name-label">@test.Name</label>
+            <label class="test-lang">@test.Language.ToString()</label>
+        </a>
+    }
+}
 @if (Model.PinnedTests != null && Model.PinnedTests.Count > 0)
 {
     <p>You have pinned this tests</p>
-    @foreach (int id in Model.PinnedTests)
+    foreach (TestMainInfo test in Model.PinnedTests)
     {
-        <p>@id</p>
+        <a asp-controller="Tests" asp-action="Test" asp-route-id="@test.Id" class="test-ref">
+            <img src="@test.ImagePath" class="test-img" />
+            <label class="test-name-label">@test.Name</label>
+            <label class="test-lang">@test.Language.ToString()</label>
+        </a>
     }
 }
 else

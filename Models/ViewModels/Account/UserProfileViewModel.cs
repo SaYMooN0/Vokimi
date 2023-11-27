@@ -5,8 +5,8 @@
         public int Id { get; set; }
         public string Nickname { get; set; }
         public string? Status { get; set; }
-        public int? LastTakenTest { get; set; }
-        public List<int> CreatedTests { get; set; }
+        public TestMainInfo? LastTakenTest { get; set; }
+        public List<TestMainInfo> CreatedTests { get; set; }
         public UserProfileViewModel(int id, string nickname, string? status)
         {
             Id = id;

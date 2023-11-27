@@ -10,12 +10,16 @@
 else
 {
     <p>Tests created by this user</p>
-    foreach (int id in Model.CreatedTests)
+    foreach (TestMainInfo test in Model.CreatedTests)
     {
-        <p>@id</p>
+        <a asp-controller="Tests" asp-action="Test" asp-route-id="@test.Id" class="test-ref">
+            <img src="@test.ImagePath" class="test-img" />
+            <label class="test-name-label">@test.Name</label>
+            <label class="test-lang">@test.Language.ToString()</label>
+        </a>
     }
 }
-@if (Model.LastTakenTest != null)
+@if (Model.LastTakenTest is not null)
 {
     <p>Last taken test by this user: @Model.LastTakenTest</p>
 }
