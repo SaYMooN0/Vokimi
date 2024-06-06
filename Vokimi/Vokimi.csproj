@@ -11,4 +11,10 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.5" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="src\data\models\users\" />
+    <Folder Include="src\data\models\tests\" />
+    <Folder Include="Services\" />
+  </ItemGroup>
+
 </Project>
