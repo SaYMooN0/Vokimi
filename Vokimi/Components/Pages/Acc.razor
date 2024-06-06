@@ -1,0 +1,36 @@
+﻿@page "/acc"
+@attribute [StreamRendering]
+
+<PageTitle>Account</PageTitle>
+
+
+Your account page
+
+@switch (_pageState)
+{
+    @case PageState.Account:
+        <Account />
+        break;
+    @case PageState.Authorization:
+        <Authorization />
+        break;
+    @case PageState.Registration:
+        <Registration />
+        break;
+}
+
+@code {
+    private enum PageState
+    {
+        Account,
+        Authorization,
+        Registration
+    }
+    private PageState _pageState;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _pageState = PageState.Authorization;
+
+    }
+}
