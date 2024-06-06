@@ -41,6 +41,10 @@ bld/
 # Visual Studio 2017 auto generated files
 Generated\ Files/
 
+Vokimi/appsettings.json
+Vokimi/appsettings.Development.json
+
+
 # MSTest test Results
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*
@@ -361,3 +365,4 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/Vokimi/appsettings.Development.json
