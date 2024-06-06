@@ -1,16 +1,15 @@
-# https://hub.docker.com/_/microsoft-dotnet
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# copy csproj and restore as distinct layers
-COPY Vokimi/Vokimi/*.csproj ./Vokimi/Vokimi/
-COPY Vokimi/Vokimi.Client/*.csproj ./Vokimi/Vokimi.Client/
-RUN dotnet restore Vokimi/Vokimi/Vokimi.csproj
-
+# Adjusted paths for the correct relative locations
+COPY Vokimi/*.csproj ./Vokimi/
+COPY Vokimi.Client/*.csproj ./Vokimi.Client/
+RUN dotnet restore Vokimi/Vokimi.csproj
 
 # copy everything else and build app
-COPY . .
-WORKDIR /src/Vokimi/Vokimi
+COPY Vokimi/ ./Vokimi/
+COPY Vokimi.Client/ ./Vokimi.Client/
+WORKDIR /src/Vokimi
 RUN dotnet publish "Vokimi.csproj" -c release -o /app/publish
 
 # final stage/image
