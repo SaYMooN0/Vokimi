@@ -1,14 +1,9 @@
 .nav-links-container {
-    height: 80px;
-    background-color: firebrick;
     width: 100%;
-    position:fixed;
-    top:0;
+    height: 100%;
     display: flex;
     flex-direction: row;
     justify-content: center;
-    gap: 8%;
+    gap: 4px;
     align-items: center;
-    padding: 0 10vw;
-    box-sizing: border-box;
 }

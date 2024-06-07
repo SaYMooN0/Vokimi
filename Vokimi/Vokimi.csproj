@@ -8,13 +8,16 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Vokimi.Client\Vokimi.Client.csproj" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.5" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.6" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4" />
+    <PackageReference Include="OneOf" Version="3.0.271" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="src\data\models\users\" />
+    <Folder Include="Components\Pages\friends\" />
+    <Folder Include="Components\Pages\tests\" />
+    <Folder Include="Components\Pages\create\" />
     <Folder Include="src\data\models\tests\" />
-    <Folder Include="Services\" />
   </ItemGroup>
 
 </Project>

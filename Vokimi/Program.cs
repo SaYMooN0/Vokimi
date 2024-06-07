@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Options;
 using Vokimi.Components;
 
 namespace Vokimi
@@ -39,5 +40,9 @@ namespace Vokimi
 
             app.Run();
         }
+        private void ConfigureServices(IServiceCollection services)
+        {
+        }
     }
+    
 }

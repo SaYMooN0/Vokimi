@@ -26,11 +26,11 @@ Your account page
         Authorization,
         Registration
     }
-    private PageState _pageState;
+    private PageState _pageState = PageState.Authorization;
 
-    protected override async Task OnInitializedAsync()
-    {
-        _pageState = PageState.Authorization;
+    // protected override async Task OnInitializedAsync()
+    // {
+    //     _pageState = PageState.Authorization;
 
-    }
+    // }
 }

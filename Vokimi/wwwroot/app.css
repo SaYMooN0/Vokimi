@@ -1,3 +1,9 @@
+.unselectable {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
 
 :root {
     --text: #040316;
@@ -6,29 +12,55 @@
     --secondary: #dde3ff;
     --accent: #5821f0;
 }
-body{
+
+body {
     margin: 0 !important;
 }
 
 .nav-link {
-    height: 90%;
+    height: 82%;
     display: flex;
     flex-direction: row;
     justify-content: center;
+    text-align:center;
     align-items: center;
-    gap: 20px;
-    background-color:whitesmoke;
+    gap: 6px;
+    background-color: var(--back);
+    text-decoration: none;
+    border-radius: 30px;
+    padding: 6px 22px;
+    box-sizing: border-box;
 }
 
-    .nav-link svg {
-        height: 80%;
+    .nav-link:hover {
+        background-color: var(--secondary);
     }
 
-    .nav-link label {
-        font-family: "Roboto", sans-serif;
-        font-size: 24px;
-        font-style: normal;
+    .nav-link svg {
+        height: 90%;
     }
+
+
+    .nav-link label {
+        font-family: "Quicksand";
+        font-size: 30px;
+        font-style: normal;
+        color: var(--primary);
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .nav-link path {
+        stroke: var(--primary);
+    }
+
+    .nav-link .svg-fill {
+        fill: var(--primary);
+    }
+
+        .nav-link .svg-fill path {
+            stroke: none;
+        }
 
 .invalid {
     outline: 1px solid #e50000;

@@ -1,6 +1,18 @@
-.nav-menu {
+.header {
     position: fixed;
-   
+    top: 0;
+    height: 80px;
+    width: 100vw;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    padding: 6px 20px;
+    box-sizing: border-box;
+    background: var(--back);
+}
+.logo {
+    height: 100%;
+    aspect-ratio: 2/1;
+
 }
 .page-content {
     margin-top: 80px;

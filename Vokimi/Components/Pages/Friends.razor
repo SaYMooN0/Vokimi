@@ -1,0 +1,30 @@
+﻿@page "/friends"
+@attribute [StreamRendering]
+
+<PageTitle>Friends</PageTitle>
+
+
+@if (_friendsCount > 0)
+{
+    <h3>
+        Find more friends:
+
+    </h3>
+
+    <h3> Your friends (@_friendsCount)</h3>
+    @* ...list *@
+    <h3>
+        Tests by my friends:
+        @* ...list *@
+    </h3>
+}
+else
+{
+    <h2>You don't have any friends ;_;</h2>
+    <h2>Go find some  @* link button *@ </h2>
+}
+
+@code {
+    private int _friendsCount = 0;
+
+}
