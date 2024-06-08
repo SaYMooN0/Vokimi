@@ -17,7 +17,6 @@
     <Folder Include="Components\Pages\friends\" />
     <Folder Include="Components\Pages\tests\" />
     <Folder Include="Components\Pages\create\" />
-    <Folder Include="src\data\models\tests\" />
   </ItemGroup>
 
 </Project>

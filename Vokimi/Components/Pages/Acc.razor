@@ -1,8 +1,8 @@
 ﻿@page "/acc"
-@attribute [StreamRendering]
+@page "/acc/{PageStateParam}"
+@inject NavigationManager NavigationManager
 
 <PageTitle>Account</PageTitle>
-
 
 Your account page
 
@@ -15,7 +15,7 @@ Your account page
         <Authorization />
         break;
     @case PageState.Registration:
-        <Registration />
+        <RegistrationFormComponent />
         break;
 }
 
@@ -26,11 +26,21 @@ Your account page
         Authorization,
         Registration
     }
+
     private PageState _pageState = PageState.Authorization;
 
-    // protected override async Task OnInitializedAsync()
-    // {
-    //     _pageState = PageState.Authorization;
+    [Parameter]
+    public string PageStateParam { get; set; }
 
-    // }
+    protected override void OnParametersSet()
+    {
+        bool signedIn = false; //TODO
+
+        if (signedIn)
+            _pageState = PageState.Account;
+        else if (PageStateParam?.ToLower() == "signup")
+            _pageState = PageState.Registration;
+        else
+            _pageState = PageState.Authorization;
+    }
 }

@@ -1,4 +1,4 @@
-﻿namespace Vokimi.src.data.models
+﻿namespace Shared.src.models.db_classes
 {
     public readonly record struct UserId(Guid Value)
     {
