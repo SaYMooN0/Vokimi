@@ -1,0 +1,35 @@
+﻿@rendermode RenderMode.InteractiveServer
+
+<EditForm Model="@form" OnValidSubmit="HandleValidSubmit" FormName="RegistrationForm">
+    <DataAnnotationsValidator />
+    <div class="form-content">
+        <label class="form-title">Create an account</label>
+
+        <InputText id="username" class="input-text" @bind-Value="form.Username" />
+        <ValidationMessage For="@(() => form.Username)" class="validation-message" />
+
+        <InputText id="email" class="input-text" @bind-Value="form.Email" />
+        <ValidationMessage For="@(() => form.Email)" class="validation-message" />
+
+        <InputText id="password" class="input-text" @bind-Value="form.Password" type="password" />
+        <ValidationMessage For="@(() => form.Password)" class="validation-message" />
+
+        <InputText id="confirmPassword" class="input-text" @bind-Value="form.ConfirmPassword" type="password" />
+        <ValidationMessage For="@(() => form.ConfirmPassword)" class="validation-message" />
+
+        <button type="submit">SignUp</button>
+        <a href="/acc">I already have an account</a>
+    </div>
+</EditForm>
+
+
+
+
+@code {
+
+    RegistrationForm form = new();
+    private void HandleValidSubmit()
+    {
+
+    }
+}

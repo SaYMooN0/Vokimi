@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Shared.src.models.db_classes;
-using Shared.src.models.db_classes.users;
+using VokimiShared.src.models.db_classes;
+using VokimiShared.src.models.db_classes.users;
 
 namespace Vokimi.src.data
 {

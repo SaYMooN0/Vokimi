@@ -12,10 +12,15 @@ Your account page
         <Account />
         break;
     @case PageState.Authorization:
-        <Authorization />
+        <div class="form-container">
+            <AuthorizationFormComponent />
+        </div>
         break;
     @case PageState.Registration:
-        <RegistrationFormComponent />
+    <div class="form-container">
+            <RegistrationFormComponent />
+
+        </div>
         break;
 }
 

@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vokimi", "Vokimi\Vokimi.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vokimi.Client", "Vokimi.Client\Vokimi.Client.csproj", "{A3605F5A-7A7C-452D-9F5D-63D31BF7341E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "Shared\Shared.csproj", "{D40ACC3A-D605-4B4A-B5A8-3B72F4EE7397}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VokimiShared", "VokimiShared\VokimiShared.csproj", "{8CE21378-47D4-43D2-BE5A-30ED23E4BD75}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +23,10 @@ Global
 		{A3605F5A-7A7C-452D-9F5D-63D31BF7341E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A3605F5A-7A7C-452D-9F5D-63D31BF7341E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A3605F5A-7A7C-452D-9F5D-63D31BF7341E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D40ACC3A-D605-4B4A-B5A8-3B72F4EE7397}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D40ACC3A-D605-4B4A-B5A8-3B72F4EE7397}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D40ACC3A-D605-4B4A-B5A8-3B72F4EE7397}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D40ACC3A-D605-4B4A-B5A8-3B72F4EE7397}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8CE21378-47D4-43D2-BE5A-30ED23E4BD75}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8CE21378-47D4-43D2-BE5A-30ED23E4BD75}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8CE21378-47D4-43D2-BE5A-30ED23E4BD75}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8CE21378-47D4-43D2-BE5A-30ED23E4BD75}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
