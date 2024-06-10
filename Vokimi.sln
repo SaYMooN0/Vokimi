@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vokimi", "Vokimi\Vokimi.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vokimi.Client", "Vokimi.Client\Vokimi.Client.csproj", "{A3605F5A-7A7C-452D-9F5D-63D31BF7341E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VokimiShared", "VokimiShared\VokimiShared.csproj", "{8CE21378-47D4-43D2-BE5A-30ED23E4BD75}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VokimiShared", "VokimiShared\VokimiShared.csproj", "{8CE21378-47D4-43D2-BE5A-30ED23E4BD75}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

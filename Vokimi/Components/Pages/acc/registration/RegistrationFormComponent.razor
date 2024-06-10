@@ -1,4 +1,9 @@
-﻿@rendermode RenderMode.InteractiveServer
+﻿@using System.Text.RegularExpressions
+
+@inject EmailService emailService
+@inject NavigationManager navigator
+@rendermode RenderMode.InteractiveServer
+
 
 <EditForm Model="@form" OnValidSubmit="HandleValidSubmit" FormName="RegistrationForm">
     <DataAnnotationsValidator />
@@ -6,17 +11,20 @@
         <label class="form-title">Create an account</label>
 
         <InputText id="username" class="input-text" @bind-Value="form.Username" />
-        <ValidationMessage For="@(() => form.Username)" class="validation-message" />
+        <ValidationMessage For="@(() => form.Username)" class="err-message" />
 
         <InputText id="email" class="input-text" @bind-Value="form.Email" />
-        <ValidationMessage For="@(() => form.Email)" class="validation-message" />
+        <ValidationMessage For="@(() => form.Email)" class="err-message" />
 
         <InputText id="password" class="input-text" @bind-Value="form.Password" type="password" />
-        <ValidationMessage For="@(() => form.Password)" class="validation-message" />
+        <ValidationMessage For="@(() => form.Password)" class="err-message" />
 
         <InputText id="confirmPassword" class="input-text" @bind-Value="form.ConfirmPassword" type="password" />
-        <ValidationMessage For="@(() => form.ConfirmPassword)" class="validation-message" />
-
+        <ValidationMessage For="@(() => form.ConfirmPassword)" class="err-message" />
+        @if (!string.IsNullOrEmpty(ServerErrorMessage))
+        {
+            <label class="err-message">@ServerErrorMessage</label>
+        }
         <button type="submit">SignUp</button>
         <a href="/acc">I already have an account</a>
     </div>
@@ -24,12 +32,51 @@
 
 
 
-
 @code {
-
+    private string ServerErrorMessage { get; set; } = string.Empty;
     RegistrationForm form = new();
-    private void HandleValidSubmit()
+
+    private async void HandleValidSubmit()
     {
+        if (!IsFormValid()) //check if email is already used
+            return;
+
+        string confirmationCode = GenerateConfirmationCode();
+        string confirmationLink = GenerateConfirmationLink(confirmationCode);
+        await emailService.SendConfirmationLink(form.Email, confirmationLink);
 
     }
+    private bool IsFormValid()
+    {
+        ServerErrorMessage = string.Empty;
+        Regex nameRegex = new(@"^[a-zA-Z0-9_.,><~^А-Яа-яЁё]*$");
+        if (form.Username.Length < 5 ||
+            form.Username.Length > 30 ||
+            !nameRegex.IsMatch(form.Username))
+        {
+            ServerErrorMessage = "Invalid username";
+            return false;
+        }
+
+        Regex emailRegex = new(@"^[^@\s]+@[^@\s]+\.[^@\s]+$");
+        if (!emailRegex.IsMatch(form.Email))
+        {
+            ServerErrorMessage = "Invalid email address";
+            return false;
+        }
+
+        if (form.Password.Length < 8 || form.Password.Length > 30)
+        {
+            ServerErrorMessage = "Password must be between 8 and 30 characters long";
+            return false;
+        }
+
+        return true;
+    }
+
+    private string GenerateConfirmationCode() =>
+        $"{DateTime.Now.GetHashCode()}-{form.GetHashCode()}";
+    private string GenerateConfirmationLink(string confirmationCode) =>
+        $"{navigator.BaseUri}?email={form.Email}&code={Uri.EscapeDataString(confirmationCode)}";
+
 }

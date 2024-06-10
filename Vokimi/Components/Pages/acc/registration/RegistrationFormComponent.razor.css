@@ -4,7 +4,7 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
-    box-shadow: rgb(43, 90, 243, 0.24) 0px 3px 8px;
+    box-shadow: rgb(43, 90, 243, 0.19) 0px 10px 20px, rgb(43, 90, 243, 0.24) 0px 6px 6px;
     border-radius: 10px;
     font-family: Roboto;
 }
@@ -33,3 +33,4 @@
     color: gray;
     font-size: 16px;
 }
+

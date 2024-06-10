@@ -5,7 +5,7 @@ namespace VokimiShared.src.models.form_classes
     public class RegistrationForm
     {
         [Required(ErrorMessage = "Username is required")]
-        [StringLength(30, MinimumLength = 8, ErrorMessage = "Username must be between 8 and 30 characters long")]
+        [StringLength(30, MinimumLength = 5, ErrorMessage = "Username must be between 5 and 30 characters long")]
         [RegularExpression(@"^[a-zA-Z0-9_.,><~^А-Яа-яЁё]*$", ErrorMessage = "Username contains invalid characters")]
         public string Username { get; set; }
 

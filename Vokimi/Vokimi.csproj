@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Vokimi.Client\Vokimi.Client.csproj" />
+    <PackageReference Include="MailKit" Version="4.6.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.6" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4" />
     <PackageReference Include="OneOf" Version="3.0.271" />
