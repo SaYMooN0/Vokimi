@@ -9,7 +9,7 @@ namespace Vokimi.src.data
         public VokimiDbContext(DbContextOptions<VokimiDbContext> options) : base(options) { }
         public DbSet<UnconfirmedAppUser> UnconfirmedAppUsers { get; set; }
         public DbSet<AppUser> AppUsers { get; set; }
-        public DbSet<LoginInfo> UserLoginInfo { get; set; }
+        public DbSet<LoginInfo> LoginInfo { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -18,7 +18,8 @@ namespace Vokimi.src.data
             modelBuilder.Entity<AppUser>(entity =>
             {
                 entity.HasKey(x => x.Id);
-                entity.Property(x => x.Id).HasConversion(v => v.Value, v => new UserId(v));
+                entity.Property(x => x.Id).HasConversion(v => v.Value, v => new AppUserId(v));
+                entity.Property(x => x.LoginInfoId).HasConversion(v => v.Value, v => new LoginInfoId(v)); 
             });
 
             modelBuilder.Entity<LoginInfo>(entity =>

@@ -1,36 +1,62 @@
 ﻿@using Microsoft.AspNetCore.WebUtilities
 
 
+
 @page "/registration-confirmation"
-@inject NavigationManager Navigation
 
-<h3>Registration Confirmation</h3>
 
-@if (!string.IsNullOrEmpty(Email) && !string.IsNullOrEmpty(Code))
-{
-    <p>Email: @Email</p>
-    <p>Confirmation Code: @Code</p>
-}
-else
-{
-    <p>Loading...</p>
-}
+@inject NavigationManager navigationManager
+@inject UsersDbOperationsService usersDbOperationsService
+
+<div class="confiramtion-container">
+
+    <h3>Registration Confirmation</h3>
+    @if (registrationConfirmed)
+    {
+        <label>
+            Registration successfully confirmed
+        </label>
+    }
+    else
+    {
+        <label class="error-message">@serverMessage</label>
+    }
+
+</div>
+
 
 @code {
-    private string Email { get; set; } = string.Empty;
-    private string Code { get; set; } = string.Empty;
+    private bool registrationConfirmed { get; set; } = false;
+    private string serverMessage { get; set; }
+    private string email { get; set; } = null;
+    private string code { get; set; } = null;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
-        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("email", out var email))
-        {
-            Email = email;
-        }
+        registrationConfirmed = false;
+        var uri = navigationManager.ToAbsoluteUri(navigationManager.Uri);
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("email", out var e))
+            email = e;
 
-        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("code", out var code))
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("code", out var c))
+            code = c;
+
+        if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(code))
+            serverMessage = "Try to reload the page. If that doesn't help, try registering again";
+        else if (await usersDbOperationsService.IsEmailTaken(email))
+            serverMessage = "Email is already confirmed. Please use authorization form to log in";
+        if (!string.IsNullOrEmpty(serverMessage))
         {
-            Code = code;
+            StateHasChanged();
+            return;
         }
+        Err serverError = await usersDbOperationsService.TryToConfirmUser(email, code);
+        if (serverError.NotNone())
+            serverMessage = serverError.Message;
+        else
+            registrationConfirmed = true;
+        StateHasChanged();
+
+
     }
 }

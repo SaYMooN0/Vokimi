@@ -2,7 +2,20 @@
 {
     public class AppUser
     {
-        public UserId Id { get; init; }
-        public required string Name { get; init; }
+        public AppUserId Id { get; private set; }
+        public string Username { get; init; }
+        public LoginInfoId LoginInfoId { get; private set; }
+
+        public virtual LoginInfo LoginInfo { get; set; }
+
+        public AppUser(string username, LoginInfoId loginInfoId)
+        {
+            Id = new();
+            Username = username;
+            LoginInfoId = loginInfoId;
+        }
+
+
+
     }
 }

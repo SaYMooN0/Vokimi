@@ -1,0 +1,11 @@
+﻿<h3>@Username, thank you for registration</h3>
+<label>
+    Link to complete the registration has been sent to <span>@Email</span>.
+    Click on the link in your email client to complete the registration
+</label>
+@code {
+    [Parameter]
+    public string Username { get; set; }
+    [Parameter]
+    public string Email { get; set; }
+}

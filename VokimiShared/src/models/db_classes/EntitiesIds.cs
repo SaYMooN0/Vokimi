@@ -1,18 +1,18 @@
 ﻿namespace VokimiShared.src.models.db_classes
 {
-    public readonly record struct UserId(Guid Value)
+    public readonly record struct AppUserId(Guid Value)
     {
-        public UserId() : this(new Guid()) { }
+        public AppUserId() : this(Guid.NewGuid()) { }
         public override string ToString() => Value.ToString();
     }
     public readonly record struct UnconfirmedAppUserId(Guid Value)
     {
-        public UnconfirmedAppUserId() : this(new Guid()) { }
+        public UnconfirmedAppUserId() : this(Guid.NewGuid()) { }
         public override string ToString() => Value.ToString();
     }
     public readonly record struct LoginInfoId(Guid Value)
     {
-        public LoginInfoId() : this(new Guid()) { }
+        public LoginInfoId() : this(Guid.NewGuid()) { }
         public override string ToString() => Value.ToString();
     }
 }

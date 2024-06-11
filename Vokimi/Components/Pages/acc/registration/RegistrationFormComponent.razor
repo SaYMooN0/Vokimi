@@ -1,49 +1,73 @@
 ﻿@using System.Text.RegularExpressions
 
+
+@inject NavigationManager navigationManager
 @inject EmailService emailService
-@inject NavigationManager navigator
+@inject UsersDbOperationsService usersDbOperationsService
+
+
 @rendermode RenderMode.InteractiveServer
 
+@if (emailAlreadySent)
+{
+    <ConfirmationEmailSent Email="@form.Email" Username="@form.Username" />
+}
+else
+{
+    <EditForm Model="@form" OnValidSubmit="HandleValidSubmit" FormName="RegistrationForm">
+        <DataAnnotationsValidator />
+        <div class="form-content">
+            <label class="form-title">Create an account</label>
 
-<EditForm Model="@form" OnValidSubmit="HandleValidSubmit" FormName="RegistrationForm">
-    <DataAnnotationsValidator />
-    <div class="form-content">
-        <label class="form-title">Create an account</label>
+            <InputText id="username" class="input-text" @bind-Value="form.Username" />
+            <ValidationMessage For="@(() => form.Username)" class="err-message" />
 
-        <InputText id="username" class="input-text" @bind-Value="form.Username" />
-        <ValidationMessage For="@(() => form.Username)" class="err-message" />
+            <InputText id="email" class="input-text" @bind-Value="form.Email" />
+            <ValidationMessage For="@(() => form.Email)" class="err-message" />
 
-        <InputText id="email" class="input-text" @bind-Value="form.Email" />
-        <ValidationMessage For="@(() => form.Email)" class="err-message" />
+            <InputText id="password" class="input-text" @bind-Value="form.Password" type="password" />
+            <ValidationMessage For="@(() => form.Password)" class="err-message" />
 
-        <InputText id="password" class="input-text" @bind-Value="form.Password" type="password" />
-        <ValidationMessage For="@(() => form.Password)" class="err-message" />
+            <InputText id="confirmPassword" class="input-text" @bind-Value="form.ConfirmPassword" type="password" />
+            <ValidationMessage For="@(() => form.ConfirmPassword)" class="err-message" />
+            @if (!string.IsNullOrEmpty(ServerErrorMessage))
+            {
+                <label class="err-message">@ServerErrorMessage</label>
+            }
+            <button type="submit">SignUp</button>
+            <a href="/acc">I already have an account</a>
+        </div>
+    </EditForm>
+}
 
-        <InputText id="confirmPassword" class="input-text" @bind-Value="form.ConfirmPassword" type="password" />
-        <ValidationMessage For="@(() => form.ConfirmPassword)" class="err-message" />
-        @if (!string.IsNullOrEmpty(ServerErrorMessage))
-        {
-            <label class="err-message">@ServerErrorMessage</label>
-        }
-        <button type="submit">SignUp</button>
-        <a href="/acc">I already have an account</a>
-    </div>
-</EditForm>
 
 
 
 @code {
+    private bool emailAlreadySent { get; set; } = false;
     private string ServerErrorMessage { get; set; } = string.Empty;
     RegistrationForm form = new();
 
     private async void HandleValidSubmit()
     {
-        if (!IsFormValid()) //check if email is already used
+        if (!IsFormValid())
             return;
-
+        if (await usersDbOperationsService.IsEmailTaken(form.Email))
+        {
+            ServerErrorMessage = "Account with this email already exists";
+            return;
+        }
         string confirmationCode = GenerateConfirmationCode();
-        string confirmationLink = GenerateConfirmationLink(confirmationCode);
-        await emailService.SendConfirmationLink(form.Email, confirmationLink);
+        (await usersDbOperationsService.CreateUnconfirmedUser(form , confirmationCode)).Switch(
+            async user =>
+            {
+                string confirmationLink = GenerateConfirmationLink(confirmationCode);
+                await emailService.SendConfirmationLink(form.Email, confirmationLink);
+                emailAlreadySent = true;
+            },
+            err => { ServerErrorMessage = "An error occurred while registering, please try again later"; }
+        );
+        StateHasChanged();
 
     }
     private bool IsFormValid()
@@ -77,6 +101,6 @@
     private string GenerateConfirmationCode() =>
         $"{DateTime.Now.GetHashCode()}-{form.GetHashCode()}";
     private string GenerateConfirmationLink(string confirmationCode) =>
-        $"{navigator.BaseUri}?email={form.Email}&code={Uri.EscapeDataString(confirmationCode)}";
+        $"{navigationManager.BaseUri}registration-confirmation?email={form.Email}&code={Uri.EscapeDataString(confirmationCode)}";
 
 }
