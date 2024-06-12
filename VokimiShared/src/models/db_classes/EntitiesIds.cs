@@ -15,4 +15,9 @@
         public LoginInfoId() : this(Guid.NewGuid()) { }
         public override string ToString() => Value.ToString();
     }
+    public readonly record struct UserAdditionalInfoId(Guid Value)
+    {
+        public UserAdditionalInfoId() : this(Guid.NewGuid()) { }
+        public override string ToString() => Value.ToString();
+    }
 }

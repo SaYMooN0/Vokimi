@@ -1,0 +1,57 @@
+﻿@inject NavigationManager navigationManager
+@inject AuthHelperService authService
+
+@page "/acc"
+@page "/acc/{userId}"
+
+<PageTitle>Account</PageTitle> @* or user name if its someone's *@
+
+@switch (pageState)
+
+{
+    @case PageState.MyAcc:
+        <MyAcc />
+        break;
+    @default:
+        <h2>Not implemented yet</h2>
+        break;
+}
+
+<h3>
+    Account page
+</h3>
+
+@code {
+
+    private enum PageState
+    {
+        MyAcc,
+        UserPublicAcc,
+        PrivateAcc
+    }
+
+    private PageState pageState { get; set; }
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    [Parameter]
+    public string userId { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (string.IsNullOrEmpty(userId))
+        {
+            AuthenticationState? authState = await authenticationStateTask;
+
+            if (!authService.IsSignedIn(authState))
+                navigationManager.NavigateTo("/login");
+            else pageState = PageState.MyAcc;
+        }
+        else
+        {
+            pageState = PageState.UserPublicAcc;//based on user isPrivate ...
+        }
+
+
+    }
+}

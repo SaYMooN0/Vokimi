@@ -6,38 +6,47 @@
 @inject UsersDbOperationsService usersDbOperationsService
 
 
+@page "/signup"
+<PageTitle>Registration</PageTitle>
+
 @rendermode RenderMode.InteractiveServer
 
 @if (emailAlreadySent)
 {
-    <ConfirmationEmailSent Email="@form.Email" Username="@form.Username" />
+    <h3>@form.Username, thank you for registration</h3>
+    <label>
+        Link to complete the registration has been sent to <span>@form.Email</span>.
+        Click on the link in your email client to complete the registration
+    </label>
 }
 else
 {
-    <EditForm Model="@form" OnValidSubmit="HandleValidSubmit" FormName="RegistrationForm">
-        <DataAnnotationsValidator />
-        <div class="form-content">
-            <label class="form-title">Create an account</label>
+    <div class="form-container">
+        <EditForm Model="@form" OnValidSubmit="HandleValidSubmit" FormName="RegistrationForm">
+            <DataAnnotationsValidator />
+            <div class="form-content">
+                <label class="form-title">Create an account</label>
 
-            <InputText placeholder="Username" class="input-text" @bind-Value="form.Username" />
-            <ValidationMessage For="@(() => form.Username)" class="err-message" />
+                <InputText placeholder="Username" class="input-text" @bind-Value="form.Username" />
+                <ValidationMessage For="@(() => form.Username)" class="err-message" />
 
-            <InputText placeholder="Email" class="input-text" @bind-Value="form.Email" />
-            <ValidationMessage For="@(() => form.Email)" class="err-message" />
+                <InputText placeholder="Email" class="input-text" @bind-Value="form.Email" />
+                <ValidationMessage For="@(() => form.Email)" class="err-message" />
 
-            <InputText placeholder="Password" class="input-text" @bind-Value="form.Password" type="password" />
-            <ValidationMessage For="@(() => form.Password)" class="err-message" />
+                <InputText placeholder="Password" class="input-text" @bind-Value="form.Password" type="password" />
+                <ValidationMessage For="@(() => form.Password)" class="err-message" />
 
-            <InputText placeholder="Confirm Password" class="input-text" @bind-Value="form.ConfirmPassword" type="password" />
-            <ValidationMessage For="@(() => form.ConfirmPassword)" class="err-message" />
-            @if (!string.IsNullOrEmpty(serverErrorMessage))
-            {
-                <label class="err-message">@serverErrorMessage</label>
-            }
-            <button type="submit">SignUp</button>
-            <a href="/acc">I already have an account</a>
-        </div>
-    </EditForm>
+                <InputText placeholder="Confirm Password" class="input-text" @bind-Value="form.ConfirmPassword" type="password" />
+                <ValidationMessage For="@(() => form.ConfirmPassword)" class="err-message" />
+                @if (!string.IsNullOrEmpty(serverErrorMessage))
+                {
+                    <label class="err-message">@serverErrorMessage</label>
+                }
+                <button type="submit">SignUp</button>
+                <a href="/login">I already have an account</a>
+            </div>
+        </EditForm>
+    </div>
 }
 
 

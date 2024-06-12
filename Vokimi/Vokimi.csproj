@@ -16,11 +16,4 @@
     <PackageReference Include="OneOf" Version="3.0.271" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Components\Pages\friends\" />
-    <Folder Include="Components\Pages\tests\" />
-    <Folder Include="Components\Pages\create\" />
-    <Folder Include="Components\Shared\" />
-  </ItemGroup>
-
 </Project>

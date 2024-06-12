@@ -55,27 +55,30 @@ namespace Vokimi.Services
 
         }
 
-        public async Task<Err> TryToConfirmUser(string email, string confirmationCode)
+        public async Task<OneOf<AppUser, Err>> TryToConfirmUser(string email, string confirmationCode)
         {
             UnconfirmedAppUser? unconfirmed = _db.UnconfirmedAppUsers.FirstOrDefault(u => u.Email == email);
             if (unconfirmed is null)
-                return new("Incorrect confirmation link");
+                return new Err("Incorrect confirmation link");
             if (confirmationCode != unconfirmed.ConfirmationCode)
-                return new("Incorrect confirmation link");
+                return new Err("Incorrect confirmation link");
 
-            LoginInfo loginInfo = new(unconfirmed.Email, unconfirmed.PasswordHash);
-            AppUser user = new(unconfirmed.Username, loginInfo.Id);
+
+            var loginInfo = LoginInfo.CreateNew(unconfirmed.Email, unconfirmed.PasswordHash);
+            var additionalInfo = UserAdditionalInfo.CreateNew(unconfirmed.RegistrationDate);
+            var user = AppUser.CreateNew(unconfirmed.Username, loginInfo.Id, additionalInfo.Id);
 
             try
             {
+                _db.UserAdditionalInfo.Add(additionalInfo);
                 _db.LoginInfo.Add(loginInfo);
                 _db.AppUsers.Add(user);
                 _db.SaveChanges();
             }
-            catch { return new("Server error. Please try again later"); }
+            catch { return new Err("Server error. Please try again later"); }
 
             await RemoveUnconfirmedAppUser(email);
-            return Err.None;
+            return user;
         }
         public async Task<AppUser?> GetUserByEmail(string email) =>
             await _db.AppUsers.FirstOrDefaultAsync(u => u.LoginInfo.Email == email);

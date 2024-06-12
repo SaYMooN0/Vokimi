@@ -9,6 +9,7 @@ namespace Vokimi.src.data
         public DbSet<UnconfirmedAppUser> UnconfirmedAppUsers { get; set; }
         public DbSet<AppUser> AppUsers { get; set; }
         public DbSet<LoginInfo> LoginInfo { get; set; }
+        public DbSet<UserAdditionalInfo> UserAdditionalInfo { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseLazyLoadingProxies();
@@ -20,8 +21,9 @@ namespace Vokimi.src.data
             modelBuilder.Entity<AppUser>(entity =>
             {
                 entity.HasKey(x => x.Id);
-                entity.Property(x => x.Id).HasConversion(v => v.Value, v => new AppUserId(v));
-                entity.Property(x => x.LoginInfoId).HasConversion(v => v.Value, v => new LoginInfoId(v));
+                entity.Property(x => x.Id).HasConversion(v => v.Value, v => new(v));
+                entity.Property(x => x.LoginInfoId).HasConversion(v => v.Value, v => new(v));
+                entity.Property(x => x.UserAdditionalInfoId).HasConversion(v => v.Value, v => new(v));
             });
 
             modelBuilder.Entity<LoginInfo>(entity =>
@@ -29,11 +31,17 @@ namespace Vokimi.src.data
                 entity.HasKey(x => x.Id);
                 entity.Property(x => x.Id).HasConversion(v => v.Value, v => new LoginInfoId(v));
             });
+            modelBuilder.Entity<UserAdditionalInfo>(entity =>
+            {
+                entity.HasKey(x => x.Id);
+                entity.Property(x => x.Id).HasConversion(v => v.Value, v => new UserAdditionalInfoId(v));
+            });
             modelBuilder.Entity<UnconfirmedAppUser>(entity =>
             {
                 entity.HasKey(x => x.Id);
                 entity.Property(x => x.Id).HasConversion(v => v.Value, v => new UnconfirmedAppUserId(v));
             });
+
 
 
         }

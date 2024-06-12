@@ -1,4 +1,10 @@
-﻿.form-content {
+﻿.form-container {
+    position: absolute;
+    top: calc(30vh + 40px);
+    left: 50%;
+    transform: translateX(-50%);
+}
+.form-content {
     width: 600px;
     padding: 20px;
     display: flex;
@@ -26,13 +32,15 @@
     outline: none;
     border: none;
     border-radius: 10px;
-    padding:8px;
+    padding: 8px;
 }
+
     .form-content button:hover {
         background-color: #4acc16;
     }
-    .form-content a {
-        color: gray;
-        font-size: 16px;
-    }
+
+.form-content a {
+    color: gray;
+    font-size: 16px;
+}
 

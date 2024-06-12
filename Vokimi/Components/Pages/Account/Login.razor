@@ -1,0 +1,55 @@
+﻿@inject UsersDbOperationsService usersDbOperationsService
+@inject NavigationManager navigationManager
+@inject AuthHelperService authHelperService
+
+@page "/login"
+<PageTitle>Authorization</PageTitle>
+
+<div class="form-container">
+    <EditForm Model="@form" OnValidSubmit="HandleLogin" FormName="AuthorizationForm">
+        <DataAnnotationsValidator />
+        <div class="form-content">
+
+            <InputText placeholder="Email" class="input-text" @bind-Value="form.Email" />
+            <ValidationMessage For="@(() => form.Email)" class="err-message" />
+
+            <InputText placeholder="Password" class="input-text" @bind-Value="form.Password" type="password" />
+            <ValidationMessage For="@(() => form.Password)" class="err-message" />
+            @if (!string.IsNullOrEmpty(serverErrorMessage))
+            {
+                <label class="err-message">@serverErrorMessage</label>
+            }
+            <button type="submit">Log In</button>
+            <a href="/signup">I don't have an account</a>
+
+        </div>
+    </EditForm>
+</div>
+
+@code {
+    [CascadingParameter]
+    public HttpContext? httpContext { get; set; }
+
+    private string serverErrorMessage { get; set; }
+
+    [SupplyParameterFromForm]
+    private AuthorizationForm form { get; set; } = new();
+
+    private async Task HandleLogin()
+    {
+        AppUser? user = await usersDbOperationsService.GetUserByEmail(form.Email);
+        if (user is null)
+            serverErrorMessage = "There is no account with this email";
+
+        else if (!BCrypt.Net.BCrypt.Verify(form.Password, user.LoginInfo.PasswordHash))
+            serverErrorMessage = "Invalid password";
+        else
+        {
+            var principal = authHelperService.CreateUserPrincipal(form.Email, user.Id);
+
+            await httpContext.SignInAsync(AuthHelperService.AuthScheme, principal);
+            navigationManager.NavigateTo("/acc");
+        }
+
+    }
+}

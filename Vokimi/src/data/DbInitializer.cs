@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-
-namespace Vokimi.src.data
+﻿namespace Vokimi.src.data
 {
     public class DbInitializer
     {

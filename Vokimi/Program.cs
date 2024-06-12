@@ -81,13 +81,14 @@ namespace Vokimi
             services.AddTransient<EmailService>();
 
             services.AddHttpContextAccessor();
-            services.AddScoped<AuthService>();
+            services.AddScoped<AuthHelperService>();
 
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+            services.AddAuthentication(AuthHelperService.AuthScheme)
                 .AddCookie(options =>
                 {
-                    options.Cookie.Name = AuthService.AuthCookieName;
+                    options.Cookie.Name = AuthHelperService.AuthCookieName;
                     options.LoginPath = "/acc";
+                    options.LogoutPath = "/logout";
                     options.AccessDeniedPath = "/access-denied";
                 });
             services.AddAuthorization();

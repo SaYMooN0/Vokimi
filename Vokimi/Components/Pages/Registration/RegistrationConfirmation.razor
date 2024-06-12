@@ -1,13 +1,11 @@
 ﻿@using Microsoft.AspNetCore.WebUtilities
 
-
-
 @page "/registration-confirmation"
-
+<PageTitle>Confirm Registration</PageTitle>
 
 @inject NavigationManager navigationManager
 @inject UsersDbOperationsService usersDbOperationsService
-@inject AuthService authService
+@inject AuthHelperService authHelperService
 
 <div class="confirmation-container">
 
@@ -27,6 +25,10 @@
 
 
 @code {
+
+    [CascadingParameter]
+    public HttpContext? httpContext { get; set; }
+
     private bool registrationConfirmed { get; set; } = false;
     private string serverMessage { get; set; }
     private string email { get; set; } = null;
@@ -36,30 +38,41 @@
     {
         registrationConfirmed = false;
         var uri = navigationManager.ToAbsoluteUri(navigationManager.Uri);
-        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("email", out var e))
-            email = e;
 
-        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("code", out var c))
-            code = c;
-
-        if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(code))
+        if (!TryGetEmailAndCode(uri))
             serverMessage = "Try to reload the page. If that doesn't help, try registering again";
+
         else if (await usersDbOperationsService.IsEmailTaken(email))
             serverMessage = "Email is already confirmed. Please use authorization form to log in";
-        if (!string.IsNullOrEmpty(serverMessage))
-        {
-            StateHasChanged();
-            return;
-        }
-        Err serverError = await usersDbOperationsService.TryToConfirmUser(email, code);
-        if (serverError.NotNone())
-            serverMessage = serverError.Message;
-        else
-            registrationConfirmed = true;
 
-        await authService.SignInAsync(email, string.Empty, checkPassword: false);
-        StateHasChanged();
+        else await SignInUser(email, code);
 
+    }
+    private bool TryGetEmailAndCode(Uri uri)
+    {
+        email = null;
+        code = null;
 
+        var queryParams = QueryHelpers.ParseQuery(uri.Query);
+        if (queryParams.TryGetValue("email", out var e))
+            email = e;
+
+        if (queryParams.TryGetValue("code", out var c))
+            code = c;
+
+        return !string.IsNullOrEmpty(email) && !string.IsNullOrEmpty(code);
+    }
+
+    private async Task SignInUser(string email, string code)
+    {
+        (await usersDbOperationsService.TryToConfirmUser(email, code)).Switch(
+            async user =>
+            {
+                var principal = authHelperService.CreateUserPrincipal(email, user.Id);
+                await httpContext.SignInAsync(AuthHelperService.AuthScheme, principal);
+                registrationConfirmed = true;
+            },
+            err => { serverMessage = err.Message; }
+        );
     }
 }
