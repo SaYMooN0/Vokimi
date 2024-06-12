@@ -19,20 +19,20 @@ else
         <div class="form-content">
             <label class="form-title">Create an account</label>
 
-            <InputText id="username" class="input-text" @bind-Value="form.Username" />
+            <InputText placeholder="Username" class="input-text" @bind-Value="form.Username" />
             <ValidationMessage For="@(() => form.Username)" class="err-message" />
 
-            <InputText id="email" class="input-text" @bind-Value="form.Email" />
+            <InputText placeholder="Email" class="input-text" @bind-Value="form.Email" />
             <ValidationMessage For="@(() => form.Email)" class="err-message" />
 
-            <InputText id="password" class="input-text" @bind-Value="form.Password" type="password" />
+            <InputText placeholder="Password" class="input-text" @bind-Value="form.Password" type="password" />
             <ValidationMessage For="@(() => form.Password)" class="err-message" />
 
-            <InputText id="confirmPassword" class="input-text" @bind-Value="form.ConfirmPassword" type="password" />
+            <InputText placeholder="Confirm Password" class="input-text" @bind-Value="form.ConfirmPassword" type="password" />
             <ValidationMessage For="@(() => form.ConfirmPassword)" class="err-message" />
-            @if (!string.IsNullOrEmpty(ServerErrorMessage))
+            @if (!string.IsNullOrEmpty(serverErrorMessage))
             {
-                <label class="err-message">@ServerErrorMessage</label>
+                <label class="err-message">@serverErrorMessage</label>
             }
             <button type="submit">SignUp</button>
             <a href="/acc">I already have an account</a>
@@ -45,57 +45,51 @@ else
 
 @code {
     private bool emailAlreadySent { get; set; } = false;
-    private string ServerErrorMessage { get; set; } = string.Empty;
-    RegistrationForm form = new();
+    private string serverErrorMessage { get; set; } = string.Empty;
+    private RegistrationForm form = new();
 
     private async void HandleValidSubmit()
     {
-        if (!IsFormValid())
-            return;
-        if (await usersDbOperationsService.IsEmailTaken(form.Email))
+        var valEr = ValidateForm();
+        if (valEr.NotNone())
+            serverErrorMessage = valEr.Message;
+        else if (await usersDbOperationsService.IsEmailTaken(form.Email))
+            serverErrorMessage = "Account with this email already exists";
+        else
         {
-            ServerErrorMessage = "Account with this email already exists";
-            return;
+            string confirmationCode = GenerateConfirmationCode();
+            (await usersDbOperationsService.CreateUnconfirmedUser(form, confirmationCode)).Switch(
+                async user =>
+                {
+                    string confirmationLink = GenerateConfirmationLink(confirmationCode);
+                    await emailService.SendConfirmationLink(form.Email, confirmationLink);
+                    emailAlreadySent = true;
+                },
+                err => { serverErrorMessage = "An error occurred while registering, please try again later"; }
+            );
         }
-        string confirmationCode = GenerateConfirmationCode();
-        (await usersDbOperationsService.CreateUnconfirmedUser(form , confirmationCode)).Switch(
-            async user =>
-            {
-                string confirmationLink = GenerateConfirmationLink(confirmationCode);
-                await emailService.SendConfirmationLink(form.Email, confirmationLink);
-                emailAlreadySent = true;
-            },
-            err => { ServerErrorMessage = "An error occurred while registering, please try again later"; }
-        );
         StateHasChanged();
 
     }
-    private bool IsFormValid()
+    private Err ValidateForm()
     {
-        ServerErrorMessage = string.Empty;
+        serverErrorMessage = string.Empty;
         Regex nameRegex = new(@"^[a-zA-Z0-9_.,><~^А-Яа-яЁё]*$");
         if (form.Username.Length < 5 ||
             form.Username.Length > 30 ||
-            !nameRegex.IsMatch(form.Username))
-        {
-            ServerErrorMessage = "Invalid username";
-            return false;
-        }
+            !nameRegex.IsMatch(form.Username)
+        ) return new("Invalid username");
+
 
         Regex emailRegex = new(@"^[^@\s]+@[^@\s]+\.[^@\s]+$");
         if (!emailRegex.IsMatch(form.Email))
-        {
-            ServerErrorMessage = "Invalid email address";
-            return false;
-        }
+            return new("Invalid email address");
 
         if (form.Password.Length < 8 || form.Password.Length > 30)
-        {
-            ServerErrorMessage = "Password must be between 8 and 30 characters long";
-            return false;
-        }
+            return new("Password must be between 8 and 30 characters long");
 
-        return true;
+
+        return Err.None;
     }
 
     private string GenerateConfirmationCode() =>

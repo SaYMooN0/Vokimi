@@ -7,8 +7,9 @@
 
 @inject NavigationManager navigationManager
 @inject UsersDbOperationsService usersDbOperationsService
+@inject AuthService authService
 
-<div class="confiramtion-container">
+<div class="confirmation-container">
 
     <h3>Registration Confirmation</h3>
     @if (registrationConfirmed)
@@ -55,6 +56,8 @@
             serverMessage = serverError.Message;
         else
             registrationConfirmed = true;
+
+        await authService.SignInAsync(email, string.Empty, checkPassword: false);
         StateHasChanged();
 
 

@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using VokimiShared.src.models.db_classes;
 using VokimiShared.src.models.db_classes.users;
-
 namespace Vokimi.src.data
 {
     public class VokimiDbContext : DbContext
@@ -10,7 +9,10 @@ namespace Vokimi.src.data
         public DbSet<UnconfirmedAppUser> UnconfirmedAppUsers { get; set; }
         public DbSet<AppUser> AppUsers { get; set; }
         public DbSet<LoginInfo> LoginInfo { get; set; }
-
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseLazyLoadingProxies();
+        }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -19,7 +21,7 @@ namespace Vokimi.src.data
             {
                 entity.HasKey(x => x.Id);
                 entity.Property(x => x.Id).HasConversion(v => v.Value, v => new AppUserId(v));
-                entity.Property(x => x.LoginInfoId).HasConversion(v => v.Value, v => new LoginInfoId(v)); 
+                entity.Property(x => x.LoginInfoId).HasConversion(v => v.Value, v => new LoginInfoId(v));
             });
 
             modelBuilder.Entity<LoginInfo>(entity =>

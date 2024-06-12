@@ -1,11 +1,10 @@
 ﻿using Vokimi.src.data;
 using VokimiShared.src.models.db_classes.users;
-using VokimiShared.src.models.db_classes;
 using Microsoft.EntityFrameworkCore;
 using VokimiShared.src;
 using VokimiShared.src.models.form_classes;
 using OneOf;
-using Microsoft.VisualBasic;
+using VokimiShared.src.models.db_classes;
 
 namespace Vokimi.Services
 {
@@ -78,5 +77,9 @@ namespace Vokimi.Services
             await RemoveUnconfirmedAppUser(email);
             return Err.None;
         }
+        public async Task<AppUser?> GetUserByEmail(string email) =>
+            await _db.AppUsers.FirstOrDefaultAsync(u => u.LoginInfo.Email == email);
+        public async Task<AppUser?> GetUserByIdAsync(AppUserId id) =>
+            await _db.AppUsers.FirstOrDefaultAsync(u => u.Id == id);
     }
 }

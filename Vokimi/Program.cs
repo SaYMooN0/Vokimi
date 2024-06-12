@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using Vokimi.Components;
@@ -44,12 +45,16 @@ namespace Vokimi
                 app.UseHsts();
             }
 
+
+            app.UseAuthentication();
+            app.UseAuthorization();
+
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseAntiforgery();
 
-            app.UseAuthentication();
-            app.UseAuthorization();
+         
 
 
             app.MapRazorComponents<App>()
@@ -62,6 +67,9 @@ namespace Vokimi
 
         private static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
+
+            services.AddAntiforgery();
+
             // Database context configuration
             services.AddDbContext<VokimiDbContext>(options =>
                 options.UseNpgsql(configuration.GetConnectionString("VokimiDb")));
@@ -72,22 +80,24 @@ namespace Vokimi
             services.Configure<SmtpSettings>(configuration.GetSection("Smtp"));
             services.AddTransient<EmailService>();
 
+            services.AddHttpContextAccessor();
+            services.AddScoped<AuthService>();
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>
                 {
+                    options.Cookie.Name = AuthService.AuthCookieName;
                     options.LoginPath = "/acc";
-                    options.Cookie.Name = "auth_token";
                     options.AccessDeniedPath = "/access-denied";
                 });
-            services.AddCascadingAuthenticationState();
-
             services.AddAuthorization();
-
+            services.AddCascadingAuthenticationState();
 
             services.AddRazorComponents()
                 .AddInteractiveServerComponents()
                 .AddInteractiveWebAssemblyComponents();
+
+            services.AddSingleton<IAuthenticationSchemeProvider, AuthenticationSchemeProvider>();
         }
     }
 

@@ -1,15 +1,20 @@
 ﻿@page "/acc"
 @page "/acc/{PageStateParam}"
-@inject NavigationManager NavigationManager
+
+@inject NavigationManager navigationManager
+@inject AuthService authService
 
 <PageTitle>Account</PageTitle>
 
-Your account page
+<h3>
+    Your account page
 
+</h3>
 @switch (_pageState)
+
 {
     @case PageState.Account:
-        <Account />
+        <AccountPageContent />
         break;
     @case PageState.Authorization:
         <div class="form-container">
@@ -17,12 +22,12 @@ Your account page
         </div>
         break;
     @case PageState.Registration:
-    <div class="form-container">
+        <div class="form-container">
             <RegistrationFormComponent />
-
         </div>
         break;
 }
+
 
 @code {
     private enum PageState
@@ -37,9 +42,9 @@ Your account page
     [Parameter]
     public string PageStateParam { get; set; }
 
-    protected override void OnParametersSet()
+    protected override async Task OnParametersSetAsync()
     {
-        bool signedIn = false; //TODO
+        bool signedIn = await authService.IsSignedInAsync();
 
         if (signedIn)
             _pageState = PageState.Account;
@@ -47,5 +52,23 @@ Your account page
             _pageState = PageState.Registration;
         else
             _pageState = PageState.Authorization;
+    }
+
+    public class LogOutForm
+    {
+        public string UserEmail { get; set; }
+    }
+
+    private LogOutForm form { get; set; } = new();
+
+    protected override void OnInitialized()
+    {
+        form = new();
+        form.UserEmail = "";
+    }
+    private async Task HandleValidSubmit()
+    {
+        await authService.SignOutAsync();
+        navigationManager.NavigateTo("/acc");
     }
 }
