@@ -5,30 +5,27 @@
 @page "/login"
 <PageTitle>Authorization</PageTitle>
 
-<div class="form-container">
-    <EditForm Model="@form" OnValidSubmit="HandleLogin" FormName="AuthorizationForm">
-        <DataAnnotationsValidator />
-        <div class="form-content">
+<FormContainer Model="form" OnValidSubmit="HandleLogin" FormName="AuthorizationForm">
+    <InputText placeholder="Email" class="input-text" @bind-Value="form.Email" />
+    <ValidationMessage For="@(() => form.Email)" class="err-message" />
 
-            <InputText placeholder="Email" class="input-text" @bind-Value="form.Email" />
-            <ValidationMessage For="@(() => form.Email)" class="err-message" />
+    <InputText placeholder="Password" class="input-text" @bind-Value="form.Password" type="password" />
+    <ValidationMessage For="@(() => form.Password)" class="err-message" />
 
-            <InputText placeholder="Password" class="input-text" @bind-Value="form.Password" type="password" />
-            <ValidationMessage For="@(() => form.Password)" class="err-message" />
-            @if (!string.IsNullOrEmpty(serverErrorMessage))
-            {
-                <label class="err-message">@serverErrorMessage</label>
-            }
-            <button type="submit">Log In</button>
-            <a href="/signup">I don't have an account</a>
+    @if (!string.IsNullOrEmpty(serverErrorMessage))
+    {
+        <label class="err-message">@serverErrorMessage</label>
+    }
 
-        </div>
-    </EditForm>
-</div>
+    <button type="submit">Log In</button>
+    <a href="/signup">I don't have an account</a>
+</FormContainer>
 
 @code {
     [CascadingParameter]
     public HttpContext httpContext { get; set; }
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
 
     private string serverErrorMessage { get; set; }
 
@@ -50,5 +47,12 @@
             navigationManager.NavigateTo("/acc", true);
         }
 
+    }
+    protected override async Task OnParametersSetAsync()
+    {
+        if (authHelperService.IsSignedIn(await authenticationStateTask))
+        {
+            navigationManager.NavigateTo("/acc", true, true);
+        }
     }
 }

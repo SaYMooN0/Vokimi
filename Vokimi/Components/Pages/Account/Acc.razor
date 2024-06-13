@@ -1,8 +1,9 @@
 ﻿@inject NavigationManager navigationManager
 @inject AuthHelperService authHelperService
 @inject UsersDbOperationsService usersDbOperationsService
-@page "/acc"
+
 @page "/acc/{userId}"
+@page "/acc"
 
 <PageTitle>Account</PageTitle> @* or user name if its someone's *@
 
@@ -37,7 +38,7 @@
         MyAcc,
         UserPublicAcc,
         PrivateAcc,
-        UserNotFound
+        UserNotFound,
     }
 
     private PageState pageState { get; set; }
@@ -46,11 +47,13 @@
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
 
+
     [Parameter]
     public string userId { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
+
         if (string.IsNullOrEmpty(userId))
         {
             AuthenticationState? authState = await authenticationStateTask;
@@ -61,7 +64,7 @@
             }
             else
             {
-                navigationManager.NavigateTo("/login", true);
+                await InvokeAsync(() => navigationManager.NavigateTo("/login", true, true));
             }
         }
         else if (Guid.TryParse(userId, out Guid guid))

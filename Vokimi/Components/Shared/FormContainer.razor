@@ -1,0 +1,24 @@
+﻿@inherits LayoutComponentBase
+
+<div class="form-container">
+    <EditForm Model="@Model" OnValidSubmit="OnValidSubmit" FormName="@FormName">
+        <DataAnnotationsValidator />
+        <div class="form-content">
+            @ChildContent
+        </div>
+    </EditForm>
+</div>
+
+@code {
+    [Parameter]
+    public object Model { get; set; }
+
+    [Parameter]
+    public EventCallback<EditContext> OnValidSubmit { get; set; }
+
+    [Parameter]
+    public string FormName { get; set; }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+}

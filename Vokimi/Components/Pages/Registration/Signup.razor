@@ -4,7 +4,7 @@
 @inject NavigationManager navigationManager
 @inject EmailService emailService
 @inject UsersDbOperationsService usersDbOperationsService
-
+@inject AuthHelperService authHelperService
 
 @page "/signup"
 <PageTitle>Registration</PageTitle>
@@ -21,32 +21,29 @@
 }
 else
 {
-    <div class="form-container">
-        <EditForm Model="@form" OnValidSubmit="HandleValidSubmit" FormName="RegistrationForm">
-            <DataAnnotationsValidator />
-            <div class="form-content">
-                <label class="form-title">Create an account</label>
+    <FormContainer Model="form" OnValidSubmit="HandleValidSubmit" FormName="RegistrationForm">
+        <label class="form-title">Create an account</label>
 
-                <InputText placeholder="Username" class="input-text" @bind-Value="form.Username" />
-                <ValidationMessage For="@(() => form.Username)" class="err-message" />
+        <InputText placeholder="Username" class="input-text" @bind-Value="form.Username" />
+        <ValidationMessage For="@(() => form.Username)" class="err-message" />
 
-                <InputText placeholder="Email" class="input-text" @bind-Value="form.Email" />
-                <ValidationMessage For="@(() => form.Email)" class="err-message" />
+        <InputText placeholder="Email" class="input-text" @bind-Value="form.Email" />
+        <ValidationMessage For="@(() => form.Email)" class="err-message" />
 
-                <InputText placeholder="Password" class="input-text" @bind-Value="form.Password" type="password" />
-                <ValidationMessage For="@(() => form.Password)" class="err-message" />
+        <InputText placeholder="Password" class="input-text" @bind-Value="form.Password" type="password" />
+        <ValidationMessage For="@(() => form.Password)" class="err-message" />
 
-                <InputText placeholder="Confirm Password" class="input-text" @bind-Value="form.ConfirmPassword" type="password" />
-                <ValidationMessage For="@(() => form.ConfirmPassword)" class="err-message" />
-                @if (!string.IsNullOrEmpty(serverErrorMessage))
-                {
-                    <label class="err-message">@serverErrorMessage</label>
-                }
-                <button type="submit">SignUp</button>
-                <a href="/login">I already have an account</a>
-            </div>
-        </EditForm>
-    </div>
+        <InputText placeholder="Confirm Password" class="input-text" @bind-Value="form.ConfirmPassword" type="password" />
+        <ValidationMessage For="@(() => form.ConfirmPassword)" class="err-message" />
+
+        @if (!string.IsNullOrEmpty(serverErrorMessage))
+        {
+            <label class="err-message">@serverErrorMessage</label>
+        }
+
+        <button type="submit">SignUp</button>
+        <a href="/login">I already have an account</a>
+    </FormContainer>
 }
 
 
@@ -56,6 +53,16 @@ else
     private bool emailAlreadySent { get; set; } = false;
     private string serverErrorMessage { get; set; } = string.Empty;
     private RegistrationForm form = new();
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+    protected override async Task OnParametersSetAsync()
+    {
+        if (authHelperService.IsSignedIn(await authenticationStateTask))
+        {
+            navigationManager.NavigateTo("/acc", true, true);
+        }
+    }
 
     private async void HandleValidSubmit()
     {
@@ -106,4 +113,5 @@ else
     private string GenerateConfirmationLink(string confirmationCode) =>
         $"{navigationManager.BaseUri}registration-confirmation?email={form.Email}&code={Uri.EscapeDataString(confirmationCode)}";
 
+  
 }
