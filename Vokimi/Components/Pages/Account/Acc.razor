@@ -1,6 +1,6 @@
 ﻿@inject NavigationManager navigationManager
-@inject AuthHelperService authService
-
+@inject AuthHelperService authHelperService
+@inject UsersDbOperationsService usersDbOperationsService
 @page "/acc"
 @page "/acc/{userId}"
 
@@ -12,8 +12,17 @@
     @case PageState.MyAcc:
         <MyAcc />
         break;
+    @case PageState.UserPublicAcc:
+        <UserAcc PageOwnerId="ownerId.Value" />
+        break;
+    @case PageState.PrivateAcc:
+        <PrivateAcc PageOwnerId="ownerId.Value" />
+        break;
+    @case PageState.UserNotFound:
+        <UserNotFound />
+        break;
     @default:
-        <h2>Not implemented yet</h2>
+        <h2>I don't but I'd really like to know why you see this message</h2>
         break;
 }
 
@@ -27,10 +36,13 @@
     {
         MyAcc,
         UserPublicAcc,
-        PrivateAcc
+        PrivateAcc,
+        UserNotFound
     }
 
     private PageState pageState { get; set; }
+    private AppUserId? ownerId { get; set; }
+
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
 
@@ -43,15 +55,29 @@
         {
             AuthenticationState? authState = await authenticationStateTask;
 
-            if (!authService.IsSignedIn(authState))
-                navigationManager.NavigateTo("/login");
-            else pageState = PageState.MyAcc;
+            if (authHelperService.IsSignedIn(authState))
+            {
+                pageState = PageState.MyAcc;
+            }
+            else
+            {
+                navigationManager.NavigateTo("/login", true);
+            }
         }
-        else
+        else if (Guid.TryParse(userId, out Guid guid))
         {
-            pageState = PageState.UserPublicAcc;//based on user isPrivate ...
-        }
+            ownerId = new(guid);
+            AppUser? appUser = await usersDbOperationsService.GetUserById(ownerId.Value);
 
+            pageState = appUser switch
+            {
+                null => PageState.UserNotFound,
+                { IsAccountPrivate: false } => PageState.UserPublicAcc, //check if friends
+                _ => PageState.PrivateAcc
+            };
+
+        }
+        else { pageState = PageState.UserNotFound; }
 
     }
 }

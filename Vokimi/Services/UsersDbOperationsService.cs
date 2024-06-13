@@ -21,12 +21,7 @@ namespace Vokimi.Services
         public async Task<OneOf<UnconfirmedAppUser, Err>> CreateUnconfirmedUser(RegistrationForm data, string confirmationCode)
         {
             string passwordHash = BCrypt.Net.BCrypt.HashPassword(data.Password);
-            UnconfirmedAppUser user = new(
-                data.Username,
-                data.Email,
-                passwordHash,
-                confirmationCode,
-                DateTime.UtcNow);
+            UnconfirmedAppUser user = UnconfirmedAppUser.CreateNew(data.Username, data.Email, passwordHash, confirmationCode);
             try
             {
                 Err removingErr = await RemoveUnconfirmedAppUser(data.Email);
@@ -82,7 +77,7 @@ namespace Vokimi.Services
         }
         public async Task<AppUser?> GetUserByEmail(string email) =>
             await _db.AppUsers.FirstOrDefaultAsync(u => u.LoginInfo.Email == email);
-        public async Task<AppUser?> GetUserByIdAsync(AppUserId id) =>
+        public async Task<AppUser?> GetUserById(AppUserId id) =>
             await _db.AppUsers.FirstOrDefaultAsync(u => u.Id == id);
     }
 }

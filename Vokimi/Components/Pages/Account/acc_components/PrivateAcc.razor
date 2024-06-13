@@ -7,7 +7,7 @@
     @System.Text.Json.JsonSerializer.Serialize(vm);
 </h4>
 @code {
-    private UserAccountPageViewModel vm;
+    private PrivateAccountPageViewModel vm;
 
     [Parameter]
     public AppUserId PageOwnerId { get; set; }
@@ -19,12 +19,10 @@
         AppUser? pageOwner = await usersDbOperationsService.GetUserById(PageOwnerId);
         if (pageOwner is null)
             navigationManager.NavigateTo("/acc/notfound", true);
-        else if (pageOwner.IsAccountPrivate)
-            navigationManager.NavigateTo("/acc/" + pageOwner.Id.ToString(), true);
         else
         {
             AppUserId? viewerId = authHelperService.GetUserIdFromClaims(httpContext.User);
-            vm = UserAccountPageViewModel.FromUser(pageOwner, viewerId);
+            vm = PrivateAccountPageViewModel.FromUser(pageOwner, viewerId);
         }
     }
 }

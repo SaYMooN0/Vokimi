@@ -28,7 +28,7 @@
 
 @code {
     [CascadingParameter]
-    public HttpContext? httpContext { get; set; }
+    public HttpContext httpContext { get; set; }
 
     private string serverErrorMessage { get; set; }
 
@@ -46,9 +46,8 @@
         else
         {
             var principal = authHelperService.CreateUserPrincipal(form.Email, user.Id);
-
             await httpContext.SignInAsync(AuthHelperService.AuthScheme, principal);
-            navigationManager.NavigateTo("/acc");
+            navigationManager.NavigateTo("/acc", true);
         }
 
     }
