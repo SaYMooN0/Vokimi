@@ -20,4 +20,20 @@
         public UserAdditionalInfoId() : this(Guid.NewGuid()) { }
         public override string ToString() => Value.ToString();
     }
+
+    public readonly record struct UnpublishedTestId(Guid Value)
+    {
+        public UnpublishedTestId() : this(Guid.NewGuid()) { }
+        public override string ToString() => Value.ToString();
+    }
+    public readonly record struct TestConclusionId(Guid Value)
+    {
+        public TestConclusionId() : this(Guid.NewGuid()) { }
+        public override string ToString() => Value.ToString();
+    }
+    public readonly record struct TestTagId(Guid Value)
+    {
+        public TestTagId() : this(Guid.NewGuid()) { }
+        public override string ToString() => Value.ToString();
+    }
 }

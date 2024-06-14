@@ -1,0 +1,59 @@
+﻿@using VokimiShared.src.enums
+
+<EditForm Model="@testMainInfo" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="form-container">
+
+        <label for="name" class="form-label">Name</label>
+        <InputText id="name" class="form-control" @bind-Value="testMainInfo.Name" />
+
+
+
+        <label for="description" class="form-label">Description</label>
+        <InputTextArea id="description" class="form-control" @bind-Value="testMainInfo.Description" />
+
+
+
+        <label for="cover" class="form-label">Cover</label>
+        <InputFile id="cover" class="form-control" OnChange="HandleFileChange" />
+
+
+
+        <label for="language" class="form-label">Language</label>
+        <InputSelect id="language" class="form-control" @bind-Value="testMainInfo.Language">
+            @foreach (Language lang in Enum.GetValues(typeof(Language)))
+            {
+                <option value="@lang">@lang</option>
+            }
+        </InputSelect>
+
+
+
+        <label for="privacy" class="form-label">Privacy</label>
+        <InputSelect id="privacy" class="form-control" @bind-Value="testMainInfo.Privacy">
+            @foreach (TestPrivacy privacy in Enum.GetValues(typeof(TestPrivacy)))
+            {
+                <option value="@privacy">@privacy</option>
+            }
+        </InputSelect>
+
+
+        <button type="submit" class="btn btn-primary">Save</button>
+    </div>
+
+</EditForm>
+@code {
+    [SupplyParameterFromForm]
+    public TestMainInfoEditingForm testMainInfo { get; set; } = new();
+
+    private void HandleFileChange(InputFileChangeEventArgs e)
+    {
+        // testMainInfo.Cover = e.File;
+    }
+
+    private void HandleValidSubmit()
+    {
+        Console.WriteLine("Form submitted!");
+    }
+}

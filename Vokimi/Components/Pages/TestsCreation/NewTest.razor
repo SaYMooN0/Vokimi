@@ -1,0 +1,31 @@
+﻿@page "/newtest"
+<PageTitle>New Test</PageTitle>
+
+@switch (pageState)
+{
+    case PageState.Overwiew:
+        <TestOverview></TestOverview>
+        break;
+    case PageState.MainInfoEditting:
+        <MainInfoEditting></MainInfoEditting>
+        break;
+    default:
+        <h2>default state</h2>
+        break;
+}
+
+@code {
+    private PageState pageState { get; set; } = PageState.MainInfoEditting;
+
+    private enum PageState
+    {
+        Overwiew,
+        MainInfoEditting,
+        QuestionCreation,
+        Results,
+        Styles,
+        TagsAdding
+    }
+    //are results ready
+    //check if logged in
+}
