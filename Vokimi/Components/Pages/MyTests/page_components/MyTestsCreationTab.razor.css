@@ -1,0 +1,14 @@
+﻿.create-test-button {
+    width: fit-content;
+    background-color: var(--primary);
+    padding: 10px 20px;
+    font-family: "Roboto";
+    color:white;
+    font-size: 22px;
+    border-radius:5px;
+    cursor:pointer;
+}
+
+    .create-test-button:hover {
+        background-color: var(--accent);
+    }

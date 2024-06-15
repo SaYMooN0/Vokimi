@@ -7,6 +7,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="wwwroot\app.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="wwwroot\app.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\app.js" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Vokimi.Client\Vokimi.Client.csproj" />
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="MailKit" Version="4.6.0" />

@@ -1,0 +1,37 @@
+﻿<NewTestTemplateChoosingDialog @ref="newTestTemplateChoosingDialogRef" />
+
+<h3>Unpublished Tests: <button class="hide-btn">Hide</button> </h3>
+@if (unpublishedTests.Count > 0) {
+    <div class="test-vms-container">
+        @* for in unpublishedTests *@
+    </div>
+    @if (unpublishedTests.Count == listPackCount) {
+        <div class="see-all-btn">See all</div>
+    }
+}
+else {
+    <label class="no-unpublished-test">You have no unpublished tests</label>
+}
+
+<h3>Created Tests: <button class="hide-btn">Hide</button> </h3>
+<div class="created-tests-container">
+    <div class="create-test-button" @onclick="OpenTemplateChoosingDialog">Create New</div>
+    @* for in userTests *@
+    @if (userTests.Count == listPackCount) {
+        <div class="see-all-btn">See all</div>
+    }
+</div>
+
+
+@code {
+    private List<TestViewModel> unpublishedTests = new();
+    private List<TestViewModel> userTests = new();
+    private int listPackCount = 5;
+    private NewTestTemplateChoosingDialog newTestTemplateChoosingDialogRef;
+
+    public async void OpenTemplateChoosingDialog() {
+        if (newTestTemplateChoosingDialogRef is not null)
+            await newTestTemplateChoosingDialogRef.Open();
+    }
+}
+

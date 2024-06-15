@@ -1,0 +1,17 @@
+﻿.available-templates-label{
+    font-family:"Roboto";
+    font-size:28px;
+}
+.dialog-content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.bottom-btns-container {
+    width:fit-content;
+    justify-self: right;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap:10px;
+}

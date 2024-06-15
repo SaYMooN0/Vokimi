@@ -1,0 +1,30 @@
+﻿
+<BaseDialog DialogId="template-choosing-dialog" @ref="baseDialogRef">
+    <div class="dialog-content">
+        <label class="available-templates-label">
+            Available templates
+        </label>
+        <div class="template @IsActiveStyle(TestTemplates.None)" @onclick="()=>{chosenTemplate=TestTemplates.None;}">
+            No template
+        </div>
+    </div>
+    <div class="bottom-btns-container">
+        <button class="close-btn" @onclick="Close">Close</button>
+        <button class='continue-btn @(chosenTemplate is null ? "inactive":"")'>Continue</button>
+    </div>
+</BaseDialog>
+
+
+@code {
+    private BaseDialog baseDialogRef;
+    private TestTemplates? chosenTemplate = null;
+
+    private string IsActiveStyle(TestTemplates template) =>
+        chosenTemplate == template ? "active" : "";
+    public async Task Open() =>
+            await baseDialogRef.OpenAsync();
+
+    private async Task Close() =>
+            await baseDialogRef.CloseAsync();
+}
+

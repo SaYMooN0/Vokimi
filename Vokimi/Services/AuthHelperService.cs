@@ -1,10 +1,7 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Components.Authorization;
 using System.Security.Claims;
-using VokimiShared.src;
 using VokimiShared.src.models.db_classes;
-using VokimiShared.src.models.db_classes.users;
 
 namespace Vokimi.Services
 {

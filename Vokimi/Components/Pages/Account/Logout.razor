@@ -11,12 +11,12 @@
     public HttpContext httpContext { get; set; }
     protected override async Task OnInitializedAsync()
     {
-        await base.OnInitializedAsync();
         if (httpContext.User.Identity.IsAuthenticated)
         {
             await httpContext.SignOutAsync();
-            navigationManager.NavigateTo("/acc", true);
-
         }
+        navigationManager.NavigateTo("/acc", true);
+        await base.OnInitializedAsync();
+
     }
 }

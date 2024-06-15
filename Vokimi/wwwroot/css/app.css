@@ -7,14 +7,15 @@
 
 :root {
     --text: #040316;
-    --back: #fbfbfe;
-    --primary: #7d71f9;
-    --secondary: #e7ddff;
-    --accent: #5821f0;
+    --back: #fdfdff;
+    --back-2: #e3e1f3;
+    --primary: #796cfa;
+    --accent: #592bf6;
 }
 
 body {
     margin: 0 !important;
+    background-color:var(--back);
 }
 
 

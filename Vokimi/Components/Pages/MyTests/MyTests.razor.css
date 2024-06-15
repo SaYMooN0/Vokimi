@@ -1,0 +1,114 @@
+﻿.tabs-container {
+    width: 100%;
+    border-top:2px solid var(--back-2);
+    margin-top:20px;
+    padding-top:10px;
+
+}
+
+.tabs-switcher {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 3%;
+}
+
+    .tabs-switcher div {
+        box-sizing: border-box;
+        padding: 2px 26px;
+        border-radius: 100px;
+        border: 3px var(--primary) solid;
+        background-color: var(--back);
+        font-family: "Quicksand";
+        font-size: 22px;
+        color: var(--primary);
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        cursor: pointer;
+    }
+
+        .tabs-switcher div.active {
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .tabs-switcher div:not(.active) {
+            color: var(--primary);
+        }
+
+        .tabs-switcher div:hover {
+            background-color: var(--back-2);
+        }
+
+.tab-content {
+    padding: 6px;
+}
+@media (max-width: 1100px) {
+    .tabs-switcher div {
+        padding: 2px 24px;
+        border: 2px var(--primary) solid;
+        font-size: 20px;
+    }
+}
+
+@media (max-width: 900px) {
+    .tabs-container {
+        margin-top: 16px;
+        padding-top: 8px;
+    }
+    .tabs-switcher div {
+        padding: 2px 20px;
+        font-size: 17px;
+    }
+}
+
+@media (max-width: 670px) {
+    .tabs-container {
+        margin-top: 10px;
+        padding: 0;
+        border-top: none;
+     
+    }
+    .tabs-switcher {
+        width: 100%;
+        display: grid;
+        height: 40px;
+        justify-content: center;
+        align-items: center;
+        gap: 0.6%;
+        padding-left: 0.6%;
+        padding-right: 0.6%;
+        box-sizing: border-box;
+        grid-template-columns: 1fr 1fr;
+    }
+
+        .tabs-switcher div {
+            height: 100%;
+            padding: 0;
+            border-radius: 4px;
+            border: none;
+            font-size: 22px;
+            font-family:"Roboto";
+            font-weight: 400;
+            color:white !important;
+            display:grid;
+            justify-content:center;
+            transition:font-size 0.15s ease-in-out;
+        }
+
+            .tabs-switcher div.active {
+                background-color: var(--accent);
+            }
+
+            .tabs-switcher div:not(.active) {
+                background-color: var(--primary);
+            }
+
+            .tabs-switcher div:hover {
+                font-size: 24px;
+            }
+}
