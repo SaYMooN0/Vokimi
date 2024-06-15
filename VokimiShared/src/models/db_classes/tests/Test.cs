@@ -5,5 +5,6 @@
         //comments
         //ratings
         //TestsTaking
+        //publication date
     }
 }

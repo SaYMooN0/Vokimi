@@ -1,0 +1,44 @@
+﻿.template {
+    display: grid;
+    grid-template-areas:
+        "icon name"
+        "feat feat";
+    grid-template-columns: 70px 1fr;
+    grid-template-rows: auto 1fr;
+    border: 4px solid var(--back);
+    height: 240px;
+    aspect-ratio: 1.6/1;
+    padding: 4%;
+    box-sizing: border-box;
+    background-color: var(--back);
+    border-radius: 10px;
+    box-shadow: 0 5px 15px 0 #00000026;
+    font-family: "Roboto";
+    transition:all 0.12s ease-in-out;
+}
+
+.chosen-template {
+    border-color: var(--primary);
+    transform:scale(1.06);
+}
+
+.template .name {
+    grid-area: name;
+    margin-left: 10px;
+    font-weight: bold;
+    color: var(--primary);
+    font-size:22px;
+}
+
+.template .icon {
+    grid-area: icon;
+    height: 80%;
+}
+
+.template .features {
+    grid-area: feat;
+}
+
+    .template .features p {
+        margin-top: 10px;
+    }

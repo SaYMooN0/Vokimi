@@ -50,11 +50,10 @@ namespace Vokimi
             app.UseAuthorization();
 
 
-            app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseAntiforgery();
+            app.UseHttpsRedirection();
 
-         
 
 
             app.MapRazorComponents<App>()

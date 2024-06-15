@@ -2,6 +2,9 @@
 @inject NavigationManager navigationManager
 
 @page "/logout"
+
+@attribute [Authorize]
+
 <PageTitle>Logging out</PageTitle>
 
 <h2>You have successfully logged out</h2>
@@ -15,8 +18,7 @@
         {
             await httpContext.SignOutAsync();
         }
-        navigationManager.NavigateTo("/acc", true);
-        await base.OnInitializedAsync();
+        navigationManager.NavigateTo("/", true, true);
 
     }
 }

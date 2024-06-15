@@ -1,17 +1,77 @@
-﻿.available-templates-label{
-    font-family:"Roboto";
-    font-size:28px;
-}
+﻿
 .dialog-content {
     display: flex;
     flex-direction: column;
     gap: 10px;
+    padding: 20px 30px;
+    width: 900px;
+}
+
+.available-templates-label {
+    text-align: center;
+    font-family: "Roboto";
+    font-size: 38px;
+    color: var(--primary);
+}
+
+.templates-container {
+    padding: 10px;
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.server-message {
+    font-family: "Roboto";
+    font-size: 18px;
 }
 
 .bottom-btns-container {
-    width:fit-content;
-    justify-self: right;
+    align-self:flex-end;
+    margin-bottom: 10px;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap:10px;
+    width: fit-content;
+    gap: 10px;
+    padding: 10px;
 }
+
+    .bottom-btns-container button {
+        padding: 10px 20px;
+        font-size: 16px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s, box-shadow 0.3s;
+    }
+
+        .bottom-btns-container button:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.5);
+        }
+
+.close-btn {
+    background-color: #ff4d4d;
+    color: #fff;
+}
+
+    .close-btn:hover {
+        background-color: #ff1a1a;
+    }
+
+.continue-btn {
+    background-color: #28a745;
+    color: #fff;
+}
+
+    .continue-btn:hover {
+        background-color: #218838;
+    }
+
+    .continue-btn.continue-inactive {
+        background-color: #6c757d;
+        cursor: not-allowed;
+    }
+
+        .continue-btn.continue-inactive:hover {
+            background-color: #6c757d;
+        }

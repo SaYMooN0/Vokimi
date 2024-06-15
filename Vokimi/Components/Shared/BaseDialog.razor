@@ -1,6 +1,6 @@
 ﻿@inject IJSRuntime JS
 
-<dialog id="@DialogId">
+<dialog id="@DialogId" class="base-dialog">
     @ChildContent
 </dialog>
 
@@ -11,13 +11,10 @@
     [Parameter]
     public RenderFragment ChildContent { get; set; }
 
-    public async Task OpenAsync()
-    {
+    public async Task OpenAsync() =>
         await JS.InvokeVoidAsync("blazorDialog.openDialog", DialogId);
-    }
 
-    public async Task CloseAsync()
-    {
+    public async Task CloseAsync() =>
         await JS.InvokeVoidAsync("blazorDialog.closeDialog", DialogId);
-    }
+
 }

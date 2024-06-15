@@ -21,9 +21,14 @@
         public override string ToString() => Value.ToString();
     }
 
-    public readonly record struct UnpublishedTestId(Guid Value)
+    public readonly record struct DraftTestMainInfoId(Guid Value)
     {
-        public UnpublishedTestId() : this(Guid.NewGuid()) { }
+        public DraftTestMainInfoId() : this(Guid.NewGuid()) { }
+        public override string ToString() => Value.ToString();
+    }
+    public readonly record struct DraftTestId(Guid Value)
+    {
+        public DraftTestId() : this(Guid.NewGuid()) { }
         public override string ToString() => Value.ToString();
     }
     public readonly record struct TestConclusionId(Guid Value)

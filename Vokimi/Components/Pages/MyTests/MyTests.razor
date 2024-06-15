@@ -3,50 +3,37 @@
 @inject UsersDbOperationsService usersDbOperationsService
 
 @page "/mytests"
+@attribute [Authorize]
+
 <PageTitle>New Test</PageTitle>
 @rendermode InteractiveServer
 
-@if (isLoggedIn) {
-    <div class="tabs-container">
-        <div class="tabs-switcher">
-            <div class='@(isCurrentTabCollections? "": "active")' @onclick="()=>{isCurrentTabCollections=false;}">
-                Tests Creation
-            </div>
-            <div class='@(isCurrentTabCollections? "active":"")' @onclick="()=>{isCurrentTabCollections=true;}">
-                My Collections
-            </div>
+
+<div class="tabs-container">
+    <div class="tabs-switcher">
+        <div class='@(isCurrentTabCollections? "": "active")' @onclick="()=>{isCurrentTabCollections=false;}">
+            Tests Creation
         </div>
-        <div class="tab-content">
-            @if (!isCurrentTabCollections) {
-                <MyTestsCreationTab></MyTestsCreationTab>
-            }
-            else {
-                <MyTestsCollectionTab></MyTestsCollectionTab>
-            }
+        <div class='@(isCurrentTabCollections? "active":"")' @onclick="()=>{isCurrentTabCollections=true;}">
+            My Collections
         </div>
     </div>
+    <div class="tab-content">
+        @if (!isCurrentTabCollections) {
+            <MyTestsCreationTab></MyTestsCreationTab>
+        }
+        else {
+            <MyTestsCollectionTab></MyTestsCollectionTab>
+        }
+    </div>
+</div>
 
-}
-else {
-    <h2>Please login first</h2>
-}
 
 @code {
-    private bool isLoggedIn = false;
     private bool isCurrentTabCollections = false;
-
-    [CascadingParameter]
-    private Task<AuthenticationState> authenticationStateTask { get; set; }
-    [CascadingParameter]
-    public HttpContext httpContext { get; set; }
 
 
     protected override async Task OnParametersSetAsync() {
-        isLoggedIn = authHelperService.IsSignedIn(await authenticationStateTask);
-        if (!isLoggedIn) {
-            navigationManager.NavigateTo("/login", true, true);
-            return;
-        }
         isCurrentTabCollections = false;
 
     }
