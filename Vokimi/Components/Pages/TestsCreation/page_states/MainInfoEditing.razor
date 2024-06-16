@@ -2,7 +2,6 @@
 
 <EditForm Model="@testMainInfo" OnValidSubmit="HandleValidSubmit">
     <DataAnnotationsValidator />
-    <ValidationSummary />
     <div class="form-container">
 
         <label for="name" class="form-label">Name</label>
@@ -22,8 +21,7 @@
 
         <label for="language" class="form-label">Language</label>
         <InputSelect id="language" class="form-control" @bind-Value="testMainInfo.Language">
-            @foreach (Language lang in Enum.GetValues(typeof(Language)))
-            {
+            @foreach (Language lang in Enum.GetValues(typeof(Language))) {
                 <option value="@lang">@lang</option>
             }
         </InputSelect>
@@ -32,14 +30,13 @@
 
         <label for="privacy" class="form-label">Privacy</label>
         <InputSelect id="privacy" class="form-control" @bind-Value="testMainInfo.Privacy">
-            @foreach (TestPrivacy privacy in Enum.GetValues(typeof(TestPrivacy)))
-            {
+            @foreach (TestPrivacy privacy in Enum.GetValues(typeof(TestPrivacy))) {
                 <option value="@privacy">@privacy</option>
             }
         </InputSelect>
 
 
-        <button type="submit" class="btn btn-primary">Save</button>
+        <button type="submit" class="save-btn">Save</button>
     </div>
 
 </EditForm>
@@ -47,13 +44,11 @@
     [SupplyParameterFromForm]
     public TestMainInfoEditingForm testMainInfo { get; set; } = new();
 
-    private void HandleFileChange(InputFileChangeEventArgs e)
-    {
+    private void HandleFileChange(InputFileChangeEventArgs e) {
         // testMainInfo.Cover = e.File;
     }
 
-    private void HandleValidSubmit()
-    {
+    private void HandleValidSubmit() {
         Console.WriteLine("Form submitted!");
     }
 }

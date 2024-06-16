@@ -1,36 +1,17 @@
-﻿<div class='template @(IsActive? "chosen-template" : "")' @onclick="OnClick">
-    <div class="icon">
-        <DynamicComponent Type="GetIconComponent(Template)" />
-    </div>
-    <label class="name">
-        @GetTempalteName(Template)
-    </label>
-    <div class="features">
-        @foreach (var f in Template.Features()) {
-            <p>• @f</p>
-        }
-    </div>
+﻿<label class="available-templates-label">
+    Available templates
+</label>
+<div class="templates-container">
+    @foreach (var template in Enum.GetValues(typeof(TestTemplate)).Cast<TestTemplate>()) {
+        <TestTemplateViewComponent Template="template" OnClick="()=>OnTemplateSelected(template)" IsActive="SelectedTemplate==template" />
+    }
 </div>
 
-
 @code {
-    [Parameter]
-    public TestTemplate Template { get; set; }
-    [Parameter]
-    public bool IsActive { get; set; }
-    [Parameter]
-    public Action OnClick { get; set; }
 
-    public Type GetIconComponent(TestTemplate template) =>
-        template switch {
-            TestTemplate.None => typeof(template_icons.TestTemplateIconNone),
-            TestTemplate.Knowledge => typeof(template_icons.TestTemplateIconKnowledge),
-            _ => throw new ArgumentOutOfRangeException(nameof(template), template, null)
-        };
-    public string GetTempalteName(TestTemplate template) =>
-       template switch {
-           TestTemplate.None => "No Template",
-           TestTemplate.Knowledge => "Knowledge Test",
-           _ => throw new ArgumentOutOfRangeException(nameof(template), template, null)
-       };
+    [Parameter]
+    public TestTemplate? SelectedTemplate { get; set; }
+
+    [Parameter]
+    public Action<TestTemplate> OnTemplateSelected { get; set; }
 }

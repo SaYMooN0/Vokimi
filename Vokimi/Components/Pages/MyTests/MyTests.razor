@@ -2,6 +2,7 @@
 @inject NavigationManager navigationManager
 @inject UsersDbOperationsService usersDbOperationsService
 
+
 @page "/mytests"
 @attribute [Authorize]
 
@@ -20,10 +21,10 @@
     </div>
     <div class="tab-content">
         @if (!isCurrentTabCollections) {
-            <MyTestsCreationTab></MyTestsCreationTab>
+            <MyTestsCreationTab />
         }
         else {
-            <MyTestsCollectionTab></MyTestsCollectionTab>
+            <MyTestsCollectionTab />
         }
     </div>
 </div>

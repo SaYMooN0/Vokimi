@@ -1,4 +1,6 @@
-﻿namespace VokimiShared.src.models.db_classes.users
+﻿using VokimiShared.src.models.db_classes.test_creation;
+
+namespace VokimiShared.src.models.db_classes.users
 {
     public class AppUser
     {
@@ -13,9 +15,9 @@
         public virtual LoginInfo LoginInfo { get; private set; }
         public virtual UserAdditionalInfo UserAdditionalInfo { get; private set; }
 
+        public virtual ICollection<DraftGenericTest> DraftGenericTests { get; set; } = [];
         public static AppUser CreateNew(string username, LoginInfoId loginInfoId, UserAdditionalInfoId userAdditionalInfoId) =>
-            new()
-            {
+            new() {
                 Id = new AppUserId(),
                 Username = username,
                 RealName = string.Empty,

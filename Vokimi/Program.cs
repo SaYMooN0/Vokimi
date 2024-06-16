@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using Vokimi.Components;
+using Vokimi.PageViewModels;
 using Vokimi.Services;
 using Vokimi.src.data;
 
@@ -9,8 +10,7 @@ namespace Vokimi
 {
     public class Program
     {
-        public static async Task Main(string[] args)
-        {
+        public static async Task Main(string[] args) {
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
@@ -19,28 +19,22 @@ namespace Vokimi
             var app = builder.Build();
 
             // Initialize database
-            using (var scope = app.Services.CreateScope())
-            {
+            using (var scope = app.Services.CreateScope()) {
                 var services = scope.ServiceProvider;
-                try
-                {
+                try {
                     var appDbContext = services.GetRequiredService<VokimiDbContext>();
                     await DbInitializer.InitializeDbAsync(appDbContext);
-                }
-                catch (Exception ex)
-                {
+                } catch (Exception ex) {
                     app.Logger.LogError(ex, "An error occurred while initializing the database.");
                     throw; // Re-throw the exception to stop the application start-up
                 }
             }
 
             // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
+            if (app.Environment.IsDevelopment()) {
                 app.UseWebAssemblyDebugging();
             }
-            else
-            {
+            else {
                 app.UseExceptionHandler("/Error");
                 app.UseHsts();
             }
@@ -64,8 +58,7 @@ namespace Vokimi
             app.Run();
         }
 
-        private static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
-        {
+        private static void ConfigureServices(IServiceCollection services, IConfiguration configuration) {
 
             services.AddAntiforgery();
 
@@ -75,16 +68,15 @@ namespace Vokimi
 
             services.AddScoped<UsersDbOperationsService>();
             services.AddScoped<TestsDbOperationsService>();
+            services.AddScoped<TestsCreationDbOperationsService>();
 
             services.Configure<SmtpSettings>(configuration.GetSection("Smtp"));
             services.AddTransient<EmailService>();
 
-            services.AddHttpContextAccessor();
             services.AddScoped<AuthHelperService>();
 
             services.AddAuthentication(AuthHelperService.AuthScheme)
-                .AddCookie(options =>
-                {
+                .AddCookie(options => {
                     options.Cookie.Name = AuthHelperService.AuthCookieName;
                     options.LoginPath = "/acc";
                     options.LogoutPath = "/logout";
@@ -97,6 +89,10 @@ namespace Vokimi
                 .AddInteractiveServerComponents()
                 .AddInteractiveWebAssemblyComponents();
 
+
+            services.AddHttpContextAccessor(); //del
+            
+            
             services.AddSingleton<IAuthenticationSchemeProvider, AuthenticationSchemeProvider>();
         }
     }

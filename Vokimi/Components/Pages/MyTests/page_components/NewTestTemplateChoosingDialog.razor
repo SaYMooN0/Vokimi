@@ -1,51 +1,111 @@
-﻿
+﻿@inject TestsCreationDbOperationsService testsCreationDbOperationsService
+@inject UsersDbOperationsService usersDbOperationsService
+@inject NavigationManager navigationManager
+@inject AuthHelperService authHelperService
+@inject IHttpContextAccessor httpContextAccessor
+
+
 <BaseDialog DialogId="template-choosing-dialog" @ref="baseDialogRef">
+    <button class="close-btn" @onclick="Close">
+        <svg viewBox="0 0 384 512">
+            <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
+        </svg>
+    </button>
+
     <div class="dialog-content">
-        <label class="available-templates-label">
-            Available templates
-        </label>
-        <div class="templates-container">
-            @foreach (var template in Enum.GetValues(typeof(TestTemplate)).Cast<TestTemplate>()) {
-                <TestTemplateChoosingComponent Template="template" OnClick="()=>{chosenTemplate=template; StateHasChanged();}" IsActive="chosenTemplate==template" />
-            }
-        </div>
+        @if (isPageStateTemplateChosing) {
+            <TestTemplateChoosingComponent SelectedTemplate="chosenTemplate"
+                                           OnTemplateSelected="OnTemplateSelected" />
+        }
+        else {
+            <label class="test-name-info" for="test-name">New Test Name</label>
+            <InputText id="test-name" class="form-control" @bind-Value="testNameInput" />
+        }
         <p class="server-message">@serverMessage</p>
-        <div class="bottom-btns-container">
-            <button class="close-btn" @onclick="Close">Close</button>
-            <button class='continue-btn @(templateChosen? "":"continue-inactive")' @onclick="()=> {if(templateChosen) OnSelected();}">Continue</button>
-        </div>
+        <button class='continue-btn @(templateChosen ? "" : "continue-inactive")'
+                @onclick="()=>{if(templateChosen)OnContinueClicked();}">
+            Continue
+        </button>
     </div>
-
 </BaseDialog>
-
-
 @code {
     private BaseDialog baseDialogRef;
-    private TestTemplate? chosenTemplate = null;
+    private bool isPageStateTemplateChosing = true;
     private string serverMessage = string.Empty;
+    private TestTemplate? chosenTemplate = null;
+    private string testNameInput = string.Empty;
 
-    private bool templateChosen =>
-        chosenTemplate is not null;
+    private bool templateChosen => chosenTemplate is not null;
 
     public async Task Open() {
+        isPageStateTemplateChosing = true;
         chosenTemplate = null;
+        serverMessage = string.Empty;
+        StateHasChanged();
         await baseDialogRef.OpenAsync();
     }
 
-    private async Task Close() =>
-            await baseDialogRef.CloseAsync();
+    private async Task Close() => await baseDialogRef.CloseAsync();
 
-    private void OnSelected() {
+    private void OnTemplateSelected(TestTemplate template) {
+        chosenTemplate = template;
+        StateHasChanged();
+    }
+    private void OnContinueClicked() {
+        if (isPageStateTemplateChosing) {
+            HandleTemplateChoosing();
+        }
+        else {
+            HandleTestNameInput();
+        }
+    }
+
+    private void HandleTemplateChoosing() {
         if (!templateChosen) {
             serverMessage = "Choose a template";
-
         }
         else if (chosenTemplate != TestTemplate.None) {
             serverMessage = "This template is not implemented yet";
         }
         else {
-            //create test in db, redirect ...
+            isPageStateTemplateChosing = false;
+            serverMessage = string.Empty;
         }
     }
-}
 
+    private void HandleTestNameInput() {
+        var err = TestMainInfoEditingForm.ValidateTestName(testNameInput);
+        if (err.NotNone()) {
+            serverMessage = err.ToString();
+        }
+        else {
+            CreateDraftTest();
+        }
+    }
+
+    private async void CreateDraftTest() {
+        HttpContext httpContext  = httpContextAccessor.HttpContext;
+
+        AppUserId? userId = authHelperService.GetUserIdFromClaims(httpContext.User);
+        if (userId is null) {
+            serverMessage = "Failed to create test. Try logging out and logging in again";
+            StateHasChanged();
+            return;
+        }
+
+        AppUser? user = await usersDbOperationsService.GetUserById(userId.Value);
+        if (user is null) {
+            serverMessage = "Failed to create test. Try logging out and logging in again";
+            StateHasChanged();
+            return;
+        }
+
+        var createResult = await testsCreationDbOperationsService.CreateNewDraftTest(testNameInput, user);
+        createResult.Switch(
+            testId => {
+                navigationManager.NavigateTo($"/newtest/{testId}");
+            },
+            err => { serverMessage = "Failed to create test. Please try again later"; }
+        );
+    }
+}

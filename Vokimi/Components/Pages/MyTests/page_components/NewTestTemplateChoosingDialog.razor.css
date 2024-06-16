@@ -1,5 +1,4 @@
-﻿
-.dialog-content {
+﻿.dialog-content {
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -7,71 +6,45 @@
     width: 900px;
 }
 
-.available-templates-label {
-    text-align: center;
-    font-family: "Roboto";
-    font-size: 38px;
-    color: var(--primary);
-}
-
-.templates-container {
-    padding: 10px;
-    display: flex;
-    justify-content: space-evenly;
-}
-
 .server-message {
     font-family: "Roboto";
     font-size: 18px;
 }
 
-.bottom-btns-container {
-    align-self:flex-end;
-    margin-bottom: 10px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    width: fit-content;
-    gap: 10px;
-    padding: 10px;
-}
-
-    .bottom-btns-container button {
-        padding: 10px 20px;
-        font-size: 16px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: background-color 0.3s, box-shadow 0.3s;
-    }
-
-        .bottom-btns-container button:focus {
-            outline: none;
-            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.5);
-        }
 
 .close-btn {
     background-color: #ff4d4d;
+    height: 40px;
+    padding: 2px;
+    aspect-ratio: 1/1;
     color: #fff;
 }
+
+    .close-btn svg {
+        fill: white;
+        height: 100%;
+    }
 
     .close-btn:hover {
         background-color: #ff1a1a;
     }
 
 .continue-btn {
-    background-color: #28a745;
-    color: #fff;
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: var(--primary);
+    color: var(--back);
+    transition: background-color 0.3s, box-shadow 0.3s;
 }
 
     .continue-btn:hover {
-        background-color: #218838;
+        background-color: var(--accent);
     }
 
     .continue-btn.continue-inactive {
-        background-color: #6c757d;
+        background-color: #6c757d !important;
         cursor: not-allowed;
     }
-
-        .continue-btn.continue-inactive:hover {
-            background-color: #6c757d;
-        }
