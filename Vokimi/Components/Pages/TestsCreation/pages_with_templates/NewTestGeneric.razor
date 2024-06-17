@@ -1,0 +1,101 @@
+﻿@inject TestsCreationDbOperationsService testsCreationDbOperationsService
+@inject UsersDbOperationsService usersDbOperationsService
+@inject AuthHelperService authHelperService
+
+@attribute [Authorize]
+@page "/newtest/gen/{testId}"
+<PageTitle>New Test</PageTitle>
+
+<h1>Test creation page</h1>
+
+@if (!string.IsNullOrEmpty(pageInitializationError)) {
+    <p>@pageInitializationError</p>
+}
+else if(creator is not null && draftTest is not null){
+
+    @switch (pageState) {
+        case TestCreationPageState.Overview:
+            <TestOverview ChangePageState="(givenState) => pageState=givenState" Creator="creator" Test="draftTest" />
+            break;
+        case TestCreationPageState.MainInfoEditing:
+            <MainInfoEditing></MainInfoEditing>
+            break;
+        case TestCreationPageState.QuestionCreation:
+            <QuestionCreation></QuestionCreation>
+            break;
+        case TestCreationPageState.ResultsCreation:
+            <ResultsCreation></ResultsCreation>
+            break;
+        case TestCreationPageState.StylesEditing:
+            <StylesEditing></StylesEditing>
+            break;
+        case TestCreationPageState.TagsAdding:
+            <TagsAdding></TagsAdding>
+            break;
+        default:
+            <h2>default state</h2>
+            break;
+    }
+}
+else {
+    <h2 class="error-occurred">An error has occurred. Try to refresh the page</h2>
+}
+@code {
+    [Parameter]
+    public string TestId { get; set; } = string.Empty;
+
+    [CascadingParameter]
+    public HttpContext httpContext { get; set; }
+
+    private string pageInitializationError = string.Empty;
+    private TestCreationPageState pageState { get; set; } = TestCreationPageState.Overview;
+    private DraftTestId? parsedTestId = null;
+
+    public enum TestCreationPageState
+    {
+        Overview,
+        MainInfoEditing,
+        QuestionCreation,
+        ResultsCreation,
+        StylesEditing,
+        TagsAdding
+    }
+
+    private AppUser creator { get; set; }
+    private DraftGenericTest draftTest { get; set; }
+
+    protected override async Task OnInitializedAsync() {
+
+        pageInitializationError = string.Empty;
+
+        if (!Guid.TryParse(TestId, out Guid parsedGuid)) {
+            pageInitializationError = "Invalid test ID format.";
+            return;
+        }
+        parsedTestId = new(parsedGuid);
+
+        AppUserId? userId = authHelperService.GetUserIdFromClaims(httpContext.User);
+        if (userId is null) {
+            pageInitializationError = "An error has occurred. Try to log out of your account and log in again.";
+            return;
+        }
+
+        creator = await usersDbOperationsService.GetUserById(userId.Value);
+        if (creator is null) {
+            pageInitializationError = "An error has occurred. Try to log out of your account and log in again.";
+            return;
+        }
+
+        draftTest = await testsCreationDbOperationsService.GetTestById<DraftGenericTest>((DraftTestId)parsedTestId, TestTemplate.Generic);
+        if (draftTest is null) {
+            pageInitializationError = "Unknown test";
+            return;
+        }
+        if (!creator.DraftTests.Contains(draftTest)) {
+            pageInitializationError = "You don't have access to this test";
+            return;
+        }
+        StateHasChanged();
+
+    }
+}

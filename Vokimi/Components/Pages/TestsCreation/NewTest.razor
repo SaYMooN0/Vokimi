@@ -1,51 +1,25 @@
 ﻿@inject TestsCreationDbOperationsService testsCreationDbOperationsService
 @inject UsersDbOperationsService usersDbOperationsService
 @inject AuthHelperService authHelperService
+@inject NavigationManager navigationManager 
 
-@attribute [Authorize]
 @page "/newtest"
 @page "/newtest/{testId}"
+
 <PageTitle>New Test</PageTitle>
-
-<h1>Test creation page</h1>
-
-@if (!string.IsNullOrEmpty(pageInitializationError)) {
-    <p>@pageInitializationError</p>
-}
-else {
-    @switch (pageState) {
-        case PageState.Overview:
-            <TestOverview></TestOverview>
-            break;
-        case PageState.MainInfoEditing:
-            <MainInfoEditing></MainInfoEditing>
-            break;
-        default:
-            <h2>default state</h2>
-            break;
-    }
-}
+<NewTestErrorComponent Message="@pageInitializationError" />
 
 @code {
     [Parameter]
     public string TestId { get; set; } = string.Empty;
 
+
     [CascadingParameter]
     public HttpContext httpContext { get; set; }
 
     private string pageInitializationError = string.Empty;
-    private PageState pageState { get; set; } = PageState.MainInfoEditing;
-    private Guid? parsedTestId = null;
+    private DraftTestId? parsedTestId = null;
 
-    private enum PageState
-    {
-        Overview,
-        MainInfoEditing,
-        QuestionCreation,
-        Results,
-        Styles,
-        TagsAdding
-    }
 
     protected override async Task OnInitializedAsync() {
 
@@ -55,7 +29,7 @@ else {
             pageInitializationError = "Invalid test ID format.";
             return;
         }
-        parsedTestId = parsedGuid;
+        parsedTestId = new(parsedGuid);
 
         AppUserId? userId = authHelperService.GetUserIdFromClaims(httpContext.User);
         if (userId is null) {
@@ -68,16 +42,14 @@ else {
             pageInitializationError = "An error has occurred. Try to log out of your account and log in again.";
             return;
         }
+        TestTemplate? type = await testsCreationDbOperationsService.GetTestTypeById(parsedTestId.Value);
+        if (type is null) {
+            pageInitializationError = "Unknown test";
+            return;
+        }
+        navigationManager.NavigateTo($"/newtest/{type.Value.ShortId()}/{parsedTestId.Value}");
 
-        // if (!user.DraftTests.Contains(parsedTestId.Value)) {
-        //     pageInitializationError = "You have no rights to change this test.";
-        //     return;
-        // }
-
-        LoadTestData(parsedTestId.Value);
-
-    }
-
-    private void LoadTestData(Guid testId) {
     }
 }
+
+

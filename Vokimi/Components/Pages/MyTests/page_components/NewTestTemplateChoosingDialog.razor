@@ -64,7 +64,7 @@
         if (!templateChosen) {
             serverMessage = "Choose a template";
         }
-        else if (chosenTemplate != TestTemplate.None) {
+        else if (chosenTemplate != TestTemplate.Generic) {
             serverMessage = "This template is not implemented yet";
         }
         else {
@@ -84,7 +84,7 @@
     }
 
     private async void CreateDraftTest() {
-        HttpContext httpContext  = httpContextAccessor.HttpContext;
+        HttpContext httpContext = httpContextAccessor.HttpContext;
 
         AppUserId? userId = authHelperService.GetUserIdFromClaims(httpContext.User);
         if (userId is null) {
@@ -100,12 +100,15 @@
             return;
         }
 
-        var createResult = await testsCreationDbOperationsService.CreateNewDraftTest(testNameInput, user);
+        var createResult = await testsCreationDbOperationsService.CreateNewDraftTest(testNameInput, chosenTemplate.Value, user);
         createResult.Switch(
             testId => {
                 navigationManager.NavigateTo($"/newtest/{testId}");
             },
-            err => { serverMessage = "Failed to create test. Please try again later"; }
+            err => {
+                serverMessage = "Failed to create test. Please try again later";
+                StateHasChanged();
+            }
         );
     }
 }

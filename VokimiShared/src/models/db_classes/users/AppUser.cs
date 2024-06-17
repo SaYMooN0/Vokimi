@@ -15,7 +15,7 @@ namespace VokimiShared.src.models.db_classes.users
         public virtual LoginInfo LoginInfo { get; private set; }
         public virtual UserAdditionalInfo UserAdditionalInfo { get; private set; }
 
-        public virtual ICollection<DraftGenericTest> DraftGenericTests { get; set; } = [];
+        public virtual ICollection<BaseDraftTest> DraftTests { get; set; } = [];
         public static AppUser CreateNew(string username, LoginInfoId loginInfoId, UserAdditionalInfoId userAdditionalInfoId) =>
             new() {
                 Id = new AppUserId(),

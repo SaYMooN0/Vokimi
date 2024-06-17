@@ -5,7 +5,7 @@ namespace Vokimi.src.data
     public class DbInitializer
     {
         public static async Task InitializeDbAsync(VokimiDbContext dbContext)
-        {    
+        {
             //await dbContext.Database.EnsureDeletedAsync();
             await dbContext.Database.EnsureCreatedAsync();
 

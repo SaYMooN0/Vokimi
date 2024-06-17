@@ -23,13 +23,13 @@
 
     public Type GetIconComponent(TestTemplate template) =>
         template switch {
-            TestTemplate.None => typeof(template_icons.TestTemplateIconNone),
+            TestTemplate.Generic => typeof(template_icons.TestTemplateIconGeneric),
             TestTemplate.Knowledge => typeof(template_icons.TestTemplateIconKnowledge),
             _ => throw new ArgumentOutOfRangeException(nameof(template), template, null)
         };
     public string GetTempalteName(TestTemplate template) =>
        template switch {
-           TestTemplate.None => "No Template",
+           TestTemplate.Generic => "No Template",
            TestTemplate.Knowledge => "Knowledge Test",
            _ => throw new ArgumentOutOfRangeException(nameof(template), template, null)
        };

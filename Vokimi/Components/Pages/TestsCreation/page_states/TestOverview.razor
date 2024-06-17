@@ -1,8 +1,67 @@
-﻿<h3>TestOverview</h3>
-<label add conclusion (optional)
+﻿@using static Vokimi.Components.Pages.TestsCreation.pages_with_templates.NewTestGeneric
 
-</label>
+<h3>TestOverview</h3>
+<div class="main-info-area">
+    <label class="test-main-info-label">
+        Test main info:
+    </label>
+    <div class="test-main-info">
+        <div class="test-main-info-text">
+            <p>
+                Name:<span>@vm.Name</span>
+            </p>
+            <p>
+                Description:<br /> <span class="test-description">@vm.Description</span>
+            </p>
+            <p>
+                Language:<span>@vm.Language</span>
+            </p>
+            <p>
+                Privacy:<span>@vm.Privace</span>
+            </p>
+        </div>
+        <img class="test-cover" src="@vm.ImagePath" />
+    </div>
+    <button class="edit-main-info-button" @onclick="()=>ChangePageState(TestCreationPageState.MainInfoEditing)">Edit</button>
+</div>
+<div class="questions-area">
+    <label class="questions-count-label">@vm.Questions.Count</label>
+    @foreach (var q in vm.Questions) {
+        <div class="question-view-component">
+            <label class="question-text">@q.Text</label>
+            <label class="answers-count">Answers count: @q.AnswersCount (@(q.IsMultiAnswer ? "Multi-Answer" : "Single-Answer"))</label>
+            <div class="possible-points-info">
+                <label>Possible Points</label>
+                <div class="min-max-container">
+                    <span>Min: @q.MinPossiblePoints</span>
+                    <span>Max: @q.MaxPossiblePoints</span>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+<div class="conclusion-area">
+    Add Test Conclusion(Optional)
+    <button>Add</button>
+</div>
+<div class="styles-area">
+    Change Test Styles(Optional)
+    <button>Change</button>
+</div>
 
 @code {
+    private TestCreationOverviewViewModel vm { get; set; }
 
+    [Parameter]
+    public AppUser Creator { get; set; }
+    [Parameter]
+    public DraftGenericTest Test { get; set; }
+    [Parameter]
+    public Action<TestCreationPageState> ChangePageState { get; set; }
+
+    protected override void OnParametersSet() {
+        vm = TestCreationOverviewViewModel.FromTest(Test);
+    }
+
+    
 }

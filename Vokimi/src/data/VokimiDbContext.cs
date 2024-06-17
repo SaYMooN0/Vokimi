@@ -14,6 +14,7 @@ namespace Vokimi.src.data
         public DbSet<AppUser> AppUsers { get; set; }
         public DbSet<LoginInfo> LoginInfo { get; set; }
         public DbSet<UserAdditionalInfo> UserAdditionalInfo { get; set; }
+        public DbSet<BaseDraftTest> DraftTestsSharedInfo { get; set; }
         public DbSet<DraftGenericTest> DraftGenericTests { get; set; }
         public DbSet<DraftTestMainInfo> DraftTestMainInfo { get; set; }
         public DbSet<TestConclusion> TestConclusions { get; set; }
@@ -31,7 +32,7 @@ namespace Vokimi.src.data
                 entity.Property(x => x.LoginInfoId).HasConversion(v => v.Value, v => new LoginInfoId(v));
                 entity.Property(x => x.UserAdditionalInfoId).HasConversion(v => v.Value, v => new UserAdditionalInfoId(v));
 
-                entity.HasMany(x => x.DraftGenericTests)
+                entity.HasMany(x => x.DraftTests)
                       .WithOne(x => x.Creator)
                       .HasForeignKey(x => x.CreatorId)
                       .IsRequired();
@@ -52,28 +53,34 @@ namespace Vokimi.src.data
                 entity.Property(x => x.Id).HasConversion(v => v.Value, v => new UnconfirmedAppUserId(v));
             });
 
-            modelBuilder.Entity<DraftGenericTest>(entity => {
+            modelBuilder.Entity<BaseDraftTest>(entity => {
                 entity.HasKey(x => x.Id);
                 entity.Property(x => x.Id).HasConversion(v => v.Value, v => new DraftTestId(v));
                 entity.Property(x => x.MainInfoId).HasConversion(v => v.Value, v => new DraftTestMainInfoId(v));
 
                 entity.HasOne(x => x.MainInfo)
                       .WithOne()
-                      .HasForeignKey<DraftGenericTest>(x => x.MainInfoId);
+                      .HasForeignKey<BaseDraftTest>(x => x.MainInfoId);
 
                 entity.HasOne(x => x.Creator)
-                      .WithMany(x => x.DraftGenericTests)
-                      .HasForeignKey(x => x.CreatorId)
-                      .IsRequired();
+                      .WithMany(x => x.DraftTests)
+                      .HasForeignKey(x => x.CreatorId);
 
                 entity.HasOne(x => x.Conclusion)
                       .WithMany()
                       .HasForeignKey(x => x.ConclusionId);
+
+                entity.ToTable("DraftTestsSharedInfo");
+            });
+
+            modelBuilder.Entity<DraftGenericTest>(entity => {
+                entity.ToTable("DraftGenericTests");
             });
 
             modelBuilder.Entity<DraftTestMainInfo>(entity => {
                 entity.HasKey(x => x.Id);
                 entity.Property(x => x.Id).HasConversion(v => v.Value, v => new DraftTestMainInfoId(v));
+
             });
 
             modelBuilder.Entity<TestConclusion>(entity => {
