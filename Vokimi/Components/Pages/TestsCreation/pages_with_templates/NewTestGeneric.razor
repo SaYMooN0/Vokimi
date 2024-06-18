@@ -1,9 +1,12 @@
 ﻿@inject TestsCreationDbOperationsService testsCreationDbOperationsService
 @inject UsersDbOperationsService usersDbOperationsService
 @inject AuthHelperService authHelperService
+@inject IHttpContextAccessor httpContextAccessor
 
+@rendermode InteractiveServer
 @attribute [Authorize]
 @page "/newtest/gen/{testId}"
+
 <PageTitle>New Test</PageTitle>
 
 <h1>Test creation page</h1>
@@ -11,14 +14,14 @@
 @if (!string.IsNullOrEmpty(pageInitializationError)) {
     <p>@pageInitializationError</p>
 }
-else if(creator is not null && draftTest is not null){
+else if (creator is not null && draftTest is not null) {
 
     @switch (pageState) {
         case TestCreationPageState.Overview:
-            <TestOverview ChangePageState="(givenState) => pageState=givenState" Creator="creator" Test="draftTest" />
+            <TestOverview ChangePageState="HandlePageStateChange" Test="new DraftGenericTestDto(draftTest)" />
             break;
         case TestCreationPageState.MainInfoEditing:
-            <MainInfoEditing></MainInfoEditing>
+            <MainInfoEditing Test="new DraftGenericTestDto(draftTest)" />
             break;
         case TestCreationPageState.QuestionCreation:
             <QuestionCreation></QuestionCreation>
@@ -44,9 +47,6 @@ else {
     [Parameter]
     public string TestId { get; set; } = string.Empty;
 
-    [CascadingParameter]
-    public HttpContext httpContext { get; set; }
-
     private string pageInitializationError = string.Empty;
     private TestCreationPageState pageState { get; set; } = TestCreationPageState.Overview;
     private DraftTestId? parsedTestId = null;
@@ -64,6 +64,9 @@ else {
     private AppUser creator { get; set; }
     private DraftGenericTest draftTest { get; set; }
 
+    private void HandlePageStateChange(TestCreationPageState newState) {
+        pageState = newState;
+    }
     protected override async Task OnInitializedAsync() {
 
         pageInitializationError = string.Empty;
@@ -74,7 +77,7 @@ else {
         }
         parsedTestId = new(parsedGuid);
 
-        AppUserId? userId = authHelperService.GetUserIdFromClaims(httpContext.User);
+        AppUserId? userId = authHelperService.GetUserIdFromClaims(httpContextAccessor.HttpContext.User);
         if (userId is null) {
             pageInitializationError = "An error has occurred. Try to log out of your account and log in again.";
             return;
@@ -95,7 +98,6 @@ else {
             pageInitializationError = "You don't have access to this test";
             return;
         }
-        StateHasChanged();
 
     }
 }

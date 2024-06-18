@@ -39,3 +39,31 @@
 
     }
 }
+
+
+@* @inject IHttpContextAccessor httpContextAccessor
+@inject IJSRuntime JsRuntime
+@inject AuthHelperService authHelperService
+
+@page "/mytests"
+@rendermode InteractiveServer
+
+<h2>My Tests</h2>
+<h5>@userIdInfo</h5>
+@code {
+    private string userIdInfo = "";
+
+    protected async override Task OnAfterRenderAsync(bool firstRender) {
+        HttpContext httpContext = httpContextAccessor.HttpContext;
+
+        AppUserId? userId = authHelperService.GetUserIdFromClaims(httpContext.User);
+        if (userId is null) {
+            await JsRuntime.InvokeVoidAsync("window.location.replace","/login" );
+        }
+        else {
+            userIdInfo = userId.Value.ToString();
+            StateHasChanged();
+        }
+    }
+} *@
+

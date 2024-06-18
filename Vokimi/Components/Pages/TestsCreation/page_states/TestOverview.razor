@@ -1,5 +1,7 @@
 ﻿@using static Vokimi.Components.Pages.TestsCreation.pages_with_templates.NewTestGeneric
 
+@rendermode InteractiveServer
+
 <h3>TestOverview</h3>
 <div class="main-info-area">
     <label class="test-main-info-label">
@@ -22,7 +24,9 @@
         </div>
         <img class="test-cover" src="@vm.ImagePath" />
     </div>
-    <button class="edit-main-info-button" @onclick="()=>ChangePageState(TestCreationPageState.MainInfoEditing)">Edit</button>
+    <button class="edit-main-info-button" @onclick="() => ChangePageState.InvokeAsync(TestCreationPageState.MainInfoEditing)">
+        Edit
+    </button>
 </div>
 <div class="questions-area">
     <label class="questions-count-label">@vm.Questions.Count</label>
@@ -52,16 +56,17 @@
 @code {
     private TestCreationOverviewViewModel vm { get; set; }
 
+    // [Parameter]
+    // public AppUserDto Creator { get; set; }
     [Parameter]
-    public AppUser Creator { get; set; }
+    public DraftGenericTestDto Test { get; set; }
     [Parameter]
-    public DraftGenericTest Test { get; set; }
-    [Parameter]
-    public Action<TestCreationPageState> ChangePageState { get; set; }
-
+    public EventCallback<TestCreationPageState> ChangePageState { get; set; }
+   
     protected override void OnParametersSet() {
-        vm = TestCreationOverviewViewModel.FromTest(Test);
+        base.OnParametersSet();
+        vm = TestCreationOverviewViewModel.FromTestDto(Test);
     }
 
-    
+
 }

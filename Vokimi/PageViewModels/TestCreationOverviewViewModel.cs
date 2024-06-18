@@ -1,5 +1,5 @@
 ﻿using VokimiShared.src.enums;
-using VokimiShared.src.models.db_classes.test_creation;
+using VokimiShared.src.models.dtos;
 
 namespace Vokimi.PageViewModels
 {
@@ -11,13 +11,14 @@ namespace Vokimi.PageViewModels
         public string Language { get; set; }
         public string Privace { get; set; }
         public List<QuestionOverviewViewModel> Questions { get; set; } = [];
-        public static TestCreationOverviewViewModel FromTest(BaseDraftTest draftTest) =>
+        public static TestCreationOverviewViewModel FromTestDto(DraftGenericTestDto dto) =>
             new() {
-                Name = draftTest.MainInfo.Name,
-                Description = string.IsNullOrEmpty(draftTest.MainInfo.Description) ? "(None)" : draftTest.MainInfo.Description,
-                ImagePath = draftTest.MainInfo.CoverImagePath,
-                Language = draftTest.MainInfo.Language.FullName(),
-                Privace = draftTest.MainInfo.Privacy.ToString()
+                Name = dto.MainInfo.Name,
+                Description = string.IsNullOrEmpty(dto.MainInfo.Description) ? "(None)" : dto.MainInfo.Description,
+                ImagePath = dto.MainInfo.CoverImagePath,
+                Language = dto.MainInfo.Language.FullName(),
+                Privace = dto.MainInfo.Privacy.ToString(),
+                Questions=new()
             };
 
     }

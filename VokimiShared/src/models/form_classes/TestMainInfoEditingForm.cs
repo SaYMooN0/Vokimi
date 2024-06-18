@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
-using VokimiShared.src.enums;
+﻿using VokimiShared.src.enums;
+using VokimiShared.src.models.dtos.draft_tests;
 
 namespace VokimiShared.src.models.form_classes
 {
@@ -7,7 +7,7 @@ namespace VokimiShared.src.models.form_classes
     {
         public string Name { get; set; }
         public string? Description { get; set; }
-        public IFormFile? Cover { get; set; }
+        public string Cover { get; set; }
         public Language Language { get; set; }
         public TestPrivacy Privacy { get; set; }
         public static Err ValidateTestName(string name) {
@@ -19,5 +19,13 @@ namespace VokimiShared.src.models.form_classes
             }
             return Err.None;
         }
+        public static TestMainInfoEditingForm FromTestMainInfoDto(DraftTestMainInfoDto dto) =>
+            new() {
+                Name= dto.Name,
+                Description= dto.Description,
+                Cover= dto.CoverImagePath,
+                Language= dto.Language,
+                Privacy= dto.Privacy
+            };
     }   
 }

@@ -1,22 +1,25 @@
-﻿@using VokimiShared.src.enums
+﻿@inject VokimiStorageService vokimiStorageService
 
-<EditForm Model="@testMainInfo" OnValidSubmit="HandleValidSubmit">
+@rendermode InteractiveServer
+
+<EditForm Model="@testMainInfo" OnValidSubmit="HandleValidSubmit" FormName="testMainInfoForm">
     <DataAnnotationsValidator />
     <div class="form-container">
 
-        <label for="name" class="form-label">Name</label>
+        <label for="name" class="form-label">Test name:</label>
         <InputText id="name" class="form-control" @bind-Value="testMainInfo.Name" />
 
 
 
-        <label for="description" class="form-label">Description (Optional)</label>
+        <label for="description" class="form-label">Test Description (Optional):</label>
         <InputTextArea id="description" class="form-control" @bind-Value="testMainInfo.Description" />
 
 
 
-        <label for="cover" class="form-label">Cover</label>
+        <label for="cover" class="form-label">Test Cover</label>
         <InputFile id="cover" class="form-control" OnChange="HandleFileChange" />
-
+        <img class="chosen-cover-viewer" src="@ImageViewerController.ImgUrl(testMainInfo.Cover)" />
+        <label class="cover-error">@coverUploadingError</label>
 
 
         <label for="language" class="form-label">Language</label>
@@ -41,14 +44,41 @@
 
 </EditForm>
 @code {
+    private string coverUploadingError = string.Empty;
+
     [SupplyParameterFromForm]
     public TestMainInfoEditingForm testMainInfo { get; set; } = new();
+    [Parameter]
+    public DraftGenericTestDto Test { get; set; }
 
-    private void HandleFileChange(InputFileChangeEventArgs e) {
-        // testMainInfo.Cover = e.File;
+    protected override async Task OnParametersSetAsync() {
+        await base.OnParametersSetAsync();
+        testMainInfo =TestMainInfoEditingForm.FromTestMainInfoDto(Test.MainInfo);
     }
 
+    private async Task HandleFileChange(InputFileChangeEventArgs e) {
+        var file = e.File;
+        if (file != null) {
+            try {
+                using (var stream = file.OpenReadStream(maxAllowedSize: 10240000)) { /* 10MB */
+                    var result = await vokimiStorageService.SaveDraftTestCover(Test.Id, stream);
+                    result.Switch(
+                        path => {
+                            testMainInfo.Cover = path;
+                            coverUploadingError = string.Empty;
+                        },
+                        err => coverUploadingError = $"Error uploading cover: {err.Message}"
+                    );
+                }
+            } catch (Exception ex) {
+                coverUploadingError = $"Error: {ex.Message}";
+            }
+        }
+    }
+
+
+
     private void HandleValidSubmit() {
-        Console.WriteLine("Form submitted!");
+
     }
 }
