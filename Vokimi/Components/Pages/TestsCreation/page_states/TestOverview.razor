@@ -22,7 +22,7 @@
                 Privacy:<span>@vm.Privace</span>
             </p>
         </div>
-        <img class="test-cover" src="@vm.ImagePath" />
+        <img class="test-cover" src="@ImgOperationsHelper.ImgUrl(vm.CoverPath)" />
     </div>
     <button class="edit-main-info-button" @onclick="() => ChangePageState.InvokeAsync(TestCreationPageState.MainInfoEditing)">
         Edit
@@ -62,7 +62,7 @@
     public DraftGenericTestDto Test { get; set; }
     [Parameter]
     public EventCallback<TestCreationPageState> ChangePageState { get; set; }
-   
+
     protected override void OnParametersSet() {
         base.OnParametersSet();
         vm = TestCreationOverviewViewModel.FromTestDto(Test);

@@ -1,11 +1,11 @@
-﻿@inject VokimiStorageService vokimiStorageService
+﻿
+@inject VokimiStorageService vokimiStorageService
 
 @rendermode InteractiveServer
 
 <EditForm Model="@testMainInfo" OnValidSubmit="HandleValidSubmit" FormName="testMainInfoForm">
     <DataAnnotationsValidator />
-    <div class="form-container">
-
+    <div class="form-content">
         <label for="name" class="form-label">Test name:</label>
         <InputText id="name" class="form-control" @bind-Value="testMainInfo.Name" />
 
@@ -16,10 +16,18 @@
 
 
 
-        <label for="cover" class="form-label">Test Cover</label>
-        <InputFile id="cover" class="form-control" OnChange="HandleFileChange" />
-        <img class="chosen-cover-viewer" src="@ImageViewerController.ImgUrl(testMainInfo.Cover)" />
-        <label class="cover-error">@coverUploadingError</label>
+        <div class="cover-choosing-zone">
+            <label class="form-label">Test Cover:</label>
+            <img class="chosen-cover-viewer" src="@ImgOperationsHelper.ImgUrl(testMainInfo.Cover)" />
+            <div class="btns-container">
+                <label for="cover" class="change-button">Change</label>
+                <div class="remove-btn" @onclick="HandleCoverDelete">Delete</div>
+            </div>
+            <InputFile id="cover" class="form-control" OnChange="HandleFileChange" accept=".jpg,.png,.webp" hidden />
+
+            <label class="cover-error">@coverUploadingError</label>
+
+        </div>
 
 
         <label for="language" class="form-label">Language</label>
@@ -53,14 +61,27 @@
 
     protected override async Task OnParametersSetAsync() {
         await base.OnParametersSetAsync();
-        testMainInfo =TestMainInfoEditingForm.FromTestMainInfoDto(Test.MainInfo);
+        testMainInfo = TestMainInfoEditingForm.FromTestMainInfoDto(Test.MainInfo);
+        if (string.IsNullOrEmpty(testMainInfo.Cover)) {
+            testMainInfo.Cover = ImgOperationsHelper.DefaultTestCoverImg;
+        }
+
     }
+    private void HandleCoverDelete() =>
+        testMainInfo.Cover = ImgOperationsHelper.DefaultTestCoverImg;
 
     private async Task HandleFileChange(InputFileChangeEventArgs e) {
+
         var file = e.File;
+        int maxAllowedSize = 3145728; /* 3MB */
+
         if (file != null) {
+            if (file.Size > maxAllowedSize) {
+                coverUploadingError = $"File is too big. Max allowed size: 3MB";
+                return;
+            }
             try {
-                using (var stream = file.OpenReadStream(maxAllowedSize: 10240000)) { /* 10MB */
+                using (var stream = file.OpenReadStream(maxAllowedSize: maxAllowedSize)) { 
                     var result = await vokimiStorageService.SaveDraftTestCover(Test.Id, stream);
                     result.Switch(
                         path => {

@@ -18,7 +18,7 @@ namespace Vokimi.Services
             _db = context;
         }
         public async Task<OneOf<DraftTestId, Err>> CreateNewDraftTest(string testName, TestTemplate template, AppUser creator) {
-            DraftTestMainInfo mainInfo = DraftTestMainInfo.CreateNew(testName);
+            DraftTestMainInfo mainInfo = DraftTestMainInfo.CreateNewFromName(testName);
             DraftGenericTest test = DraftGenericTest.CreateNew(creator.Id, mainInfo.Id);
 
             try {

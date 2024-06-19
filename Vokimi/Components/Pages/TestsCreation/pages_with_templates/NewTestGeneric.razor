@@ -11,38 +11,42 @@
 
 <h1>Test creation page</h1>
 
-@if (!string.IsNullOrEmpty(pageInitializationError)) {
-    <p>@pageInitializationError</p>
-}
-else if (creator is not null && draftTest is not null) {
-
-    @switch (pageState) {
-        case TestCreationPageState.Overview:
-            <TestOverview ChangePageState="HandlePageStateChange" Test="new DraftGenericTestDto(draftTest)" />
-            break;
-        case TestCreationPageState.MainInfoEditing:
-            <MainInfoEditing Test="new DraftGenericTestDto(draftTest)" />
-            break;
-        case TestCreationPageState.QuestionCreation:
-            <QuestionCreation></QuestionCreation>
-            break;
-        case TestCreationPageState.ResultsCreation:
-            <ResultsCreation></ResultsCreation>
-            break;
-        case TestCreationPageState.StylesEditing:
-            <StylesEditing></StylesEditing>
-            break;
-        case TestCreationPageState.TagsAdding:
-            <TagsAdding></TagsAdding>
-            break;
-        default:
-            <h2>default state</h2>
-            break;
+<div class="central-align">
+    @if (!string.IsNullOrEmpty(pageInitializationError)) {
+        <p>@pageInitializationError</p>
     }
-}
-else {
-    <h2 class="error-occurred">An error has occurred. Try to refresh the page</h2>
-}
+
+    else if (creator is not null && draftTest is not null) {
+
+        @switch (pageState) {
+            case TestCreationPageState.Overview:
+                <TestOverview ChangePageState="HandlePageStateChange" Test="new DraftGenericTestDto(draftTest)" />
+                break;
+            case TestCreationPageState.MainInfoEditing:
+                <MainInfoEditing Test="new DraftGenericTestDto(draftTest)" />
+                break;
+            case TestCreationPageState.QuestionCreation:
+                <QuestionCreation></QuestionCreation>
+                break;
+            case TestCreationPageState.ResultsCreation:
+                <ResultsCreation></ResultsCreation>
+                break;
+            case TestCreationPageState.StylesEditing:
+                <StylesEditing></StylesEditing>
+                break;
+            case TestCreationPageState.TagsAdding:
+                <TagsAdding></TagsAdding>
+                break;
+            default:
+                <h2>default state</h2>
+                break;
+        }
+    }
+    else {
+        <h2 class="error-occurred">An error has occurred. Try to refresh the page</h2>
+    }
+</div>
+
 @code {
     [Parameter]
     public string TestId { get; set; } = string.Empty;

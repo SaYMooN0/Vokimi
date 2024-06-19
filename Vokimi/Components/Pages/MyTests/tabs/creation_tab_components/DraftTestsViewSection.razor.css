@@ -1,0 +1,57 @@
+﻿
+.section-title {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #d1d6db;
+    position: relative;
+}
+
+    .section-title label {
+        font-family: "Roboto";
+        font-weight: bold;
+        font-size: 28px;
+    }
+
+.toggle-button {
+    position: absolute;
+    right: 10px;
+    top: 0;
+    width: 100px;
+    font-family: "Roboto";
+    font-weight:bold;
+    letter-spacing:2px;
+    color: white;
+    font-size: 20px;
+    border: none;
+    background-color: #bdbdbd;
+    padding: 8px 16px;
+    border-radius: 100px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.3s ease;
+}
+
+    .toggle-button:hover {
+        background-color: #757581;
+    }
+
+    .toggle-button svg {
+        width: 16px;
+        height: 16px;
+    }
+
+.test-vms-container {
+    padding:10px;
+    box-sizing:border-box;
+    gap: 30px;
+    display: flex;
+    flex-direction: row;
+    height: 280px;
+
+}

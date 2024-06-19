@@ -10,11 +10,11 @@ namespace VokimiShared.src.models.db_classes.tests
         public string? Description { get; init; }
         public Language Language { get; init; }
         public TestPrivacy Privacy { get; init; }
-        public static DraftTestMainInfo CreateNew(string name) =>
+        public static DraftTestMainInfo CreateNewFromName(string name) =>
             new() {
                 Id=new(),
                 Name = name,
-                CoverImagePath = string.Empty,
+                CoverImagePath = ImgOperationsHelper.DefaultTestCoverImg,
                 Description = null,
                 Language = Language.Unset,
                 Privacy = TestPrivacy.Anyone

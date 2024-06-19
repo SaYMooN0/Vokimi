@@ -1,6 +1,7 @@
 ﻿using Amazon.S3;
 using Amazon.S3.Model;
 using OneOf;
+using Vokimi.src;
 using VokimiShared.src;
 using VokimiShared.src.models.db_classes;
 
@@ -8,11 +9,6 @@ public class VokimiStorageService
 {
     private readonly IAmazonS3 _s3Client;
     private readonly string _bucketName;
-    private const string
-        profilePicturesFolder = "profile_pictures",
-        testCoversFolder = "test_covers",
-        generalFolder = "general",
-        draftTestCoversFolder = "draft_tests_covers";
 
 
     public VokimiStorageService(IAmazonS3 s3Client, string bucketName) {
@@ -21,7 +17,7 @@ public class VokimiStorageService
     }
     public async Task<OneOf<string, Err>> SaveDraftTestCover(DraftTestId id, Stream fileStream) {
         try {
-            string key = $"{draftTestCoversFolder}/{id}";
+            string key = $"{ImgOperationsHelper.GeneralFolder}/{id}";
             var putRequest = new PutObjectRequest {
                 BucketName = _bucketName,
                 Key = key,
@@ -40,4 +36,5 @@ public class VokimiStorageService
             return new Err("Server error. Please try again later");
         }
     }
+
 }

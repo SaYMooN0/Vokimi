@@ -1,6 +1,6 @@
 ﻿<div class='template @(IsActive? "chosen-template" : "")' @onclick="OnClick">
     <div class="icon">
-        <DynamicComponent Type="GetIconComponent(Template)" />
+        <DynamicComponent Type="Template.TemplateIconComponent()" />
     </div>
     <label class="name">
         @GetTempalteName(Template)
@@ -21,15 +21,9 @@
     [Parameter]
     public Action OnClick { get; set; }
 
-    public Type GetIconComponent(TestTemplate template) =>
-        template switch {
-            TestTemplate.Generic => typeof(template_icons.TestTemplateIconGeneric),
-            TestTemplate.Knowledge => typeof(template_icons.TestTemplateIconKnowledge),
-            _ => throw new ArgumentOutOfRangeException(nameof(template), template, null)
-        };
-    public string GetTempalteName(TestTemplate template) =>
+    private string GetTempalteName(TestTemplate template) =>
        template switch {
-           TestTemplate.Generic => "No Template",
+           TestTemplate.Generic => "Generic",
            TestTemplate.Knowledge => "Knowledge Test",
            _ => throw new ArgumentOutOfRangeException(nameof(template), template, null)
        };

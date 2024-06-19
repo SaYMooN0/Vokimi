@@ -11,13 +11,11 @@ namespace Vokimi.Controllers
 
         private readonly IAmazonS3 _s3Client;
         private readonly string _bucketName;
-
         public ImageViewerController(IAmazonS3 s3Client, IConfiguration configuration) {
             _s3Client = s3Client;
             _bucketName = configuration["AWS:BucketName"];
         }
-        public static string ImgUrl(string fileKey) =>
-            $"vokimiimgs/GetImage/{fileKey}";
+       
 
         [HttpGet("{*fileKey}")]
         public async Task<IActionResult> GetImage(string fileKey) {

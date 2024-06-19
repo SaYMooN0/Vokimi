@@ -1,0 +1,53 @@
+﻿@inject IHttpContextAccessor httpContextAccessor
+@inject AuthHelperService authHelperService
+@inject NavigationManager navigationManager
+@inject UsersDbOperationsService usersDbOperationsService
+
+
+<DraftTestsViewSection DraftTestsCount="draftTestsCount" TestsArray="unpublishedTests" TestPackageCount="testPackageCount"/>
+
+<h3>Created Tests: <button class="hide-btn">Hide</button> </h3>
+<div class="created-tests-container">
+    <div class="create-test-button" @onclick="OpenTemplateChoosingDialog">Create New</div>
+    @* for in userTests *@
+    @if (userTests.Count == testPackageCount) {
+        <div class="see-all-btn">See all</div>
+    }
+</div>
+
+<NewTestTemplateChoosingDialog @ref="newTestTemplateChoosingDialogRef" />
+
+@code {
+    private int draftTestsCount = 0;
+    private int testPackageCount = 4;
+
+
+    private DraftTestViewModel[] unpublishedTests = [];
+    private List<DraftTestViewModel> userTests = new();
+    private NewTestTemplateChoosingDialog newTestTemplateChoosingDialogRef;
+
+    protected override async Task OnInitializedAsync() {
+        base.OnInitialized();
+        AppUserId? appUserId = authHelperService.GetUserIdFromClaims(httpContextAccessor.HttpContext.User);
+        if (appUserId is null) {
+            navigationManager.NavigateTo("/login");
+            return;
+        }
+        AppUser? user = await usersDbOperationsService.GetUserById(appUserId.Value);
+        if (user is null) {
+            navigationManager.NavigateTo("/login");
+            return;
+        }
+        draftTestsCount = user.DraftTests.Count();
+        unpublishedTests = user.DraftTests
+            .Take(testPackageCount)
+            .Select(t => DraftTestViewModel.FromTest(t))
+            .ToArray();
+        // userTests=
+    }
+    public async void OpenTemplateChoosingDialog() {
+        if (newTestTemplateChoosingDialogRef is not null)
+            await newTestTemplateChoosingDialogRef.Open();
+    }
+}
+

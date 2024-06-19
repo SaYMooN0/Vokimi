@@ -1,4 +1,6 @@
-﻿@inject AuthHelperService authHelperService
+﻿@using Vokimi.Components.Pages.MyTests.tabs
+
+@inject AuthHelperService authHelperService
 @inject NavigationManager navigationManager
 @inject UsersDbOperationsService usersDbOperationsService
 
@@ -6,7 +8,7 @@
 @page "/mytests"
 @attribute [Authorize]
 
-<PageTitle>New Test</PageTitle>
+<PageTitle>My Tests</PageTitle>
 @rendermode InteractiveServer
 
 

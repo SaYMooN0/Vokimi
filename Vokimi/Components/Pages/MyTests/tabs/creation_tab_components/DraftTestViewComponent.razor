@@ -1,0 +1,19 @@
+﻿<div class="draft-test-view">
+    <img class="image-cover" src="@ImgOperationsHelper.ImgUrl(Vm.ImagePath)" />
+    <div class="top-container">
+        @if (Vm.IsReady) {
+            <label class="test-status">Ready to be published</label>
+        }
+        <div class="template-icon-wrapper">
+            <DynamicComponent Type="Vm.Template.TemplateIconComponent()" />
+        </div>
+    </div>
+
+    <label class="test-name">@Vm.Name</label>
+</div>
+
+
+@code {
+    [Parameter]
+    public DraftTestViewModel Vm { get; set; }
+}

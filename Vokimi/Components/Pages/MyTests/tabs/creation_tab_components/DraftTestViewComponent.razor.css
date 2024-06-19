@@ -1,0 +1,36 @@
+﻿
+.draft-test-view {
+    padding: 4px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background-color:burlywood;
+    width:fit-content;
+}
+
+.image-cover {
+    height:100%;
+    aspect-ratio: 1.6/1;
+    border-radius: 10px;
+}
+
+.top-container{
+    position: absolute;
+    top: 2px;
+    left: 0;
+    display:grid;
+    width:100%;
+
+}
+
+.template-icon-wrapper {
+    margin-right:10px;
+    justify-self:right;
+    height: 32px;
+    aspect-ratio: 1/1;
+    box-sizing: border-box;
+    padding: 2px;
+    border-radius: 50%;
+    background-color: white;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+}
