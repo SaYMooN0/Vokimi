@@ -3,26 +3,41 @@
 @inject NavigationManager navigationManager
 @inject UsersDbOperationsService usersDbOperationsService
 
+<TestsViewSection SectionLabel=@($"Draft Tests ({draftTestsCount})")>
+    <div class="test-vms-container">
+        @if (draftTests is not null && draftTests.Length > 0) {
+            @foreach (var draftTestVm in draftTests) {
+                <DraftTestViewComponent Vm="draftTestVm" />
+            }
 
-<DraftTestsViewSection DraftTestsCount="draftTestsCount" TestsArray="unpublishedTests" TestPackageCount="testPackageCount"/>
+            @if (draftTests.Length == testPackageCount) {
+                <div class="see-all-btn">See all</div>
+            }
+        }
+        else {
+            <label class="no-draft-test">You have no draft tests</label>
+        }
+    </div>
+</TestsViewSection>
 
-<h3>Created Tests: <button class="hide-btn">Hide</button> </h3>
-<div class="created-tests-container">
-    <div class="create-test-button" @onclick="OpenTemplateChoosingDialog">Create New</div>
-    @* for in userTests *@
-    @if (userTests.Count == testPackageCount) {
-        <div class="see-all-btn">See all</div>
-    }
-</div>
+<TestsViewSection SectionLabel=@($"Created Tests ({createdTestsCount})")>
+    <div class="test-vms-container">
+    </div>
+</TestsViewSection>
+
+<button>Overall Tests Statistic</button>
+
+<div class="create-test-button" @onclick="OpenTemplateChoosingDialog">Create New</div>
 
 <NewTestTemplateChoosingDialog @ref="newTestTemplateChoosingDialogRef" />
 
 @code {
     private int draftTestsCount = 0;
+    private int createdTestsCount = 0;
     private int testPackageCount = 4;
 
 
-    private DraftTestViewModel[] unpublishedTests = [];
+    private DraftTestViewModel[] draftTests = [];
     private List<DraftTestViewModel> userTests = new();
     private NewTestTemplateChoosingDialog newTestTemplateChoosingDialogRef;
 
@@ -39,7 +54,7 @@
             return;
         }
         draftTestsCount = user.DraftTests.Count();
-        unpublishedTests = user.DraftTests
+        draftTests = user.DraftTests
             .Take(testPackageCount)
             .Select(t => DraftTestViewModel.FromTest(t))
             .ToArray();

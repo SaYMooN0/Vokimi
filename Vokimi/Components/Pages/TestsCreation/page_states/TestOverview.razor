@@ -1,63 +1,73 @@
 ﻿@using static Vokimi.Components.Pages.TestsCreation.pages_with_templates.NewTestGeneric
+@inject TestsCreationDbOperationsService testsCreationDbOperationsService
+@inject VokimiStorageService vokimiStorageService
 
 @rendermode InteractiveServer
 
-<h3>TestOverview</h3>
-<div class="main-info-area">
-    <label class="test-main-info-label">
-        Test main info:
-    </label>
-    <div class="test-main-info">
-        <div class="test-main-info-text">
-            <p>
-                Name:<span>@vm.Name</span>
-            </p>
-            <p>
-                Description:<br /> <span class="test-description">@vm.Description</span>
-            </p>
-            <p>
-                Language:<span>@vm.Language</span>
-            </p>
-            <p>
-                Privacy:<span>@vm.Privace</span>
-            </p>
+<div class="state-container">
+    <div class="top-container">
+        <div class="main-info-area">
+            <label class="top-container-label">Test Main Info</label>
+            <div class="test-main-info-text">
+                <p>@vm.Name</p>
+                <p>
+                    Description:<br /> <span class="test-description">@vm.Description</span>
+                </p>
+                <p>
+                    Language:<span>@vm.Language</span>
+                </p>
+                <p>
+                    Privacy:<span>@vm.Privace</span>
+                </p>
+            </div>
+            <button class="edit-main-info-btn" @onclick="() => ChangePageState.InvokeAsync(TestCreationPageState.MainInfoEditing)">
+                Edit Main Info
+            </button>
         </div>
-        <img class="test-cover" src="@ImgOperationsHelper.ImgUrl(vm.CoverPath)" />
+        <div class="test-cover-area">
+            <label class="top-container-label">Test Cover</label>
+            <div class="test-cover">
+                <img src="@GetImageUrl(vm.CoverPath)" alt="Test Cover" />
+            </div>
+
+            <InputFile id="cover" class="form-control" OnChange="HandleFileChange" accept=".jpg,.png,.webp" hidden />
+            <label class="cover-error">@coverUploadingError</label>
+            <label for="cover" class="change-btn">Change</label>
+            <div class="remove-btn" @onclick="HandleCoverRemoving">Remove</div>
+        </div>
     </div>
-    <button class="edit-main-info-button" @onclick="() => ChangePageState.InvokeAsync(TestCreationPageState.MainInfoEditing)">
-        Edit
-    </button>
-</div>
-<div class="questions-area">
-    <label class="questions-count-label">@vm.Questions.Count</label>
-    @foreach (var q in vm.Questions) {
-        <div class="question-view-component">
-            <label class="question-text">@q.Text</label>
-            <label class="answers-count">Answers count: @q.AnswersCount (@(q.IsMultiAnswer ? "Multi-Answer" : "Single-Answer"))</label>
-            <div class="possible-points-info">
-                <label>Possible Points</label>
-                <div class="min-max-container">
-                    <span>Min: @q.MinPossiblePoints</span>
-                    <span>Max: @q.MaxPossiblePoints</span>
+
+    <div class="questions-area">
+        <label class="questions-count-label">@vm.Questions.Count</label>
+        @foreach (var q in vm.Questions) {
+            <div class="question-view-component">
+                <label class="question-text">@q.Text</label>
+                <label class="answers-count">Answers count: @q.AnswersCount (@(q.IsMultiAnswer ? "Multi-Answer" : "Single-Answer"))</label>
+                <div class="possible-points-info">
+                    <label>Possible Points</label>
+                    <div class="min-max-container">
+                        <span>Min: @q.MinPossiblePoints</span>
+                        <span>Max: @q.MaxPossiblePoints</span>
+                    </div>
                 </div>
             </div>
-        </div>
-    }
-</div>
-<div class="conclusion-area">
-    Add Test Conclusion(Optional)
-    <button>Add</button>
-</div>
-<div class="styles-area">
-    Change Test Styles(Optional)
-    <button>Change</button>
+        }
+    </div>
+    <div class="conclusion-area">
+        Add Test Conclusion(Optional)
+        <button>Add</button>
+    </div>
+    <div class="styles-area">
+        Change Test Styles(Optional)
+        <button>Change</button>
+    </div>
 </div>
 
 @code {
+    private string coverUploadingError = string.Empty;
     private TestCreationOverviewViewModel vm { get; set; }
+    private string imageUrl { get; set; }
 
-    // [Parameter]
-    // public AppUserDto Creator { get; set; }
     [Parameter]
     public DraftGenericTestDto Test { get; set; }
     [Parameter]
@@ -66,7 +76,54 @@
     protected override void OnParametersSet() {
         base.OnParametersSet();
         vm = TestCreationOverviewViewModel.FromTestDto(Test);
+        imageUrl = GetImageUrl(vm.CoverPath); // Initialize image URL
     }
 
+    private string GetImageUrl(string path) {
+        return $"{ImgOperationsHelper.ImgUrl(path)}?v={Guid.NewGuid()}";
+    }
 
+    private async void HandleCoverRemoving() {
+        Err err = await testsCreationDbOperationsService.UpdateTestCover(Test.MainInfo.Id, ImgOperationsHelper.DefaultTestCoverImg);
+        if (err.NotNone()) {
+            coverUploadingError = err.ToString();
+        }
+        else {
+            vm.CoverPath = ImgOperationsHelper.DefaultTestCoverImg;
+            StateHasChanged();
+        }
+    }
+
+    private async Task HandleFileChange(InputFileChangeEventArgs e) {
+        var file = e.File;
+        int maxAllowedSize = 3145728; /* 3MB */
+
+        if (file is not null) {
+            if (file.Size > maxAllowedSize) {
+                coverUploadingError = $"File is too big. Max allowed size: 3MB";
+                return;
+            }
+            try {
+                using (var stream = file.OpenReadStream(maxAllowedSize: maxAllowedSize)) {
+                    var result = await vokimiStorageService.SaveDraftTestCover(Test.Id, stream);
+                    result.Switch(
+                        async path => {
+                            Err err = await testsCreationDbOperationsService.UpdateTestCover(Test.MainInfo.Id, path);
+                            if (err.NotNone()) {
+                                coverUploadingError = err.ToString();
+                            }
+                            else {
+                                vm.CoverPath = path; 
+                                StateHasChanged();
+                            }
+                        },
+                        err => coverUploadingError = $"Error uploading cover: {err.Message}"
+                    );
+
+                }
+            } catch (Exception ex) {
+                coverUploadingError = $"Server error. Please try again later";
+            }
+        }
+    }
 }

@@ -1,10 +1,8 @@
-﻿
-.section-title {
+﻿.section-title {
     display: flex;
     justify-content: center;
-    gap: 40px;
     align-items: center;
-    padding: 10px;
+    padding: 20px;
     border-bottom: 1px solid #d1d6db;
     position: relative;
 }
@@ -18,11 +16,12 @@
 .toggle-button {
     position: absolute;
     right: 10px;
-    top: 0;
+    top: 50%;
+    transform:translateY(-50%);
     width: 100px;
     font-family: "Roboto";
-    font-weight:bold;
-    letter-spacing:2px;
+    font-weight: bold;
+    letter-spacing: 2px;
     color: white;
     font-size: 20px;
     border: none;
@@ -46,12 +45,3 @@
         height: 16px;
     }
 
-.test-vms-container {
-    padding:10px;
-    box-sizing:border-box;
-    gap: 30px;
-    display: flex;
-    flex-direction: row;
-    height: 280px;
-
-}

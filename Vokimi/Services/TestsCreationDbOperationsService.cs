@@ -45,7 +45,25 @@ namespace Vokimi.Services
             (await _db.DraftTestsSharedInfo.FirstOrDefaultAsync(i => i.Id == id))?.Template;
         public async Task<T?> GetTestById<T>(DraftTestId id, TestTemplate template) where T : BaseDraftTest =>
             await _db.Set<T>().FirstOrDefaultAsync(i => i.Id == id && i.Template == template);
+        public async Task<DraftTestMainInfo?> GetDraftTestMainInfoById(DraftTestMainInfoId id) =>
+            await _db.DraftTestMainInfo.FirstOrDefaultAsync(mi => mi.Id == id);
+        public async Task<Err> UpdateTestCover(DraftTestMainInfoId mainInfoId, string newPath) {
+            var mainInfo = await GetDraftTestMainInfoById(mainInfoId);
+            if (mainInfo is null) {
+                return new Err("Test cannot be found");
+            }
+            if (mainInfo.CoverImagePath == newPath) {
+                return Err.None;
+            }
+            mainInfo.UpdateCoverImage(newPath);
+            try {
+                _db.DraftTestMainInfo.Update(mainInfo);
+                await _db.SaveChangesAsync();
+            } catch (Exception ex) {
+                return new Err("Server error. Please try again later");
+            }
+            return Err.None;
 
-
+        }
     }
 }

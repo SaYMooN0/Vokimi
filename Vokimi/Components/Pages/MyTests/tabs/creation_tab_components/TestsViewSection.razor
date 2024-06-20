@@ -1,0 +1,26 @@
+﻿
+<div class="section-title">
+    <label>@SectionLabel</label>
+    <div>
+        <button class="toggle-button" @onclick="ToggleSectionVisibility">
+            @(isSectionVisible ? "Hide" : "Show")
+        </button>
+    </div>
+</div>
+
+@if (isSectionVisible) {
+    @ChildContent
+}
+
+
+@code {
+    [Parameter] public string SectionLabel { get; set; }
+    [Parameter] public RenderFragment ChildContent { get; set; }
+
+    private bool isSectionVisible { get; set; } = true;
+
+    private void ToggleSectionVisibility() =>
+        isSectionVisible = !isSectionVisible;
+
+
+}
