@@ -1,55 +1,70 @@
-﻿@rendermode InteractiveServer
+﻿@inject TestsCreationDbOperationsService testsCreationDbOperationsService
 
-<EditForm Model="@testMainInfo" OnValidSubmit="HandleValidSubmit" FormName="testMainInfoForm">
-    <DataAnnotationsValidator />
+@rendermode InteractiveServer
+
+
+<form name="formData" @onsubmit="HandleSubmit">
     <div class="form-content">
         <label for="name" class="form-label">Test name:</label>
-        <InputText id="name" class="form-control" @bind-Value="testMainInfo.Name" />
-
-
+        <input id="name" class="form-control" @bind="formData.Name" />
 
         <label for="description" class="form-label">Test Description (Optional):</label>
-        <InputTextArea id="description" class="form-control" @bind-Value="testMainInfo.Description" />
+        <textarea id="description" class="form-control" @bind="formData.Description"></textarea>
 
         <label for="language" class="form-label">Language</label>
-        <InputSelect id="language" class="form-control" @bind-Value="testMainInfo.Language">
-            @foreach (Language lang in Enum.GetValues(typeof(Language))) {
-                <option value="@lang">@lang</option>
+        <select id="language" class="form-control" @bind="formData.Language">
+            @foreach (var lang in availableLanguges) {
+                <option value="@lang.Key">@lang.Value</option>
             }
-        </InputSelect>
-
-
+        </select>
 
         <label for="privacy" class="form-label">Privacy</label>
-        <InputSelect id="privacy" class="form-control" @bind-Value="testMainInfo.Privacy">
+        <select id="privacy" class="form-control" @bind="formData.Privacy">
             @foreach (TestPrivacy privacy in Enum.GetValues(typeof(TestPrivacy))) {
                 <option value="@privacy">@privacy</option>
             }
-        </InputSelect>
+        </select>
+        <p class="validation-error">
 
-
-        <button type="submit" class="save-btn">Save</button>
+        </p>
+        <div class="bottom-buttons-container">
+            <button type="button" class="cancel-button" @onclick="BackToOverviewAction">Cancel</button>
+            <button type="submit" class="save-btn">Save</button>
+        </div>
     </div>
-
-</EditForm>
+</form>
 @code {
+    private Dictionary<Language, string> availableLanguges;
+    private string formValidationMessage = string.Empty;
 
     [SupplyParameterFromForm]
-    public TestMainInfoEditingForm testMainInfo { get; set; } = new();
+    public TestMainInfoEditingForm formData { get; set; } = new();
     [Parameter]
     public DraftGenericTestDto Test { get; set; }
+    [Parameter]
+    public Action BackToOverviewAction { get; set; }
 
     protected override async Task OnParametersSetAsync() {
         await base.OnParametersSetAsync();
-        testMainInfo = TestMainInfoEditingForm.FromTestMainInfoDto(Test.MainInfo);
-        if (string.IsNullOrEmpty(testMainInfo.Cover)) {
-            testMainInfo.Cover = ImgOperationsHelper.DefaultTestCoverImg;
-        }
-
+        formData = TestMainInfoEditingForm.FromTestMainInfoDto(Test.MainInfo);
+        IEnumerable<Language> languages = Enum.GetValues(typeof(Language)).Cast<Language>();
+        availableLanguges = languages.ToDictionary(l => l, l => l.FullName());
     }
 
 
-    private void HandleValidSubmit() {
-
+    private async void HandleSubmit() {
+        Err serverErr = formData.Validate();
+        if (serverErr.NotNone()) {
+            formValidationMessage = serverErr.ToString();
+            return;
+        }
+        serverErr = await testsCreationDbOperationsService
+            .UpdateDraftTestMainInfo(Test.MainInfo.Id, formData.Name, formData.Description, formData.Language, formData.Privacy);
+        if (serverErr.NotNone()) {
+            formValidationMessage = serverErr.ToString();
+            return;
+        }
+        BackToOverviewAction();
+        StateHasChanged();
     }
 }

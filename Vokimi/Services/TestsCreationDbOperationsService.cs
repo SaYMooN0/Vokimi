@@ -65,5 +65,25 @@ namespace Vokimi.Services
             return Err.None;
 
         }
+        public async Task<Err> UpdateDraftTestMainInfo(
+            DraftTestMainInfoId mainInfoId,
+            string newName,
+            string? newDescription,
+            Language newLang,
+            TestPrivacy newPrivacy) {
+            DraftTestMainInfo? info = await GetDraftTestMainInfoById(mainInfoId);
+            if (info is null) {
+                return new Err("Unknown test, please refresh the page");
+            }
+            info.Update(newName, newDescription, newLang, newPrivacy);
+            try {
+                _db.DraftTestMainInfo.Update(info);
+                await _db.SaveChangesAsync();
+            } catch (Exception ex) {
+                return new Err("Server error. Please try again later");
+            }
+            return Err.None;
+        }
+
     }
 }

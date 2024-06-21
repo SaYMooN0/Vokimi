@@ -7,7 +7,7 @@
         Spa,
         Ger,
         Fra,
-        Unset
+        Other
     }
     public static class LanguageExtensions
     {
@@ -18,7 +18,7 @@
             Language.Spa => "Español",
             Language.Ger => "Deutsch",
             Language.Fra => "Français",
-            Language.Unset => "Unset",
+            Language.Other => "Other",
             _ => throw new NotImplementedException()
         };
 

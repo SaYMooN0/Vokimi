@@ -1,26 +1,22 @@
-﻿
-.draft-test-view {
-    height: 270px;
-    padding: 4px;
+﻿.draft-test-view {
+    width: 380px;
+    max-width: 380px;
     position: relative;
     display: grid;
-    grid-template-rows:240px 1fr;
-    background-color: burlywood;
+    grid-template-rows: 240px 1fr;
     width: fit-content;
+    position: relative;
+    text-decoration: none;
 }
-    .draft-test-view:hover {
-        transform:scale(1.02);
-    }
-        .draft-test-view:hover .hover-overlay {
-            display: flex !important;
-            opacity: 1;
-        }
 
 .image-cover {
-    height:100%;
+    width: 100%;
+    box-sizing: border-box;
     aspect-ratio: 1.6/1;
     border-radius: 10px;
+    border: solid var(--primary) 4px;
 }
+
 
 .top-container {
     position: absolute;
@@ -41,25 +37,49 @@
     background-color: white;
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 }
-.test-name{
-    font-family:Roboto;
-    font-size:17px;
+
+.test-name {
+    max-width: 100%;
+    font-family: Roboto;
+    font-size: 17px;
 }
 
 .hover-overlay {
-    display: none;
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 100%;
-    background-color: rgb(2, 20, 126, 0.50);
-    color: white;
+    display: flex;
     justify-content: center;
     align-items: center;
     text-align: center;
-    border-radius: 8px;
+    position: absolute;
+    height: 0;
+    width: 100%;
+    background-color: var(--primary);
+    color: white;
+    font-family: Roboto;
+    font-size: 18px;
+    border-radius: 8px 8px 0 0;
     opacity: 0;
-    transition: opacity 0.3s ease;
+    transition: height 0.12s ease, opacity 0.2s ease, font-size 0.35s ease-out;
+}
 
+    .hover-overlay svg {
+        height: 12px;
+        margin-left: 3px;
+        fill: white;
+        padding-top: 1px;
+        transition: transform 0.35s ease-out, margin-left 0.5s ease-in-out;
+    }
+
+.draft-test-view:hover .hover-overlay {
+    font-size: 24px;
+    height: 190px;
+    opacity: 1;
+}
+
+    .draft-test-view:hover .hover-overlay svg {
+        margin-left: 18px;
+        transform: scale(1.8);
+    }
+
+.draft-test-view:active {
+    transform: scale(1.02);
 }

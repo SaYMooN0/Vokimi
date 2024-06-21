@@ -10,7 +10,7 @@
                 <DraftTestViewComponent Vm="draftTestVm" />
             }
 
-            @if (draftTests.Length == testPackageCount) {
+            @if (draftTestsCount > testPackageCount) {
                 <div class="see-all-btn">See all</div>
             }
         }

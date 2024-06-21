@@ -14,27 +14,64 @@
     grid-template-columns: 1fr 560px;
 }
 
+
 .top-container-label {
     align-self: center;
     height: fit-content;
     justify-content: center;
     font-family: Roboto;
     font-size: 26px;
+    margin-bottom: 10px;
 }
 
+.main-info-area,
 .test-cover-area {
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
-.test-cover {
+.test-main-info-text {
+    /*background-color: firebrick;*/
+    border: 3px var(--primary) solid;
+    border-radius: 12px;
+    height: 100%;
+    width: 90%;
+}
+
+.edit-main-info-btn {
     margin-top: 10px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    background-color: var(--primary);
+    font-family: Roboto;
+    color: white;
+    font-size: 20px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    transition-duration: 0.2s;
+}
+
+    .edit-main-info-btn svg {
+        height: 22px;
+        fill: white;
+    }
+
+    .edit-main-info-btn:hover {
+        background-color: var(--accent);
+        border-radius: 6px;
+    }
+
+.test-cover {
     width: 100%;
     aspect-ratio: 1.6/1;
     box-sizing: border-box;
     border: 3px var(--primary) solid;
-    border-radius: 14px;
+    border-radius: 12px;
 }
 
     .test-cover img {
@@ -49,21 +86,42 @@
 .remove-btn {
     height: 36px;
     width: 80%;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    border-radius:16px;
-    font-family:Roboto;
-    color:white;
-    font-size:18px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 16px;
+    font-family: Roboto;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.12s ease-in;
 }
 
 .change-btn {
     margin-top: 14px;
-    background-color: var(--accent);
+    margin-bottom: 4px;
+    background-color: var(--primary);
 }
 
 .remove-btn {
-    margin-top:8px;
+    margin-top: 6px;
     background-color: #dd3322;
+    margin-bottom: 4px;
+}
+
+    .change-btn:hover,
+    .remove-btn:hover {
+        height: 40px;
+        width: 86%;
+        border-radius: 12px;
+        letter-spacing: 2px;
+    }
+
+.change-btn:hover {
+    margin-bottom: 2px;
+    margin-top: 12px;
+}
+
+.remove-btn:hover {
+    margin-bottom: 0px;
 }

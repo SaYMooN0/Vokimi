@@ -7,7 +7,6 @@ namespace VokimiShared.src.models.form_classes
     {
         public string Name { get; set; }
         public string? Description { get; set; }
-        public string Cover { get; set; }
         public Language Language { get; set; }
         public TestPrivacy Privacy { get; set; }
         public static Err ValidateTestName(string name) {
@@ -19,13 +18,22 @@ namespace VokimiShared.src.models.form_classes
             }
             return Err.None;
         }
+        public Err Validate() {
+            Err nameErr = ValidateTestName(Name);
+
+            if (nameErr.NotNone())
+                return nameErr;
+            else if (string.IsNullOrEmpty(Description))
+                return Err.None;
+            else
+                return Description.Length > 510 ? new Err("Length of the test description cannot be more than 510 characters") : Err.None;
+        }
         public static TestMainInfoEditingForm FromTestMainInfoDto(DraftTestMainInfoDto dto) =>
             new() {
-                Name= dto.Name,
-                Description= dto.Description,
-                Cover= dto.CoverImagePath,
-                Language= dto.Language,
-                Privacy= dto.Privacy
+                Name = dto.Name,
+                Description = dto.Description,
+                Language = dto.Language,
+                Privacy = dto.Privacy
             };
-    }   
+    }
 }

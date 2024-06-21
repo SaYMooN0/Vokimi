@@ -18,10 +18,10 @@
 
         @switch (pageState) {
             case TestCreationPageState.Overview:
-                <TestOverview ChangePageState="HandlePageStateChange" Test="new DraftGenericTestDto(draftTest)" />
+                <TestOverview ChangePageState="ChangePageState" Test="new DraftGenericTestDto(draftTest)" />
                 break;
             case TestCreationPageState.MainInfoEditing:
-                <MainInfoEditing Test="new DraftGenericTestDto(draftTest)" />
+                <MainInfoEditing Test="new DraftGenericTestDto(draftTest)" BackToOverviewAction="()=>ChangePageState(TestCreationPageState.Overview)" />
                 break;
             case TestCreationPageState.QuestionCreation:
                 <QuestionCreation></QuestionCreation>
@@ -66,7 +66,7 @@
     private AppUser creator { get; set; }
     private DraftGenericTest draftTest { get; set; }
 
-    private void HandlePageStateChange(TestCreationPageState newState) {
+    private void ChangePageState(TestCreationPageState newState) {
         pageState = newState;
     }
     protected override async Task OnInitializedAsync() {
