@@ -25,7 +25,7 @@
             }
         </select>
         <p class="validation-error">
-
+            @formValidationMessage
         </p>
         <div class="bottom-buttons-container">
             <button type="button" class="cancel-button" @onclick="BackToOverviewAction">Cancel</button>
@@ -65,6 +65,5 @@
             return;
         }
         BackToOverviewAction();
-        StateHasChanged();
     }
 }

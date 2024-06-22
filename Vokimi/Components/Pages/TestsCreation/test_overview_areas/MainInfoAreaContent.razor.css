@@ -1,0 +1,51 @@
+﻿.test-main-info-overview {
+    border: 3px var(--primary) solid;
+    border-radius: 12px;
+    width: 90%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.test-name {
+}
+
+.test-description {
+    max-width: 100%;
+    word-break: break-word;
+}
+
+.lang-priv-container {
+    margin-top: auto;
+    width: 100%;
+    height: 40px;
+    display: flex;
+    justify-content: space-around;
+}
+
+.edit-main-info-btn {
+    margin-top: 10px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    background-color: var(--primary);
+    font-family: Roboto;
+    color: white;
+    font-size: 20px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    transition-duration: 0.2s;
+}
+
+    .edit-main-info-btn svg {
+        height: 22px;
+        fill: white;
+    }
+
+    .edit-main-info-btn:hover {
+        background-color: var(--accent);
+        border-radius: 6px;
+    }

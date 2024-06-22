@@ -41,4 +41,14 @@
         public TestTagId() : this(Guid.NewGuid()) { }
         public override string ToString() => Value.ToString();
     }
+    public readonly record struct QuestionId(Guid Value)
+    {
+        public QuestionId() : this(Guid.NewGuid()) { }
+        public override string ToString() => Value.ToString();
+    }
+    public readonly record struct AnswerId(Guid Value)
+    {
+        public AnswerId() : this(Guid.NewGuid()) { }
+        public override string ToString() => Value.ToString();
+    }
 }

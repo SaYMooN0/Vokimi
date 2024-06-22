@@ -1,0 +1,22 @@
+﻿.bottom-fixed {
+    width: 1000px;
+    height: 100px;
+    position: fixed;
+    bottom: 20px;
+    box-shadow: 0 4px 12px rgb(32, 32, 53, 0.16);
+    border-radius: 20px;
+    padding: 10px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items:center;
+}
+.add-question-button {
+    margin-right: 20px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    background-color: var(--primary);
+    font-family: Roboto;
+    color: white;
+    font-size: 20px;
+    cursor:pointer;
+}

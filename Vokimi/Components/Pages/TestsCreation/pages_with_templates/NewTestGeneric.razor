@@ -23,8 +23,8 @@
             case TestCreationPageState.MainInfoEditing:
                 <MainInfoEditing Test="new DraftGenericTestDto(draftTest)" BackToOverviewAction="()=>ChangePageState(TestCreationPageState.Overview)" />
                 break;
-            case TestCreationPageState.QuestionCreation:
-                <QuestionCreation></QuestionCreation>
+            case TestCreationPageState.AllQuestionsOverview:
+                <AllQuestionsOverview />
                 break;
             case TestCreationPageState.ResultsCreation:
                 <ResultsCreation></ResultsCreation>
@@ -57,7 +57,7 @@
     {
         Overview,
         MainInfoEditing,
-        QuestionCreation,
+        AllQuestionsOverview,
         ResultsCreation,
         StylesEditing,
         TagsAdding
@@ -68,6 +68,7 @@
 
     private void ChangePageState(TestCreationPageState newState) {
         pageState = newState;
+        StateHasChanged();
     }
     protected override async Task OnInitializedAsync() {
 

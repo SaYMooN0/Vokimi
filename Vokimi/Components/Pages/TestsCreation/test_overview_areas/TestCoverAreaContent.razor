@@ -1,0 +1,67 @@
+﻿@inject TestsCreationDbOperationsService testsCreationDbOperationsService
+@inject VokimiStorageService vokimiStorageService
+
+<div class="test-cover">
+    <img src="@GetImageUrl(Vm.CoverPath)" alt="Test Cover" />
+</div>
+
+<InputFile id="cover" class="form-control" OnChange="HandleFileChange" accept=".jpg,.png,.webp" hidden />
+<label class="cover-error">@coverUploadingError</label>
+<label for="cover" class="change-btn">Change</label>
+<div class="remove-btn" @onclick="HandleCoverRemoving">Remove</div>
+
+@code {
+    [Parameter] public TestCreationOverviewViewModel Vm { get; set; }
+    [Parameter] public DraftTestMainInfoId MainInfoId { get; set; }
+    [Parameter] public DraftTestId TestId { get; set; }
+
+
+    private string coverUploadingError = string.Empty;
+
+    private string GetImageUrl(string path) =>
+    $"{ImgOperationsHelper.ImgUrl(path)}?v={Guid.NewGuid()}";
+
+    private async void HandleCoverRemoving() {
+        Err err = await testsCreationDbOperationsService.UpdateTestCover(MainInfoId, ImgOperationsHelper.DefaultTestCoverImg);
+        if (err.NotNone()) {
+            coverUploadingError = err.ToString();
+        }
+        else {
+            Vm.CoverPath = ImgOperationsHelper.DefaultTestCoverImg;
+            StateHasChanged();
+        }
+    }
+
+    private async Task HandleFileChange(InputFileChangeEventArgs e) {
+        var file = e.File;
+        int maxAllowedSize = 3145728; /* 3MB */
+
+        if (file is not null) {
+            if (file.Size > maxAllowedSize) {
+                coverUploadingError = $"File is too big. Max allowed size: 3MB";
+                return;
+            }
+            try {
+                using (var stream = file.OpenReadStream(maxAllowedSize: maxAllowedSize)) {
+                    var result = await vokimiStorageService.SaveDraftTestCover(TestId, stream);
+                    result.Switch(
+                        async path => {
+                            Err err = await testsCreationDbOperationsService.UpdateTestCover(MainInfoId, path);
+                            if (err.NotNone()) {
+                                coverUploadingError = err.ToString();
+                            }
+                            else {
+                                Vm.CoverPath = path;
+                                StateHasChanged();
+                            }
+                        },
+                        err => coverUploadingError = $"Error uploading cover: {err.Message}"
+                    );
+
+                }
+            } catch (Exception ex) {
+                coverUploadingError = $"Server error. Please try again later";
+            }
+        }
+    }
+}
