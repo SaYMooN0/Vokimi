@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace VokimiShared.src.models.db_classes.test_answers
 {
-    public abstract class BaseAnswer
+    public class TextAndImageAnswer : BaseAnswer
     {
-        public AnswerId AnswerId { get; set; }
-        public int Points { get; init; }
+        public string Text { get; init; }
+        public string ImagePath { get; init; }
+
     }
 }

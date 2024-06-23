@@ -2,11 +2,8 @@
 
 namespace VokimiShared.src.models.db_classes.test_questions
 {
-    public class MultipleChoiceQuestion<T> : BaseQuestion<T> where T : BaseAnswer
+    public class SingleChoiceQuestion<T> : BaseQuestion<T> where T : BaseAnswer
     {
-        public int MinAnswers { get; init; }
-        public int MaxAnswers { get; init; }
-        public bool UseAverageScore { get; init; }
         public override int MaxPossiblePoints() {
             throw new NotImplementedException();
         }
@@ -14,6 +11,5 @@ namespace VokimiShared.src.models.db_classes.test_questions
         public override int MinPossiblePoints() {
             throw new NotImplementedException();
         }
-
     }
 }

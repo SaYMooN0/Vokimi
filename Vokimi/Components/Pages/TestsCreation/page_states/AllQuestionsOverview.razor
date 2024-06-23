@@ -4,18 +4,24 @@
     }
 </div>
 <div class="bottom-fixed">
-    <div class="labels-container">
-        <label class="questions-number">Number of questions: @questionVMs.Count()</label>
-        <div class="possible-points-container">
-            <label>Possible points:</label>
-            <span>Min: @minPossiblePoints</span>
-            <span>Max: @maxPossiblePoints</span>
+    <div class="main-content">
+        <div class="labels-container">
+            <label class="questions-number">Number of questions: @questionVMs.Count()</label>
+            <div class="possible-points-container">
+                <label>Possible points:</label>
+                <span>Min: @minPossiblePoints</span>
+                <span>Max: @maxPossiblePoints</span>
+            </div>
         </div>
+        <div class="add-question-button">Add question</div>
     </div>
-    <div class="add-question-button">Add question</div>
+    <label class="back-link" @onclick="BackToOverviewAction">Back to test overview</label>
 </div>
 @code {
+
+    [Parameter] public QuestionEditingDialog questionsDialogRef { get; set; }
     [Parameter] public DraftTestId TestId { get; set; }
+    [Parameter] public Action BackToOverviewAction { get; set; }
 
     private IEnumerable<QuestionViewModel> questionVMs { get; set; } = [];
     private int minPossiblePoints { get; set; }

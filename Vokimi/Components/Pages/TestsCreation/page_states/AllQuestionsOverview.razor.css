@@ -1,5 +1,5 @@
 ﻿.bottom-fixed {
-    width: 1000px;
+    width: 900px;
     height: 100px;
     position: fixed;
     bottom: 20px;
@@ -7,9 +7,31 @@
     border-radius: 20px;
     padding: 10px;
     display: grid;
-    grid-template-columns: 1fr auto;
-    align-items:center;
+    grid-template-rows: 1fr auto;
 }
+
+.main-content {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+}
+
+.back-link {
+    justify-self: center;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    font-family: "Roboto";
+    color: #95959a;
+    cursor: pointer;
+    padding: 6px;
+}
+
+    .back-link:hover {
+        color: #7f7f82;
+        text-decoration: underline;
+    }
+
 .add-question-button {
     margin-right: 20px;
     padding: 10px 20px;
@@ -18,5 +40,5 @@
     font-family: Roboto;
     color: white;
     font-size: 20px;
-    cursor:pointer;
+    cursor: pointer;
 }

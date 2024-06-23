@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using VokimiShared.src.models.db_classes;
+using VokimiShared.src.models.db_classes.test_answers;
 using VokimiShared.src.models.db_classes.test_creation;
 using VokimiShared.src.models.db_classes.tests;
 using VokimiShared.src.models.db_classes.users;
@@ -18,6 +19,7 @@ namespace Vokimi.src.data
         public DbSet<DraftGenericTest> DraftGenericTests { get; set; }
         public DbSet<DraftTestMainInfo> DraftTestMainInfo { get; set; }
         public DbSet<TestConclusion> TestConclusions { get; set; }
+        public DbSet<DraftTestQuestion> DraftTestQuestions { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
             optionsBuilder.UseLazyLoadingProxies();
@@ -86,6 +88,18 @@ namespace Vokimi.src.data
             modelBuilder.Entity<TestConclusion>(entity => {
                 entity.HasKey(x => x.Id);
                 entity.Property(x => x.Id).HasConversion(v => v.Value, v => new TestConclusionId(v));
+            });
+            modelBuilder.Entity<DraftTestQuestion>(entity =>
+            {
+                entity.HasKey(x => x.Id);
+                entity.Property(x => x.Id).HasConversion(v => v.Value, v => new DraftTestQuestionId(v));
+
+                entity.OwnsOne(x => x.MultipleChoiceData, mc =>
+                {
+                    mc.Property(x => x.MinAnswers).HasColumnName("MinAnswers");
+                    mc.Property(x => x.MaxAnswers).HasColumnName("MaxAnswers");
+                    mc.Property(x => x.UseAverageScore).HasColumnName("UseAverageScore");
+                });
             });
         }
     }

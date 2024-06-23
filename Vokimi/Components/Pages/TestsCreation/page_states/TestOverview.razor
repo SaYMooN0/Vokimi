@@ -2,6 +2,7 @@
 
 @rendermode InteractiveServer
 
+
 <div class="state-container">
     <div class="main-info-and-cover-section">
         <div class="main-info-area">
@@ -15,16 +16,24 @@
     </div>
 
     <div class="questions-area">
-        <label class="questions-count-label">Number of questions: @vm.Questions.Count</label>
-        @foreach (var q in vm.Questions) {
-            <div class="question-view-component">
-                <p class="question-text">@q.Text</p>
-                <label class="answers-count">Answers count: @q.AnswersCount (@(q.IsMultiAnswer ? "Multi-Answer" : "Single-Answer"))</label>
-            </div>
-        }
-        <button class="go-to-questions-btn" @onclick="() => ChangePageState.InvokeAsync(TestCreationPageState.AllQuestionsOverview)">
-            See All Questions
-        </button>
+        <label class="questions-count-label">Test Questions (@vm.Questions.Count)</label>
+        <div class="question-vms-container">
+            @foreach (var q in vm.Questions) {
+                <div class="question-view-component">
+                    <p class="question-text">@q.Text</p>
+                    <label class="answers-count">Answers count: @q.AnswersCount (@(q.IsMultiAnswer ? "Multi-Answer" : "Single-Answer"))</label>
+                </div>
+            }
+        </div>
+        <div>
+            <button class="go-to-questions-btn" @onclick="() => ChangePageState.InvokeAsync(TestCreationPageState.AllQuestionsOverview)">
+                More Info
+            </button>
+            <button class="new-question-btn" @onclick="NewQuestionAction">
+                New Question
+            </button>
+        </div>
+
     </div>
     <div class="conclusion-area">
         Add Test Conclusion(Optional)
@@ -39,6 +48,8 @@
 @code {
     private TestCreationOverviewViewModel vm { get; set; }
 
+    [Parameter]
+    public Action NewQuestionAction { get; set; }
     [Parameter]
     public DraftGenericTestDto Test { get; set; }
     [Parameter]

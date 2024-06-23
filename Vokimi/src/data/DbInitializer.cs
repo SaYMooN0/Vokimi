@@ -6,7 +6,7 @@ namespace Vokimi.src.data
     {
         public static async Task InitializeDbAsync(VokimiDbContext dbContext)
         {
-            //await dbContext.Database.EnsureDeletedAsync();
+            await dbContext.Database.EnsureDeletedAsync();
             await dbContext.Database.EnsureCreatedAsync();
 
             if (dbContext.AppUsers.Any() || dbContext.UnconfirmedAppUsers.Any()) return;

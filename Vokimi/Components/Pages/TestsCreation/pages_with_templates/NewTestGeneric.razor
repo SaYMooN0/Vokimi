@@ -3,11 +3,16 @@
 @inject AuthHelperService authHelperService
 @inject IHttpContextAccessor httpContextAccessor
 
+
+
+
 @rendermode InteractiveServer
 @attribute [Authorize]
 @page "/newtest/gen/{testId}"
 
 <PageTitle>New Test</PageTitle>
+
+
 
 <div class="central-align">
     @if (!string.IsNullOrEmpty(pageInitializationError)) {
@@ -15,16 +20,19 @@
     }
 
     else if (creator is not null && draftTest is not null) {
-
+        <QuestionEditingDialog @ref="@questionEditingDialog" creatorId="@creator.Id" testId="@draftTest.Id" />
         @switch (pageState) {
             case TestCreationPageState.Overview:
-                <TestOverview ChangePageState="ChangePageState" Test="new DraftGenericTestDto(draftTest)" />
+                <TestOverview ChangePageState="ChangePageState"
+                              Test="new DraftGenericTestDto(draftTest)"
+                              NewQuestionAction="()=>{ChangePageState(TestCreationPageState.AllQuestionsOverview);questionEditingDialog.NewQuestion();}" />
                 break;
             case TestCreationPageState.MainInfoEditing:
-                <MainInfoEditing Test="new DraftGenericTestDto(draftTest)" BackToOverviewAction="()=>ChangePageState(TestCreationPageState.Overview)" />
+                <MainInfoEditing Test="new DraftGenericTestDto(draftTest)"
+                                 BackToOverviewAction="()=>ChangePageState(TestCreationPageState.Overview)" />
                 break;
             case TestCreationPageState.AllQuestionsOverview:
-                <AllQuestionsOverview />
+                <AllQuestionsOverview questionsDialogRef="questionEditingDialog" BackToOverviewAction="()=>ChangePageState(TestCreationPageState.Overview)"/>
                 break;
             case TestCreationPageState.ResultsCreation:
                 <ResultsCreation></ResultsCreation>
@@ -49,6 +57,8 @@
     [Parameter]
     public string TestId { get; set; } = string.Empty;
 
+
+    private QuestionEditingDialog questionEditingDialog { get; set; }
     private string pageInitializationError = string.Empty;
     private TestCreationPageState pageState { get; set; } = TestCreationPageState.Overview;
     private DraftTestId? parsedTestId = null;
