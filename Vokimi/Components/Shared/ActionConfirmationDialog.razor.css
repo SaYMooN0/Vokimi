@@ -1,0 +1,16 @@
+﻿.dialog-content {
+    width: 800px;
+    height: 340px;
+    display: flex;
+    flex-direction: column;
+}
+
+    .dialog-content p {
+        font-family: "Roboto";
+    }
+
+.dialog-buttons {
+    margin: auto 20px 20px auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}

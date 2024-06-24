@@ -1,4 +1,6 @@
-﻿<div class="content">
+﻿@inject TestsCreationDbOperationsService testsCreationDbOperationsService
+
+<div class="content">
     <label class="text-label">Enter the text of the question (it can be changed later)</label>
     <input @bind="questionText" placeholder="Question text" name="@Guid.NewGuid()" class="question-text-input" />
 
@@ -12,7 +14,7 @@
     <label class="server-message">@serverMessage</label>
     <div class="bottom-btns-container">
         <div class="cancel-btn" @onclick="CancelAction">Cancel</div>
-        <div class="continue-btn" @onclick="goToEditingState">Continue</div>
+        <div class="continue-btn" @onclick="saveNewQuestion">Continue</div>
     </div>
 
 </div>
@@ -22,15 +24,26 @@
     private string questionText { get; set; }
     private AnswersType answersType { get; set; } = AnswersType.TextOnly;
 
+    [Parameter] public DraftTestId TestId { get; set; }
     [Parameter] public Action CancelAction { get; set; }
-    [Parameter] public Action<string, AnswersType> GoToNextStageAction { get; set; }
+    [Parameter] public Action GoToNextStageAction { get; set; }
 
-    private void goToEditingState() {
-        if (string.IsNullOrEmpty(questionText)) {
-            serverMessage = "Question text cannot be empty";
+    private async void saveNewQuestion() {
+        if (string.IsNullOrEmpty(questionText) || questionText.Length < 10) {
+            serverMessage = "Question text cannot be less than 10 characters";
             return;
         }
-        GoToNextStageAction?.Invoke(questionText, answersType);
+        else if (questionText.Length > 127) {
+            serverMessage = "Question text cannot be more than 127 characters";
+            return;
+        }
+        DraftTestQuestion question = DraftTestQuestion.CreateNew(questionText, answersType, TestId);
+        Err err = await testsCreationDbOperationsService.AddQuestionToGenericTest(TestId, question);
+        if (err.NotNone()) {
+            serverMessage = err.ToString();
+            return;
+        }
+        GoToNextStageAction();
     }
 
 }

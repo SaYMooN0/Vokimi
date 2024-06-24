@@ -1,11 +1,11 @@
 ﻿<div class="test-main-info-overview">
-    <label class="test-name">@Vm.Name</label>
+    <label class="test-name">@MainInfoDto.Name</label>
     <p>
-        Description:<br /> <label class="test-description">@Vm.Description</label>
+        Description:<br /> <label class="test-description">@MainInfoDto.Description</label>
     </p>
     <div class="lang-priv-container">
-        <label>Language: @Vm.Language</label>
-        <label>Privacy: @Vm.Privacy</label>
+        <label>Language: @MainInfoDto.Language</label>
+        <label>Privacy: @MainInfoDto.Privacy</label>
     </div>
 </div>
 <div class="edit-main-info-btn" @onclick="GoToMainInfoEditing">
@@ -17,6 +17,6 @@
 
 
 @code {
-    [Parameter] public TestCreationOverviewViewModel Vm { get; set; }
+    [Parameter] public DraftTestMainInfoDto MainInfoDto { get; set; }
     [Parameter] public Action GoToMainInfoEditing{ get; set; }
 }

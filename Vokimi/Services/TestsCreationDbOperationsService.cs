@@ -4,6 +4,7 @@ using Vokimi.src.data;
 using VokimiShared.src;
 using VokimiShared.src.enums;
 using VokimiShared.src.models.db_classes;
+using VokimiShared.src.models.db_classes.test_answers;
 using VokimiShared.src.models.db_classes.test_creation;
 using VokimiShared.src.models.db_classes.tests;
 using VokimiShared.src.models.db_classes.users;
@@ -84,6 +85,21 @@ namespace Vokimi.Services
             }
             return Err.None;
         }
+        public async Task<Err> AddQuestionToGenericTest(DraftTestId testId, DraftTestQuestion draftTestQuestion) {
+            DraftGenericTest? test = await GetTestById<DraftGenericTest>(testId, TestTemplate.Generic);
+            if (test is null) {
+                return new Err("Unknown test");
+            }
+            test.Questions.Add(draftTestQuestion);
+            try {
+                _db.DraftGenericTests.Update(test);
+                await _db.SaveChangesAsync();
+            } catch (Exception ex) {
+                return new Err("Server error. Please try again later");
+            }
+            return Err.None;
+        }
+
 
     }
 }

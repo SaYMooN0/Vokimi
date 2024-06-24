@@ -1,0 +1,59 @@
+﻿<ActionConfirmationDialog @ref="confirmationDialogRef"
+                          ConfirmAction="DeleteQuestion"
+                          ConfirmButtonText="Delete" />
+<div class="question-vms-container">
+    @for (int i = 0; i < Questions.Count(); i++) {
+        var q = Questions[i];
+        var localIndex = i;
+        <div class="question-view-component">
+            <div class="question-info">
+                <p class="question-text">@(localIndex + 1). @q.Text</p>
+                <label class="answers-count">Answers count: @q.AnswersCount (@(q.IsMultipleChoice ? "Multi-Answer" : "Single-Answer"))</label>
+            </div>
+            <div class="question-actions">
+                <button class="edit-question-btn" @onclick="()=>EditQuestionAction(q.Id)">
+                    Edit
+                    <svg viewBox="0 0 512 512">
+                        <path d="M362.7 19.3L314.3 67.7 444.3 197.7l48.4-48.4c25-25 25-65.5 0-90.5L453.3 19.3c-25-25-65.5-25-90.5 0zm-71 71L58.6 323.5c-10.4 10.4-18 23.3-22.2 37.4L1 481.2C-1.5 489.7 .8 498.8 7 505s15.3 8.5 23.7 6.1l120.3-35.4c14.1-4.2 27-11.8 37.4-22.2L421.7 220.3 291.7 90.3z" />
+                    </svg>
+                </button>
+                <button class="delete-question-btn" @onclick="()=>OnDelteQuestionPressed(localIndex)">
+                    <svg viewBox="0 0 448 512">
+                        <path d="M432 256c0 17.7-14.3 32-32 32L48 288c-17.7 0-32-14.3-32-32s14.3-32 32-32l352 0c17.7 0 32 14.3 32 32z" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    }
+</div>
+
+<div>
+    <button class="go-to-questions-btn" @onclick="GoToQiestionsOverview">
+        More Info
+    </button>
+    <button class="new-question-btn" @onclick="NewQuestionAction">
+        New Question
+    </button>
+</div>
+@code {
+    [Parameter]
+    public Action NewQuestionAction { get; set; }
+    [Parameter]
+    public Action GoToQiestionsOverview { get; set; }
+    [Parameter]
+    public List<QuestionBriefInfoDto> Questions { get; set; }
+    [Parameter]
+    public Action<DraftTestQuestionId> EditQuestionAction { get; set; }
+
+    private int questionToDeleteIndex;
+    private ActionConfirmationDialog confirmationDialogRef;
+
+    private void DeleteQuestion() {
+        //from db
+        confirmationDialogRef.Close();
+    }
+    private void OnDelteQuestionPressed(int i) {
+        questionToDeleteIndex = i;
+        confirmationDialogRef.Open($"Are you sure you want to delete #{i + 1} question?");
+    }
+}

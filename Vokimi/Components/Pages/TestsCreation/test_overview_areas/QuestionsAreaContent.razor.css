@@ -1,0 +1,49 @@
+﻿.question-vms-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.question-view-component {
+    min-height: 80px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+}
+
+.question-info {
+    display: grid;
+    grid-template-rows: 1fr auto;
+}
+
+.question-actions {
+    height: 42px;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+
+.edit-question-btn {
+    height: 100%;
+    width: fit-content;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    gap: 10px;
+}
+
+    .edit-question-btn svg {
+        height: 60%;
+        aspect-ratio: 1/1;
+    }
+
+.delete-question-btn {
+    height: 100%;
+    aspect-ratio: 1/1;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content:center;
+}
+
+    .delete-question-btn svg {
+        height: 60%;
+    }

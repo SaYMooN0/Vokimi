@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using VokimiShared.src.models.db_classes.test_creation;
 
 namespace VokimiShared.src.models.db_classes.test_answers
 {
@@ -10,5 +6,6 @@ namespace VokimiShared.src.models.db_classes.test_answers
     {
         public AnswerId AnswerId { get; set; }
         public int Points { get; init; }
+        public DraftTestQuestionId QuestionId { get; set; }
     }
 }

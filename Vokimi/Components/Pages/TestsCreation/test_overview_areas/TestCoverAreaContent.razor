@@ -11,10 +11,7 @@
 <div class="remove-btn" @onclick="HandleCoverRemoving">Remove</div>
 
 @code {
-    [Parameter] public TestCreationOverviewViewModel Vm { get; set; }
-    [Parameter] public DraftTestMainInfoId MainInfoId { get; set; }
-    [Parameter] public DraftTestId TestId { get; set; }
-
+    [Parameter] public TestCoverAreaContentViewModel Vm { get; set; }
 
     private string coverUploadingError = string.Empty;
 
@@ -22,12 +19,12 @@
     $"{ImgOperationsHelper.ImgUrl(path)}?v={Guid.NewGuid()}";
 
     private async void HandleCoverRemoving() {
-        Err err = await testsCreationDbOperationsService.UpdateTestCover(MainInfoId, ImgOperationsHelper.DefaultTestCoverImg);
+        Err err = await testsCreationDbOperationsService.UpdateTestCover(Vm.MainInfoId, ImgOperationsHelper.DefaultTestCoverImg);
         if (err.NotNone()) {
             coverUploadingError = err.ToString();
         }
         else {
-            Vm.CoverPath = ImgOperationsHelper.DefaultTestCoverImg;
+            Vm.UpdateCoverPath(ImgOperationsHelper.DefaultTestCoverImg);
             StateHasChanged();
         }
     }
@@ -43,15 +40,15 @@
             }
             try {
                 using (var stream = file.OpenReadStream(maxAllowedSize: maxAllowedSize)) {
-                    var result = await vokimiStorageService.SaveDraftTestCover(TestId, stream);
+                    var result = await vokimiStorageService.SaveDraftTestCover(Vm.TestId, stream);
                     result.Switch(
                         async path => {
-                            Err err = await testsCreationDbOperationsService.UpdateTestCover(MainInfoId, path);
+                            Err err = await testsCreationDbOperationsService.UpdateTestCover(Vm.MainInfoId, path);
                             if (err.NotNone()) {
                                 coverUploadingError = err.ToString();
                             }
                             else {
-                                Vm.CoverPath = path;
+                                Vm.UpdateCoverPath(path);
                                 StateHasChanged();
                             }
                         },

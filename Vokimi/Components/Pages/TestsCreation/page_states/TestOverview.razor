@@ -7,32 +7,22 @@
     <div class="main-info-and-cover-section">
         <div class="main-info-area">
             <label class="area-title">Test Main Info</label>
-            <MainInfoAreaContent Vm="vm" GoToMainInfoEditing="() => ChangePageState.InvokeAsync(TestCreationPageState.MainInfoEditing)" />
+            <MainInfoAreaContent MainInfoDto="TestDto.MainInfo"
+                                 GoToMainInfoEditing="() => ChangePageState.InvokeAsync(TestCreationPageState.MainInfoEditing)" />
         </div>
         <div class="test-cover-area">
             <label class="area-title">Test Cover</label>
-            <TestCoverAreaContent Vm="vm" MainInfoId="Test.MainInfo.Id" TestId="Test.Id" />
+            <TestCoverAreaContent Vm="new TestCoverAreaContentViewModel(TestDto.MainInfo.CoverImagePath,TestDto.MainInfo.Id, TestDto.Id)" />
         </div>
     </div>
 
     <div class="questions-area">
-        <label class="questions-count-label">Test Questions (@vm.Questions.Count)</label>
-        <div class="question-vms-container">
-            @foreach (var q in vm.Questions) {
-                <div class="question-view-component">
-                    <p class="question-text">@q.Text</p>
-                    <label class="answers-count">Answers count: @q.AnswersCount (@(q.IsMultiAnswer ? "Multi-Answer" : "Single-Answer"))</label>
-                </div>
-            }
-        </div>
-        <div>
-            <button class="go-to-questions-btn" @onclick="() => ChangePageState.InvokeAsync(TestCreationPageState.AllQuestionsOverview)">
-                More Info
-            </button>
-            <button class="new-question-btn" @onclick="NewQuestionAction">
-                New Question
-            </button>
-        </div>
+        <label class="question-area-title">Test Questions (@TestDto.Questions.Count)</label>
+
+        <QuestionsAreaContent Questions="TestDto.Questions"
+                              NewQuestionAction="NewQuestionAction"
+                              GoToQiestionsOverview="() => ChangePageState.InvokeAsync(TestCreationPageState.AllQuestionsOverview)"
+                              EditQuestionAction="EditQuestionAction"/>
 
     </div>
     <div class="conclusion-area">
@@ -46,18 +36,16 @@
 </div>
 
 @code {
-    private TestCreationOverviewViewModel vm { get; set; }
 
+    [Parameter] public Action NewQuestionAction { get; set; }
+    [Parameter] public Action<DraftTestQuestionId> EditQuestionAction { get; set; }
     [Parameter]
-    public Action NewQuestionAction { get; set; }
-    [Parameter]
-    public DraftGenericTestDto Test { get; set; }
+    public DraftGenericTestDto TestDto { get; set; }
     [Parameter]
     public EventCallback<TestCreationPageState> ChangePageState { get; set; }
 
     protected override void OnParametersSet() {
         base.OnParametersSet();
-        vm = TestCreationOverviewViewModel.FromTestDto(Test);
     }
 
 

@@ -1,0 +1,29 @@
+﻿<BaseDialog DialogId="@id" @ref="baseDialogRef">
+    <div class="dialog-content">
+        <p>@dialogMessage</p>
+        <div class="dialog-buttons">
+            <button class="dialog-button" @onclick="Close">@CancelButtonText</button>
+            <button class="dialog-button" @onclick="ConfirmAction">@ConfirmButtonText</button>
+        </div>
+    </div>
+</BaseDialog>
+
+@code {
+    private string id;
+    private BaseDialog baseDialogRef;
+    private string dialogMessage;
+
+    [Parameter] public string ConfirmButtonText { get; set; } = "Confirm";
+    [Parameter] public string CancelButtonText { get; set; } = "Cancel";
+    [Parameter] public Action ConfirmAction { get; set; }
+    protected override void OnParametersSet() {
+        id = Guid.NewGuid().ToString();
+    }
+    public async Task Close() => await baseDialogRef.CloseAsync();
+    public async Task Open(string message) {
+        dialogMessage = message;
+        StateHasChanged();
+        await baseDialogRef.OpenAsync();
+    }
+
+}

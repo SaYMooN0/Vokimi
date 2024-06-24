@@ -24,8 +24,9 @@
         @switch (pageState) {
             case TestCreationPageState.Overview:
                 <TestOverview ChangePageState="ChangePageState"
-                              Test="new DraftGenericTestDto(draftTest)"
-                              NewQuestionAction="()=>{ChangePageState(TestCreationPageState.AllQuestionsOverview);questionEditingDialog.NewQuestion();}" />
+                              TestDto="new DraftGenericTestDto(draftTest)"
+                              NewQuestionAction="()=>{ChangePageState(TestCreationPageState.AllQuestionsOverview);questionEditingDialog.NewQuestion();}"
+                              EditQuestionAction="(id)=>{ChangePageState(TestCreationPageState.AllQuestionsOverview);questionEditingDialog.EditQuestion(id);}"/>
                 break;
             case TestCreationPageState.MainInfoEditing:
                 <MainInfoEditing Test="new DraftGenericTestDto(draftTest)"

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using VokimiShared.src.models.db_classes;
+using VokimiShared.src.models.db_classes.questions;
 using VokimiShared.src.models.db_classes.test_answers;
 using VokimiShared.src.models.db_classes.test_creation;
 using VokimiShared.src.models.db_classes.tests;
@@ -20,6 +21,9 @@ namespace Vokimi.src.data
         public DbSet<DraftTestMainInfo> DraftTestMainInfo { get; set; }
         public DbSet<TestConclusion> TestConclusions { get; set; }
         public DbSet<DraftTestQuestion> DraftTestQuestions { get; set; }
+        public DbSet<ImageOnlyAnswer> ImageOnlyAnswers { get; set; }
+        public DbSet<TextAndImageAnswer> TextAndImageAnswers { get; set; }
+        public DbSet<TextOnlyAnswer> TextOnlyAnswers { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
             optionsBuilder.UseLazyLoadingProxies();
@@ -75,8 +79,14 @@ namespace Vokimi.src.data
                 entity.ToTable("DraftTestsSharedInfo");
             });
 
-            modelBuilder.Entity<DraftGenericTest>(entity => {
+            modelBuilder.Entity<DraftGenericTest>(entity =>
+            {
                 entity.ToTable("DraftGenericTests");
+
+                entity.HasMany(x => x.Questions)
+                      .WithOne()
+                      .HasForeignKey(x => x.DraftTestId)
+                      .IsRequired();
             });
 
             modelBuilder.Entity<DraftTestMainInfo>(entity => {
@@ -100,7 +110,24 @@ namespace Vokimi.src.data
                     mc.Property(x => x.MaxAnswers).HasColumnName("MaxAnswers");
                     mc.Property(x => x.UseAverageScore).HasColumnName("UseAverageScore");
                 });
+
+                entity.HasMany(x => x.Answers)
+                      .WithOne()
+                      .HasForeignKey(x => x.QuestionId);
+
+                entity.Property(x => x.DraftTestId).IsRequired();  
             });
+            modelBuilder.Entity<BaseAnswer>(entity => {
+                entity.HasKey(x => x.AnswerId);
+                entity.Property(x => x.AnswerId).HasConversion(v => v.Value, v => new AnswerId(v));
+                entity.ToTable("AnswersSharedInfo");
+            });
+
+            modelBuilder.Entity<ImageOnlyAnswer>(entity => { entity.ToTable("ImageOnlyAnswers"); });
+
+            modelBuilder.Entity<TextAndImageAnswer>(entity => { entity.ToTable("TextAndImageAnswers"); });
+
+            modelBuilder.Entity<TextOnlyAnswer>(entity => { entity.ToTable("TextOnlyAnswers"); });
         }
     }
 }
