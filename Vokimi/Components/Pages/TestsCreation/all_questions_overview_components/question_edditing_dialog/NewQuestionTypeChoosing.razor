@@ -26,7 +26,7 @@
 
     [Parameter] public DraftTestId TestId { get; set; }
     [Parameter] public Action CancelAction { get; set; }
-    [Parameter] public Action GoToNextStageAction { get; set; }
+    [Parameter] public Action<DraftTestQuestionId> GoToNextStageAction { get; set; }
 
     private async void saveNewQuestion() {
         if (string.IsNullOrEmpty(questionText) || questionText.Length < 10) {
@@ -43,7 +43,7 @@
             serverMessage = err.ToString();
             return;
         }
-        GoToNextStageAction();
+        GoToNextStageAction(question.Id);
     }
 
 }

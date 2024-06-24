@@ -1,39 +1,36 @@
 ﻿<BaseDialog DialogId="question-editing-dialog" @ref="baseDialogRef">
     @if (isTypeChoosingState) {
         <NewQuestionTypeChoosing CancelAction="()=>{Close();}" TestId="@testId"
-                                 GoToNextStageAction="()=>{isTypeChoosingState = false; StateHasChanged();}" />
+                                 GoToNextStageAction="ChangeToQuestionEditing" />
     }
     else {
-        <div class="dialog-content">
-            <label class="question-text-label"></label>
-        </div>
-        <div class="bottom-btns-container">
-            <div class="cancel-btn" @onclick="Close">Cancel</div>
-            <div class="save-btn">Save</div>
-        </div>
+        <QuestionEditingContent CloseAction="()=>{Close();}" QuestionId="@questionId" />
     }
 
 </BaseDialog>
 @code {
     private BaseDialog baseDialogRef;
     private bool isTypeChoosingState = true;
-    private QuestionEditingForm data;
-
+    private DraftTestQuestionId questionId;
 
     [Parameter] public AppUserId creatorId { get; set; }
     [Parameter] public DraftTestId testId { get; set; }
 
-    public async Task NewQuestion() {
+    private async void ChangeToQuestionEditing(DraftTestQuestionId id) {
+        questionId = id;
+        isTypeChoosingState = false;
+        await baseDialogRef.OpenAsync();
+        StateHasChanged();
+    }
+
+    public async void NewQuestion() {
         isTypeChoosingState = true;
-        data = QuestionEditingForm.NewDefault();
         await baseDialogRef.OpenAsync();
 
     }
-
-    public async Task EditQuestion(DraftTestQuestionId questionId) {
+    public async void EditQuestion(DraftTestQuestionId id) {
+        questionId = id;
         isTypeChoosingState = false;
-        // data = quesionInfo;
-        //from db
         await baseDialogRef.OpenAsync();
     }
 

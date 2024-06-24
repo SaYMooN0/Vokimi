@@ -44,3 +44,18 @@
         width: 16px;
         height: 16px;
     }
+
+@media (max-width: 670px) {
+
+    .section-title {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 20px;
+    }
+
+    .toggle-button {
+        position: unset;
+        transform: unset;
+    }
+}

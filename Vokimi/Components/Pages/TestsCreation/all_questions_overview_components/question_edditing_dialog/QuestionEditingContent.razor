@@ -1,5 +1,60 @@
-﻿<h3>QuestionEditingContent</h3>
+﻿@inject TestsCreationDbOperationsService testsCreationDbOperationsService
 
+
+@if (!string.IsNullOrEmpty(questionFetchingError)) {
+    <p class="server-error">
+        @questionFetchingError
+    </p>
+}
+else {
+    <div class="dialog-content">
+        <label for="question-text" class="question-text-label">Question Text:</label>
+        <input id="question-text" type="text" @bind="data.Text" />
+
+        <label for="image-path" class="">Image Path:</label>
+        <input id="image-path" type="text" @bind="data.ImagePath" />
+
+
+        <label for="shuffle-answers" class="">Shuffle Answers:</label>
+        <input id="shuffle-answers" type="checkbox" @bind="data.ShuffleAnswers" />
+
+        @if (data.IsMultipleChoice) {
+            <div class="multiple-choice-form-block">
+                <label for="is-multiple-choice" class="">Is Multiple Choice:</label>
+                <input id="is-multiple-choice" type="checkbox" @bind="data.IsMultipleChoice" />
+
+                <label for="min-answers-count" class="">Minimum Answers Count:</label>
+                <input id="min-answers-count" type="number" @bind="data.MinAnswersCount" />
+
+                <label for="max-answers-count" class="">Maximum Answers Count:</label>
+                <input id="max-answers-count" type="number" @bind="data.MaxAnswersCount" />
+
+                <label for="use-average-score" class="">Use Average Score:</label>
+                <input id="use-average-score" type="checkbox" @bind="data.UseAverageScore" />
+            </div>
+        }
+        @* answers *@
+    </div>
+    <div class="bottom-btns-container">
+        <div class="cancel-btn" @onclick="CloseAction">Cancel</div>
+        <div class="save-btn">Save</div>
+    </div>
+}
 @code {
+    private string questionFetchingError = "Error";
+    private QuestionEditingForm data;
 
+    [Parameter] public DraftTestQuestionId QuestionId { get; set; }
+    [Parameter] public Action CloseAction { get; set; }
+
+    protected override async Task OnParametersSetAsync() {
+        DraftTestQuestion? question = await testsCreationDbOperationsService.GetDraftTestQuestionById(QuestionId);
+        if (question is null) {
+            questionFetchingError = "Question not found";
+            return;
+        }
+        data = QuestionEditingForm.FromDraftTestQuestion(question);
+        questionFetchingError = "";
+
+    }
 }

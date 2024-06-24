@@ -99,7 +99,8 @@ namespace Vokimi.Services
             }
             return Err.None;
         }
-
+        public Task<DraftTestQuestion?> GetDraftTestQuestionById(DraftTestQuestionId id) =>
+            _db.DraftTestQuestions.FirstOrDefaultAsync(i => i.Id == id);
 
     }
 }

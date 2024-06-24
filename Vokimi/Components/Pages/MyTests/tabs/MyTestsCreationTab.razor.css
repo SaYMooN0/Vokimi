@@ -16,12 +16,90 @@
 .test-vms-container {
     padding: 10px;
     box-sizing: border-box;
-    gap: 30px;
     display: flex;
     align-items: start;
+    justify-content: space-around;
     flex-direction: row;
-    height: 300px;
+    max-height: 300px;
 }
 
 .see-all-btn {
+    align-self: center;
+    height: 100%;
+    min-width: calc(20px + 6%);
+    border-radius: 10px;
+    border: solid var(--primary) 4px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+    .see-all-btn svg {
+        height: 22px;
+    }
+
+    .see-all-btn:hover {
+        letter-spacing: 2px;
+    }
+
+        .see-all-btn:hover svg {
+            padding-left: 10px;
+        }
+
+@media (max-width: 1400px) {
+    .see-all-btn {
+        min-width: calc(56px + 4%);
+    }
+
+    .test-vms-container {
+        padding: 6px;
+        max-height: 280px;
+    }
+}
+
+@media (max-width: 1100px) {
+
+    .test-vms-container {
+        flex-direction: unset;
+        max-height: unset;
+        padding: 10px;
+        box-sizing: border-box;
+        display: grid;
+        grid-template-rows: 1fr 1fr auto;
+        grid-template-columns: 1fr 1fr;
+        grid-template-areas:
+            "vm vm"
+            "vm vm"
+            "btn btn";
+        justify-content: center;
+    }
+
+    .see-all-btn {
+        margin-top: 10px;
+        grid-area: btn;
+        flex-direction: row;
+        gap: 20px;
+    }
+}
+
+@media (max-width: 670px) {
+
+    .test-vms-container {
+        flex-direction: column;
+        display: flex;
+        grid-template-rows: unset;
+        grid-template-columns: unset;
+        grid-template-areas: unset;
+        justify-content: center;
+        align-items:center;
+    }
+
+    .see-all-btn {
+        margin-top: 10px;
+        grid-area: btn;
+        flex-direction: row;
+        gap: 20px;
+    }
 }

@@ -1,2 +1,6 @@
-﻿body {
+﻿.server-error {
+    width: 460px;
+    padding: 20px;
+    font-family: "Roboto";
+    font-size: 28px;
 }
