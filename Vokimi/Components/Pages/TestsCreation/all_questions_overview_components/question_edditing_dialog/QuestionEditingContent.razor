@@ -8,31 +8,57 @@
 }
 else {
     <div class="dialog-content">
-        <label for="question-text" class="question-text-label">Question Text:</label>
-        <input id="question-text" type="text" @bind="data.Text" />
+        <h3 class="dialog-title">Question Editing</h3>
 
-        <label for="image-path" class="">Image Path:</label>
-        <input id="image-path" type="text" @bind="data.ImagePath" />
-
-
-        <label for="shuffle-answers" class="">Shuffle Answers:</label>
-        <input id="shuffle-answers" type="checkbox" @bind="data.ShuffleAnswers" />
-
-        @if (data.IsMultipleChoice) {
-            <div class="multiple-choice-form-block">
-                <label for="is-multiple-choice" class="">Is Multiple Choice:</label>
-                <input id="is-multiple-choice" type="checkbox" @bind="data.IsMultipleChoice" />
-
-                <label for="min-answers-count" class="">Minimum Answers Count:</label>
-                <input id="min-answers-count" type="number" @bind="data.MinAnswersCount" />
-
-                <label for="max-answers-count" class="">Maximum Answers Count:</label>
-                <input id="max-answers-count" type="number" @bind="data.MaxAnswersCount" />
-
-                <label for="use-average-score" class="">Use Average Score:</label>
-                <input id="use-average-score" type="checkbox" @bind="data.UseAverageScore" />
+        <div class="top-input-zone">
+            <div class="text-input-area">
+                <label for="question-text-label" class="question-text-label">Question Text:</label>
+                <textarea id="question-text-input" @bind="data.Text" />
             </div>
-        }
+            <div class="cover-input-area">
+                @if (string.IsNullOrEmpty(data.ImagePath)) {
+                    <div class="add-image-button">
+                    </div>
+                }
+                else {
+
+                }
+            </div>
+        </div>
+
+
+
+
+        <div class="shuffle-answers-input-line">
+            Shuffle Answers:
+            <span>tool tip</span>
+            <CustomCheckbox @bind-Checked="data.ShuffleAnswers" />
+        </div>
+
+        <div class="multi-choince-input-line">
+            Multiple choice:
+            <span>tool tip</span>
+            <CustomCheckbox @bind-Checked="data.IsMultipleChoice" />
+        </div>
+        <div class="multiple-choice-form-block @showMultipleChoiceCssClass">
+
+
+            <label for="min-answers-count" class="">Minimum Answers Count:</label>
+            <input id="min-answers-count" type="number" @bind="data.MinAnswersCount" />
+
+
+            <label for="max-answers-count" class="">Maximum Answers Count:</label>
+            <input id="max-answers-count" type="number" @bind="data.MaxAnswersCount" />
+
+            <label for="use-average-score" class="">Use Average Score:</label>
+            <label class="multi-choice-line">
+                Use Average Score:
+                <span>tool tip</span>
+                <CustomCheckbox @bind-Checked="data.UseAverageScore" />
+            </label>
+
+        </div>
+        <label class="answers-count-label">Question Answers (@data.Answers.Count)</label>
         @* answers *@
     </div>
     <div class="bottom-btns-container">
@@ -43,6 +69,7 @@ else {
 @code {
     private string questionFetchingError = "Error";
     private QuestionEditingForm data;
+    private string showMultipleChoiceCssClass => data.IsMultipleChoice ? "show" : "hide";
 
     [Parameter] public DraftTestQuestionId QuestionId { get; set; }
     [Parameter] public Action CloseAction { get; set; }

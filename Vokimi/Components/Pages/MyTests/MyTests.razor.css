@@ -1,9 +1,8 @@
 ﻿.tabs-container {
     width: 100%;
-    border-top:2px solid var(--back-2);
-    margin-top:20px;
-    padding-top:10px;
-
+    border-top: 2px solid var(--back-2);
+    margin-top: 20px;
+    padding-top: 10px;
 }
 
 .tabs-switcher {
@@ -22,7 +21,7 @@
         border: 3px var(--primary) solid;
         background-color: var(--back);
         font-family: "Quicksand";
-        font-size: 22px;
+        font-size: 24px;
         color: var(--primary);
         font-weight: 600;
         display: flex;
@@ -40,17 +39,23 @@
             color: var(--primary);
         }
 
-        .tabs-switcher div:hover {
-            background-color: var(--back-2);
-        }
+            .tabs-switcher div:not(.active):hover {
+                color: var(--primary-hov);
+                border-color: var(--primary-hov);
+                transform: translateY(4px);
+            }
+
+            .tabs-switcher div:not(.active):active {
+                background-color: var(--back-2);
+            }
 
 .tab-content {
     padding: 6px;
 }
+
 @media (max-width: 1100px) {
     .tabs-switcher div {
         padding: 2px 24px;
-        border: 2px var(--primary) solid;
         font-size: 20px;
     }
 }
@@ -60,9 +65,10 @@
         margin-top: 16px;
         padding-top: 8px;
     }
+
     .tabs-switcher div {
         padding: 2px 20px;
-        font-size: 17px;
+        font-size: 20px;
     }
 }
 
@@ -71,8 +77,8 @@
         margin-top: 10px;
         padding: 0;
         border-top: none;
-     
     }
+
     .tabs-switcher {
         width: 100%;
         display: grid;
@@ -91,13 +97,13 @@
             padding: 0;
             border-radius: 4px;
             border: none;
-            font-size: 22px;
-            font-family:"Roboto";
+            font-size: 21px;
+            font-family: "Roboto";
             font-weight: 400;
-            color:white !important;
-            display:grid;
-            justify-content:center;
-            transition:font-size 0.15s ease-in-out;
+            color: white !important;
+            display: grid;
+            justify-content: center;
+            transition: font-size 0.12s ease-in-out;
         }
 
             .tabs-switcher div.active {
@@ -107,8 +113,9 @@
             .tabs-switcher div:not(.active) {
                 background-color: var(--primary);
             }
-
-            .tabs-switcher div:hover {
-                font-size: 24px;
-            }
+                .tabs-switcher div:not(.active):hover {
+                    transform:none;
+                    background-color: var(--primary-hov);
+                    font-size:24px;
+                }
 }

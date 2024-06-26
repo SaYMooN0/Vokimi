@@ -10,7 +10,8 @@
     --back: #fdfdff;
     --back-2: #ededf6;
     --primary: #796cfa;
-    --accent: #592bf6;
+    --primary-hov: #6455fb;
+    --accent: #6332f2;
 }
 
 body {

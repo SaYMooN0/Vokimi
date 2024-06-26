@@ -1,1 +1,67 @@
-﻿
+﻿.dialog-content {
+    width: 1000px;
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+}
+
+.dialog-title {
+    align-self: center;
+    font-size: 28px;
+    margin-top: 4px;
+    font-family: Roboto;
+}
+
+.top-input-zone {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+}
+
+.text-input-area {
+    display: flex;
+    flex-direction: column;
+}
+
+.multi-choince-input-line {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    font-family: Roboto;
+    font-size: 22px;
+}
+
+.show {
+    animation: slideIn 0.5s forwards;
+}
+
+.hide {
+    display: none;
+}
+
+.bottom-btns-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    justify-content: center;
+    align-items: center;
+    width: fit-content;
+    gap: 20px;
+    margin: auto 10px 10px auto;
+}
+
+    .bottom-btns-container div {
+        background-color: violet;
+        padding: 10px 20px;
+    }
+
+@keyframes slideIn {
+    from {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}

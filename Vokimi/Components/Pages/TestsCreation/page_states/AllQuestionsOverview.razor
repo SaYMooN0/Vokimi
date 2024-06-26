@@ -1,6 +1,7 @@
 ﻿<div class="questions-vm-container">
     @foreach (var questionVM in questionVMs) {
-
+        @System.Text.Json.JsonSerializer.Serialize(questionVM)
+        
     }
 </div>
 <div class="bottom-fixed">
@@ -9,19 +10,22 @@
             <label class="questions-number">Number of questions: @questionVMs.Count()</label>
             <div class="possible-points-container">
                 <label>Possible points:</label>
-                <span>Min: @minPossiblePoints</span>
-                <span>Max: @maxPossiblePoints</span>
+                <div class="min-max-container">
+                    <span>Min: @minPossiblePoints</span>
+                    <span>Max: @maxPossiblePoints</span>
+                </div>
             </div>
         </div>
-        <div class="add-question-button">Add question</div>
+        <div class="add-question-button" @onclick="NewQuestionAction">New question</div>
     </div>
     <label class="back-link" @onclick="BackToOverviewAction">Back to test overview</label>
 </div>
 @code {
 
-    [Parameter] public QuestionEditingDialog questionsDialogRef { get; set; }
     [Parameter] public DraftTestId TestId { get; set; }
     [Parameter] public Action BackToOverviewAction { get; set; }
+    [Parameter] public Action<DraftTestQuestionId> EditQuestionAction { get; set; }
+    [Parameter] public Action NewQuestionAction { get; set; }
 
     private IEnumerable<QuestionViewModel> questionVMs { get; set; } = [];
     private int minPossiblePoints { get; set; }

@@ -26,20 +26,23 @@
                 <TestOverview ChangePageState="ChangePageState"
                               TestDto="new DraftGenericTestDto(draftTest)"
                               NewQuestionAction="()=>{ChangePageState(TestCreationPageState.AllQuestionsOverview);questionEditingDialog.NewQuestion();}"
-                              EditQuestionAction="(id)=>{ChangePageState(TestCreationPageState.AllQuestionsOverview);questionEditingDialog.EditQuestion(id);}"/>
+                              EditQuestionAction="(id)=>{ChangePageState(TestCreationPageState.AllQuestionsOverview);questionEditingDialog.EditQuestion(id);}" />
                 break;
             case TestCreationPageState.MainInfoEditing:
                 <MainInfoEditing Test="new DraftGenericTestDto(draftTest)"
                                  BackToOverviewAction="()=>ChangePageState(TestCreationPageState.Overview)" />
                 break;
             case TestCreationPageState.AllQuestionsOverview:
-                <AllQuestionsOverview questionsDialogRef="questionEditingDialog" BackToOverviewAction="()=>ChangePageState(TestCreationPageState.Overview)"/>
+                <AllQuestionsOverview TestId="@draftTest.Id"
+                                      BackToOverviewAction="()=>ChangePageState(TestCreationPageState.Overview)"
+                                      EditQuestionAction="questionEditingDialog.EditQuestion"
+                                      NewQuestionAction="questionEditingDialog.NewQuestion" />
                 break;
             case TestCreationPageState.ResultsCreation:
-                <ResultsCreation></ResultsCreation>
+                <ResultsCreation />
                 break;
             case TestCreationPageState.StylesEditing:
-                <StylesEditing></StylesEditing>
+                <StylesEditing />
                 break;
             case TestCreationPageState.TagsAdding:
                 <TagsAdding></TagsAdding>
