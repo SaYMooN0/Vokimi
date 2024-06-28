@@ -1,22 +1,56 @@
-﻿@using Vokimi.Components.Pages.TestsCreation.all_questions_overview_components.question_edditing_dialog.editing_content_components.answers_zone_vms_lists
+﻿@using Vokimi.Components.Pages.TestsCreation.all_questions_overview_components.question_edditing_dialog.editing_content_components.answers_zone_creation_components
 
+<p class="title-line">
+    <label class="answers-count-label">Answers (@Answers.Count)</label>
+    <button @onclick="()=>isHidden = !isHidden" type="button">@(isHidden ? "Show" : "Hide")</button>
+</p>
 
-<div class="answers-container">
-    @switch (AnswersType) {
-        case AnswersType.TextOnly:
-            <TextOnlyAnswerVmsList AnswersList="Answers.Select(x => x as TextOnlyAnswerForm).ToList()" />
-            break;
-        case AnswersType.ImageOnly:
-            <ImageOnlyAnswerVmsList AnswersList="Answers.Select(x => x as ImageOnlyAnswerForm).ToList()" />
-            break;
-        case AnswersType.TextAndImage:
-            <TextAndImageAnswerVmsList AnswersList="Answers.Select(x => x as TextAndImageAnswerForm).ToList()" />
-            break;
-        default:
-            throw new NotImplementedException();
-    }
-</div>
+@if (!isHidden) {
+    <div class="answers-container">
+        @foreach (var answer in Answers) {
+            <div class="answer">
+                <div class="points-container">
+                    Points: <input type="number" @bind-value="answer.Points" />
+                </div>
+
+                @switch (AnswersType) {
+                    case AnswersType.TextOnly:
+                        <TextOnlyAnswerCreation @bind-AnswerText="(answer as TextOnlyAnswerForm).Text" />
+                        break;
+                    case AnswersType.ImageOnly:
+                        <ImageOnlyAnswerCreation @bind-AnswerImage="(answer as TextAndImageAnswerForm).ImagePath" />
+                        break;
+                    case AnswersType.TextAndImage:
+                        <TextAndImageAnswerCreation @bind-AnswerText="(answer as TextAndImageAnswerForm).Text"
+                                                    @bind-AnswerImage="(answer as TextAndImageAnswerForm).ImagePath" />
+                        break;
+                    default:
+                        throw new NotImplementedException();
+                }
+            </div>
+        }
+    </div>
+}
+<div class="add-answer-btn" @onclick="AddNewAnswer">Add Answer</div>
 @code {
+    private bool isHidden = false;
+
     [Parameter] public AnswersType AnswersType { get; set; }
     [Parameter] public List<BaseAnswerForm> Answers { get; set; }
+    public void AddNewAnswer() {
+        isHidden = false;
+        switch (AnswersType) {
+            case AnswersType.TextOnly:
+                Answers.Add(new TextOnlyAnswerForm());
+                break;
+            case AnswersType.ImageOnly:
+                Answers.Add(new ImageOnlyAnswerForm());
+                break;
+            case AnswersType.TextAndImage:
+                Answers.Add(new TextAndImageAnswerForm());
+                break;
+            default:
+                throw new NotImplementedException();
+        }
+    }
 }

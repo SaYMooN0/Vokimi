@@ -1,5 +1,43 @@
-﻿.answers-container {
+﻿.title-line {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 6px;
+}
+
+.answers-count-label {
+    font-size: 24px;
+    font-family: Roboto;
+}
+
+.hide-answers-btn {
+    position: absolute;
+    right: 20px;
+    padding: 10px 20px;
+}
+
+.answers-container {
     width: 100%;
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.add-answer-btn {
+    padding: 10px 20px;
+    background-color: firebrick;
+}
+
+.answer {
+    border: 2px solid red;
+    min-height: 60px;
+    width: 96%;
+    display: grid;
+    grid-template-columns: 200px 1fr;
+}
+
+.points-container {
 }

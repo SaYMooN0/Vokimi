@@ -1,5 +1,5 @@
 ﻿.dialog-content {
-    width: 1000px;
+    width: 1300px;
     display: flex;
     flex-direction: column;
     align-items: start;
@@ -9,20 +9,19 @@
 
 .close-btn {
     position: absolute;
-    background-color: #ff4d4d;
-    height: 40px;
+    top: 10px;
+    right: 10px;
+    height: 22px;
     padding: 2px;
     aspect-ratio: 1/1;
-    color: #fff;
+    cursor: pointer;
+    fill: #c8c6cb;
+    transition:all 0.08s ease-in;
 }
 
-    .close-btn svg {
-        fill: white;
-        height: 100%;
-    }
-
     .close-btn:hover {
-        background-color: #ff1a1a;
+        fill: #9e9ba3;
+        transform:scale(1.04);
     }
 
 .dialog-title {
@@ -40,35 +39,4 @@
 .text-input-area {
     display: flex;
     flex-direction: column;
-}
-
-
-
-.multi-choince-input-line {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 10px;
-    font-family: Roboto;
-    font-size: 22px;
-}
-
-.show {
-    animation: slideIn 0.5s forwards;
-}
-
-.hide {
-    display: none;
-}
-
-@keyframes slideIn {
-    from {
-        transform: translateY(100%);
-        opacity: 0;
-    }
-
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
 }

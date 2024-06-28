@@ -1,0 +1,17 @@
+﻿<div class="answer-main-content">
+    <input placeholder="Answer text" type="text" @onchange="@OnTextChanged" />
+    <div>image input</div>
+</div>
+
+@code {
+    [Parameter] public string AnswerText { get; set; }
+    [Parameter] public EventCallback<string> AnswerTextChanged { get; set; }
+
+    [Parameter] public string AnswerImage { get; set; }
+    [Parameter] public EventCallback<string> AnswerImageChanged { get; set; }
+
+    private async Task OnTextChanged(ChangeEventArgs e) {
+        AnswerText = (string)e.Value;
+        await AnswerTextChanged.InvokeAsync(AnswerText);
+    }
+}

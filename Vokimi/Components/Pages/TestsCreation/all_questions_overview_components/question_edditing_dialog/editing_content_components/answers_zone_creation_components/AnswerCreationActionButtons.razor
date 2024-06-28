@@ -1,0 +1,20 @@
+﻿
+    <div class="action-btns-container">
+        @if (IsEditingState) {
+            <button type="button" @onclick="OnSaveAction">Save</button>
+            <button type="button" @onclick="OnCancelAction">Cancel</button>
+        }
+        else {
+            <button type="button" @onclick="ChangeToEditAction">Edit</button>
+            <button type="button" @onclick="DeleteAnswerAction">Delete</button>
+        }
+    </div>
+@code {
+    [Parameter] public bool IsEditingState { get; set; }
+    [Parameter] public Action OnSaveAction { get; set; }
+    [Parameter] public Action OnCancelAction { get; set; }
+    [Parameter] public Action ChangeToEditAction { get; set; }
+    [Parameter] public Action DeleteAnswerAction { get; set; }
+
+
+}

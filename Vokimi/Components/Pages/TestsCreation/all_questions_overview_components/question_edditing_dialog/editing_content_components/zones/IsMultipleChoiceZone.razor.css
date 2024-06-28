@@ -1,0 +1,28 @@
+﻿.multi-choince-input-line {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    font-family: Roboto;
+    font-size: 22px;
+}
+
+.show {
+    animation: slideIn 0.5s forwards;
+}
+
+.hide {
+    display: none;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}

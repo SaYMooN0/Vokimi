@@ -8,6 +8,7 @@ using VokimiShared.src.models.db_classes.test_answers;
 using VokimiShared.src.models.db_classes.test_creation;
 using VokimiShared.src.models.db_classes.tests;
 using VokimiShared.src.models.db_classes.users;
+using VokimiShared.src.models.form_classes;
 
 namespace Vokimi.Services
 {
@@ -101,6 +102,29 @@ namespace Vokimi.Services
         }
         public Task<DraftTestQuestion?> GetDraftTestQuestionById(DraftTestQuestionId id) =>
             _db.DraftTestQuestions.FirstOrDefaultAsync(i => i.Id == id);
+        public async Task<Err> UpdateDraftTestQuestion(DraftTestQuestionId questionId, QuestionEditingForm newData) {
 
+            DraftTestQuestion? question = await GetDraftTestQuestionById(questionId);
+            if (question is null) { return new Err("Unknown question"); }
+
+            if (newData.IsMultipleChoice) {
+                MultipleChoiceAdditionalData multiChoiceIndfo = new() {
+                    MaxAnswers = newData.MaxAnswersCount,
+                    MinAnswers = newData.MinAnswersCount,
+                    UseAverageScore = newData.UseAverageScore,
+                };
+
+                question.UpdateAsMultipleChoice(newData.Text, newData.ImagePath, newData.ShuffleAnswers);
+            }
+            else {
+                question.UpdateAsSingleChoice();
+            }
+            throw new NotImplementedException();
+
+        }
+        public async Task DeleteDraftTestQuestion(DraftTestQuestionId questionId) {
+            throw new NotImplementedException();
+
+        }
     }
 }

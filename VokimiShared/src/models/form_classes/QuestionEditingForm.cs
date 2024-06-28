@@ -1,4 +1,5 @@
-﻿using VokimiShared.src.enums;
+﻿using System.Diagnostics;
+using VokimiShared.src.enums;
 using VokimiShared.src.models.db_classes.questions;
 using VokimiShared.src.models.db_classes.test_answers;
 using VokimiShared.src.models.db_classes.test_creation;
@@ -17,7 +18,7 @@ namespace VokimiShared.src.models.form_classes
         public ushort MinAnswersCount { get; set; }
         public ushort MaxAnswersCount { get; set; }
         public bool UseAverageScore { get; set; }
-        public List<BaseAnswerForm> Answers { get; set; }
+        public List<BaseAnswerForm> Answers { get; set; } = [];
         public static QuestionEditingForm FromDraftTestQuestion(DraftTestQuestion question) => new() {
             Text = question.Text,
             ImagePath = question.ImagePath,
@@ -29,6 +30,21 @@ namespace VokimiShared.src.models.form_classes
             UseAverageScore = question.MultipleChoiceData is not null ? question.MultipleChoiceData.UseAverageScore : true,
             Answers = ExtractAnswers(question)
         };
+        public Err Validate() {
+            if (IsMultipleChoice) {
+                if (MinAnswersCount > MaxAnswersCount) {
+                    return new Err("Minimum answers count cannot be more than maximum answers count");
+                }
+                else if (MinAnswersCount < 1) {
+                    return new Err("Minimum answers count cannot be less than 1");
+                }
+                else if (MaxAnswersCount > Answers.Count) {
+                    return new Err("Maximum answers count cannot be more than total answers count");
+                }
+            }
+            //validate all answers
+            return Err.None;
+        }
 
         private static ushort ExtractMinAnswersCount(DraftTestQuestion q) =>
            q.MultipleChoiceData is not null ? (ushort)q.MultipleChoiceData.MinAnswers : (ushort)1;

@@ -1,0 +1,21 @@
+﻿<div class="answer-main-content">
+    <div>image input</div>
+</div>
+
+@code {
+    [Parameter] public string AnswerImage { get; set; }
+    [Parameter] public EventCallback<string> AnswerImageChanged { get; set; }
+
+}
+
+@* <div class="answer-container">
+    <div class="answer-img">
+        <img src="@ImgOperationsHelper.ImageUrlWithVersion(Answer.ImagePath)" alt="Img" />
+    </div>
+
+    <InputFile id="@id" OnChange="HandleFileChange" accept=".jpg,.png,.webp" hidden />
+    <label for="@id" class="change-btn">Change</label
+    <label class="cover-error">@errorString</label>
+
+</div>
+ *@

@@ -2,7 +2,7 @@
 @inject VokimiStorageService vokimiStorageService
 
 <div class="test-cover">
-    <img src="@GetImageUrl(Vm.CoverPath)" alt="Test Cover" />
+    <img src="@ImgOperationsHelper.ImageUrlWithVersion(Vm.CoverPath)" alt="Test Cover" />
 </div>
 
 <InputFile id="cover" class="form-control" OnChange="HandleFileChange" accept=".jpg,.png,.webp" hidden />
@@ -14,9 +14,6 @@
     [Parameter] public TestCoverAreaContentViewModel Vm { get; set; }
 
     private string coverUploadingError = string.Empty;
-
-    private string GetImageUrl(string path) =>
-    $"{ImgOperationsHelper.ImgUrl(path)}?v={Guid.NewGuid()}";
 
     private async void HandleCoverRemoving() {
         Err err = await testsCreationDbOperationsService.UpdateTestCover(Vm.MainInfoId, ImgOperationsHelper.DefaultTestCoverImg);
