@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-using VokimiShared.src.enums;
-using VokimiShared.src.models.db_classes.questions;
+﻿using VokimiShared.src.enums;
 using VokimiShared.src.models.db_classes.test_answers;
 using VokimiShared.src.models.db_classes.test_creation;
 using VokimiShared.src.models.form_classes.draft_tests_answers_form;
@@ -53,7 +51,7 @@ namespace VokimiShared.src.models.form_classes
         private static List<BaseAnswerForm> ExtractAnswers(DraftTestQuestion q) {
             List<BaseAnswerForm> answers = [];
 
-            foreach (var answer in q.Answers) {
+            foreach (var answer in q.Answers.OrderBy(a => a.OrderInQuestion)) {
                 switch (q.AnswersType) {
                     case AnswersType.ImageOnly:
                         var imageOnlyAnswer = answer as ImageOnlyAnswer;

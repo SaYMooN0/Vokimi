@@ -32,12 +32,83 @@
 }
 
 .answer {
-    border: 2px solid red;
-    min-height: 60px;
+    box-shadow: rgba(52, 56, 228, 0.10) 0px 2px 4px 0px, rgba(52, 56, 228, 0.10) 0px 2px 16px 0px;
+    border-radius: 10px;
+    min-height: 90px;
     width: 96%;
     display: grid;
-    grid-template-columns: 200px 1fr;
+    grid-template-columns: 160px 1fr auto;
 }
 
 .points-container {
+    align-self: center;
+    height: 60%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    padding: 6px;
+    border-right: 2px solid rgb(96, 105, 207, 0.16);
+}
+
+    .points-container label {
+    }
+
+    .points-container input {
+        width: 70%;
+        padding: 2px 0px 2px 6px;
+        border-radius: 6px;
+        border: none;
+        background-color: var(--back-2);
+        text-align: center;
+        font-size: 20px;
+        font-family: Roboto;
+        transition: transform 0.08s;
+    }
+
+        .points-container input:hover {
+            transform: scale(1.04);
+        }
+
+        .points-container input:focus {
+            border-radius: 4px;
+            outline: 2px solid var(--primary);
+            transform: scale(1.04);
+        }
+
+.delete-answer-btn {
+    align-self: center;
+    margin-right: 10px;
+    width: 36px;
+    aspect-ratio: 1/1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+    background-color: var(--grey);
+}
+
+    .delete-answer-btn svg {
+        width: 46%;
+        fill: #fff;
+    }
+
+    .delete-answer-btn:hover {
+        background-color: #ed2f2f;
+        overflow: visible;
+    }
+
+.bin path {
+    transition: all 0.2s;
+}
+
+.delete-answer-btn:active {
+    transform: scale(0.98);
 }

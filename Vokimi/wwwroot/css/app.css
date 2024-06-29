@@ -12,11 +12,12 @@
     --primary: #796cfa;
     --primary-hov: #6455fb;
     --accent: #6332f2;
+    --grey: #B5BAC1;
 }
 
 body {
     margin: 0 !important;
-    background-color:var(--back);
+    background-color: var(--back);
 }
 
 

@@ -9,6 +9,7 @@ using VokimiShared.src.models.db_classes.test_creation;
 using VokimiShared.src.models.db_classes.tests;
 using VokimiShared.src.models.db_classes.users;
 using VokimiShared.src.models.form_classes;
+using VokimiShared.src.models.form_classes.draft_tests_answers_form;
 
 namespace Vokimi.Services
 {
@@ -102,29 +103,57 @@ namespace Vokimi.Services
         }
         public Task<DraftTestQuestion?> GetDraftTestQuestionById(DraftTestQuestionId id) =>
             _db.DraftTestQuestions.FirstOrDefaultAsync(i => i.Id == id);
-        public async Task<Err> UpdateDraftTestQuestion(DraftTestQuestionId questionId, QuestionEditingForm newData) {
 
+        public async Task<Err> UpdateDraftTestQuestion(DraftTestQuestionId questionId, QuestionEditingForm newData) {
             DraftTestQuestion? question = await GetDraftTestQuestionById(questionId);
             if (question is null) { return new Err("Unknown question"); }
 
+            await DeleteAnswerForDraftTestQuestion(questionId);
+            var answers = new List<BaseAnswer>();
+
+            foreach (var answerForm in newData.Answers) {
+                ushort orderIndex = (ushort)newData.Answers.IndexOf(answerForm);
+                BaseAnswer answer = answerForm switch {
+                    ImageOnlyAnswerForm imageOnlyAnswerForm => ImageOnlyAnswer
+                        .CreateNew(questionId, imageOnlyAnswerForm.Points, orderIndex, imageOnlyAnswerForm.ImagePath),
+                    TextAndImageAnswerForm textAndImageAnswerForm => TextAndImageAnswer
+                        .CreateNew(questionId, textAndImageAnswerForm.Points, orderIndex, textAndImageAnswerForm.Text, textAndImageAnswerForm.ImagePath),
+                    TextOnlyAnswerForm textOnlyAnswerForm => TextOnlyAnswer
+                        .CreateNew(questionId, textOnlyAnswerForm.Points, orderIndex, textOnlyAnswerForm.Text),
+                    _ => throw new InvalidOperationException("Unknown answer type")
+                };
+
+                _db.Add(answer);
+                answers.Add(answer);
+            }
+
             if (newData.IsMultipleChoice) {
-                MultipleChoiceAdditionalData multiChoiceIndfo = new() {
+                MultipleChoiceAdditionalData multiChoiceInfo = new() {
                     MaxAnswers = newData.MaxAnswersCount,
                     MinAnswers = newData.MinAnswersCount,
                     UseAverageScore = newData.UseAverageScore,
                 };
 
-                question.UpdateAsMultipleChoice(newData.Text, newData.ImagePath, newData.ShuffleAnswers);
+                question.UpdateAsMultipleChoice(newData.Text, newData.ImagePath, newData.ShuffleAnswers, answers, multiChoiceInfo);
             }
             else {
-                question.UpdateAsSingleChoice();
+                question.UpdateAsSingleChoice(newData.Text, newData.ImagePath, newData.ShuffleAnswers, answers);
             }
-            throw new NotImplementedException();
+            try {
+                _db.DraftTestQuestions.Update(question);
+                await _db.SaveChangesAsync();
+                return Err.None;
 
+            } catch (Exception ex) {
+                return new Err("Server error. Please try again later");
+            }
         }
-        public async Task DeleteDraftTestQuestion(DraftTestQuestionId questionId) {
-            throw new NotImplementedException();
 
+        public async Task<Err> DeleteAnswerForDraftTestQuestion(DraftTestQuestionId questionId) {
+            DraftTestQuestion? question = await GetDraftTestQuestionById(questionId);
+            if (question is null) { return new Err("Unknown question"); }
+            question.Answers.Clear();
+            return Err.None;
         }
     }
 }
