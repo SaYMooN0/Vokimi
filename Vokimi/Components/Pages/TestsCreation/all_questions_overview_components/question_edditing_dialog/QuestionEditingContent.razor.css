@@ -4,6 +4,8 @@
     flex-direction: column;
     align-items: start;
     position: relative;
+    max-height: 90vh;
+    overflow-y: auto;
 }
 
 

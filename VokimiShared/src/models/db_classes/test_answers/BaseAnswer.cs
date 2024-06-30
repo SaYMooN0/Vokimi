@@ -6,5 +6,7 @@
         public int Points { get; init; }
         public DraftTestQuestionId QuestionId { get; set; }
         public ushort OrderInQuestion { get; set; }
+
     }
+    
 }

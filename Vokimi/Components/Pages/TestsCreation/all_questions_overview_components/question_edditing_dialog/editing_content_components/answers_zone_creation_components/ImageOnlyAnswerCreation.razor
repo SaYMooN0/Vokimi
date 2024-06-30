@@ -1,21 +1,53 @@
-﻿<div class="answer-main-content">
-    <div>image input</div>
+﻿@inject VokimiStorageService vokimiStorageService
+<div class="answer-main-content">
+    @if (AnyImage) {
+        <img src="@ImgOperationsHelper.ImageUrlWithVersion(AnswerImage)" alt="Img" />
+    }
+    <div class="img-input-container">
+        <InputFile id="@id" OnChange="HandleFileChange" accept=".jpg,.png,.webp" hidden />
+        @if (AnyImage) {
+            <label for="@id" class="change-btn">Change Image</label>
+
+        }
+        else {
+            <label for="@id" class="upload-btn">Add Image</label>
+
+        }
+        <label class="cover-error">@errorString</label>
+    </div>
 </div>
 
 @code {
+    private string id = Guid.NewGuid().ToString();
+    private string errorString = "";
+    private bool AnyImage => !string.IsNullOrEmpty(AnswerImage);
+
     [Parameter] public string AnswerImage { get; set; }
     [Parameter] public EventCallback<string> AnswerImageChanged { get; set; }
+    private async Task HandleFileChange(InputFileChangeEventArgs e) {
+        var file = e.File;
+        int maxAllowedSize = 3145728; /* 3MB */
+
+        if (file is not null) {
+            if (file.Size > maxAllowedSize) {
+                errorString = $"File is too big. Max allowed size: 3MB";
+                return;
+            }
+            try {
+                // using (var stream = file.OpenReadStream(maxAllowedSize: maxAllowedSize)) {
+                //     var result = await vokimiStorageService.SaveDraftTestAnswerImage(stream);
+                //     result.Switch(
+                //         async path => {
+
+                //         },
+                //         err => errorString = $"Error uploading cover: {err.Message}"
+                //     );
+
+                // }
+            } catch (Exception ex) {
+                errorString = $"Server error. Please try again later";
+            }
+        }
+    }
 
 }
-
-@* <div class="answer-container">
-    <div class="answer-img">
-        <img src="@ImgOperationsHelper.ImageUrlWithVersion(Answer.ImagePath)" alt="Img" />
-    </div>
-
-    <InputFile id="@id" OnChange="HandleFileChange" accept=".jpg,.png,.webp" hidden />
-    <label for="@id" class="change-btn">Change</label
-    <label class="cover-error">@errorString</label>
-
-</div>
- *@

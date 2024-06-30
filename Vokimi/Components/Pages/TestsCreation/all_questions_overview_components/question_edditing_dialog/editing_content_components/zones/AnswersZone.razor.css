@@ -27,22 +27,43 @@
 }
 
 .add-answer-btn {
-    padding: 10px 20px;
-    background-color: firebrick;
+    padding: 6px 12px;
+    border: 3px solid var(--primary);
+    color: var(--primary);
+    font-family: Roboto;
+    font-size: 22px;
+    align-self: end;
+    margin: 10px;
+    cursor: pointer;
+    border-radius: 10px;
 }
+
+    .add-answer-btn:hover {
+        color: var(--primary-hov);
+        border-color: var(--primary-hov);
+        transform: scale(1.02);
+    }
 
 .answer {
     box-shadow: rgba(52, 56, 228, 0.10) 0px 2px 4px 0px, rgba(52, 56, 228, 0.10) 0px 2px 16px 0px;
     border-radius: 10px;
-    min-height: 90px;
+    min-height: 120px;
     width: 96%;
     display: grid;
     grid-template-columns: 160px 1fr auto;
+    position:relative;
 }
-
+.answer-number {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    font-family: Roboto;
+    color: var(--grey);
+    font-size: 20px;
+}
 .points-container {
     align-self: center;
-    height: 60%;
+    height: calc(90% - 30px);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -50,11 +71,9 @@
     gap: 6px;
     padding: 6px;
     border-right: 2px solid rgb(96, 105, 207, 0.16);
+    font-family: Roboto;
+    font-size: 20px;
 }
-
-    .points-container label {
-    }
-
     .points-container input {
         width: 70%;
         padding: 2px 0px 2px 6px;
@@ -101,14 +120,10 @@
     }
 
     .delete-answer-btn:hover {
-        background-color: #ed2f2f;
+        background-color: var(--red-del);
         overflow: visible;
     }
 
-.bin path {
-    transition: all 0.2s;
-}
-
-.delete-answer-btn:active {
-    transform: scale(0.98);
-}
+    .delete-answer-btn:active {
+        transform: scale(0.98);
+    }

@@ -17,7 +17,7 @@ public class VokimiStorageService
     }
     public async Task<OneOf<string, Err>> SaveDraftTestCover(DraftTestId id, Stream fileStream) {
         try {
-            string key = $"{ImgOperationsHelper.GeneralFolder}/{id}";
+            string key = $"{ImgOperationsHelper.DraftTestCoversFolder}/{id}";
             var putRequest = new PutObjectRequest {
                 BucketName = _bucketName,
                 Key = key,
@@ -36,5 +36,28 @@ public class VokimiStorageService
             return new Err("Server error. Please try again later");
         }
     }
+    public async Task<OneOf<string, Err>> SaveDraftTestAnswerImage(Stream fileStream) {
+        try {
+            string key = $"{ImgOperationsHelper.DraftTestAnswersFolder}/{Guid.NewGuid()}";
+            var putRequest = new PutObjectRequest {
+                BucketName = _bucketName,
+                Key = key,
+                InputStream = fileStream
+            };
 
+            PutObjectResponse response = await _s3Client.PutObjectAsync(putRequest);
+
+            if (response.HttpStatusCode == System.Net.HttpStatusCode.OK) {
+                return key;
+            }
+            else {
+                return new Err("Failed to upload the file");
+            }
+        } catch (Exception ex) {
+            return new Err("Server error. Please try again later");
+        }
+    }
+    public async void RemoveDraftTestAnswerImage(string key) {
+
+    }
 }

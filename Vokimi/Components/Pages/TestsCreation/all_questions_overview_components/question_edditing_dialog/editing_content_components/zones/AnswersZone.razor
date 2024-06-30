@@ -6,27 +6,28 @@
 </p>
 @if (!isHidden) {
     <div class="answers-container">
-        @foreach (var answer in Answers) {
+        @foreach (var answer in Answers.Select((value, index) => new { value, index })) {
             <div class="answer">
+                <label class="answer-number">#@(answer.index + 1)</label>
                 <div class="points-container">
-                    Points: <input type="number" @bind-value="answer.Points" />
+                    Points: <input type="number" @bind-value="answer.value.Points" />
                 </div>
 
                 @switch (AnswersType) {
                     case AnswersType.TextOnly:
-                        <TextOnlyAnswerCreation @bind-AnswerText="(answer as TextOnlyAnswerForm).Text" />
+                        <TextOnlyAnswerCreation @bind-AnswerText="(answer.value as TextOnlyAnswerForm).Text" />
                         break;
                     case AnswersType.ImageOnly:
-                        <ImageOnlyAnswerCreation @bind-AnswerImage="(answer as TextAndImageAnswerForm).ImagePath" />
+                        <ImageOnlyAnswerCreation @bind-AnswerImage="(answer.value as ImageOnlyAnswerForm).ImagePath" />
                         break;
                     case AnswersType.TextAndImage:
-                        <TextAndImageAnswerCreation @bind-AnswerText="(answer as TextAndImageAnswerForm).Text"
-                                                    @bind-AnswerImage="(answer as TextAndImageAnswerForm).ImagePath" />
+                        <TextAndImageAnswerCreation @bind-AnswerText="(answer.value as TextAndImageAnswerForm).Text"
+                                                    @bind-AnswerImage="(answer.value as TextAndImageAnswerForm).ImagePath" />
                         break;
                     default:
                         throw new NotImplementedException();
                 }
-                <div class="delete-answer-btn" @onclick="()=>Answers.Remove(answer)">
+                <div class="delete-answer-btn" @onclick="()=>RemoveAnswer(answer.value)">
                     <svg fill="none" viewBox="0 0 50 59" class="bin">
                         <path d="M0 7.5C0 5.01472 2.01472 3 4.5 3H45.5C47.9853 3 50 5.01472 50 7.5V7.5C50 8.32843 49.3284 9 48.5 9H1.5C0.671571 9 0 8.32843 0 7.5V7.5Z"></path>
                         <path d="M17 3C17 1.34315 18.3431 0 20 0H29.3125C30.9694 0 32.3125 1.34315 32.3125 3V3H17V3Z"></path>
@@ -36,14 +37,23 @@
                         <path d="M2 13H48L47.6742 21.28H2.32031L2 13Z"></path>
                     </svg>
                 </div>
-
             </div>
         }
+
     </div>
 }
 <div class="add-answer-btn" @onclick="AddNewAnswer">Add Answer</div>
 @code {
     private bool isHidden = false;
+    private void RemoveAnswer(BaseAnswerForm answer) {
+        @if (AnswersType == AnswersType.TextAndImage || AnswersType == AnswersType.ImageOnly) {
+            string? path = (answer as ImageOnlyAnswerForm).ImagePath;
+            if (!string.IsNullOrEmpty(path)) {
+                throw new NotImplementedException();
+            }
+        }
+        Answers.Remove(answer);
+    }
 
 
     [Parameter] public AnswersType AnswersType { get; set; }

@@ -40,7 +40,7 @@ namespace VokimiShared.src.models.form_classes
                     return new Err("Maximum answers count cannot be more than total answers count");
                 }
             }
-            //validate all answers
+        
             return Err.None;
         }
 

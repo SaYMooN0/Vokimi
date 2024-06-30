@@ -12,7 +12,8 @@
     --primary: #796cfa;
     --primary-hov: #6455fb;
     --accent: #6332f2;
-    --grey: #B5BAC1;
+    --grey: #adafb2;
+    --red-del: #ed2f2f;
 }
 
 body {

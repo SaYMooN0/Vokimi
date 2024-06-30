@@ -1,5 +1,7 @@
-﻿<div class="answer-main-content">
-    <input placeholder="Answer text" type="text" @onchange="@OnTextChanged" value="@AnswerText" />
+﻿
+<div class="answer-main-content">
+    <label>Text of the answer</label>
+    <textarea type="text" @onchange="@OnTextChanged" value="@AnswerText" />
 </div>
 
 @code {
