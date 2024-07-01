@@ -1,7 +1,113 @@
-﻿.answer-main-content
-{
-    display:flex;
-    flex-direction:row;
-    justify-content:center;
-    
+﻿.answer-main-content {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    gap: 30px;
+    padding: 4px 80px;
+    box-sizing: border-box;
 }
+
+    .answer-main-content img {
+        justify-self:center;  
+        height: 220px;
+        border-radius: 8px;
+    }
+
+.error-string {
+    font-family: Roboto;
+}
+
+.img-input-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.add-img-btn {
+    width: fit-content;
+    height: 110px;
+    padding: 2px 20px;
+    box-sizing: border-box;
+    display: grid;
+    grid-template-rows: auto 70px;
+    align-items: center;
+    border: 4px solid var(--primary);
+    border-radius: 8px;
+    font-family: Quicksand;
+    font-size: 21px;
+    font-weight: bold;
+    color: var(--primary);
+    cursor: pointer;
+    transition: all 0.16s;
+}
+
+    .add-img-btn svg {
+        justify-self: center;
+        fill: var(--primary);
+        height: 80%;
+        transition: all 0.13s;
+    }
+
+    .add-img-btn:hover {
+        padding: 1px 30px;
+        color: var(--primary-hov);
+        border-color: var(--primary-hov);
+        font-size: 23px;
+    }
+
+        .add-img-btn:hover svg {
+            height: 100%;
+            fill: var(--primary-hov);
+        }
+
+    .add-img-btn:active {
+        transform: scale(0.96);
+    }
+
+.change-btn {
+    padding: 8px 24px;
+    background-color: var(--primary);
+    border-radius: 8px;
+    font-family: Quicksand;
+    font-size: 21px;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+    transition: all 0.16s;
+}
+/*.add-img-btn {
+    padding: 8px 24px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    background-color: var(--primary);
+    border-radius: 8px;
+    font-family: Quicksand;
+    font-size: 21px;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+    transition: all 0.16s;
+}
+
+    .add-img-btn svg {
+        fill: white;
+        height: 31px;
+    }
+
+    .add-img-btn:hover {
+        padding: 11px 33px;
+        gap: 16px;
+        font-size: 23px;
+        background-color: var(--primary-hov);
+    }
+
+    .add-img-btn:active {
+        transform: scale(0.95);
+    }
+
+*/

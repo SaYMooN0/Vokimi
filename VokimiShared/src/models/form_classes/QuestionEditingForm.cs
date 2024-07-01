@@ -40,9 +40,15 @@ namespace VokimiShared.src.models.form_classes
                     return new Err("Maximum answers count cannot be more than total answers count");
                 }
             }
-        
+            for (int i = 0; i < Answers.Count; i++) {
+                Err err = Answers[i].Validate();
+                if (err.NotNone()) {
+                    return new Err($"Error in answer #{i + 1}: " + err.ToString());
+                }
+            }
             return Err.None;
         }
+
 
         private static ushort ExtractMinAnswersCount(DraftTestQuestion q) =>
            q.MultipleChoiceData is not null ? (ushort)q.MultipleChoiceData.MinAnswers : (ushort)1;

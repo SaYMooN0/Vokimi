@@ -1,6 +1,7 @@
 ﻿@using Vokimi.Components.Pages.TestsCreation.all_questions_overview_components.question_edditing_dialog.editing_content_components.zones
 
 @inject TestsCreationDbOperationsService testsCreationDbOperationsService
+@inject VokimiStorageService vokimiStorageService
 
 @if (!string.IsNullOrEmpty(questionFetchingError)) {
     <p class="error-line">
@@ -40,7 +41,7 @@ else {
 
         <IsMultipleChoiceZone FormData="formData" />
 
-        <AnswersZone Answers="@formData.Answers" AnswersType="@formData.AnswersType" />
+        <AnswersZone Answers="@formData.Answers" AnswersType="@formData.AnswersType" QuestionId="@QuestionId" />
 
         <p class="error-line">@savingError</p>
         <SaveButton Onclick="SaveData" />
@@ -78,6 +79,10 @@ else {
         Err err = await testsCreationDbOperationsService.UpdateDraftTestQuestion(QuestionId, formData);
         if (err.NotNone()) {
             savingError = err.Message;
+        }
+        else if (formData.AnswersType.HasImage()) {
+            var imageKeys = formData.Answers.Select(x => (x as IAnswerFormWithImage).ImagePath);
+            vokimiStorageService.ClearUnusedAnswerImagesForQuestion(QuestionId, imageKeys);
         }
     }
 }

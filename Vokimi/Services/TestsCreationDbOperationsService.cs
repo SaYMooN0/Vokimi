@@ -122,8 +122,10 @@ namespace Vokimi.Services
                         .CreateNew(questionId, textOnlyAnswerForm.Points, orderIndex, textOnlyAnswerForm.Text),
                     _ => throw new InvalidOperationException("Unknown answer type")
                 };
-                //if (answerForm.Validate().NotNone())
-                //    continue;
+
+                if (answerForm.Validate().NotNone())
+                    continue;
+
                 _db.Add(answer);
                 answers.Add(answer);
             }

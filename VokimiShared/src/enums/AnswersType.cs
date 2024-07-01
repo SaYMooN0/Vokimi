@@ -13,4 +13,14 @@ namespace VokimiShared.src.enums
         ImageOnly,
         //color
     }
+    public static class AnswersTypeExtensions
+    {
+        public static bool HasImage(this AnswersType type) => type switch
+        {
+            AnswersType.TextOnly => false,
+            AnswersType.TextAndImage => true,
+            AnswersType.ImageOnly => true,
+            _ => throw new NotImplementedException()
+        };
+    }
 }

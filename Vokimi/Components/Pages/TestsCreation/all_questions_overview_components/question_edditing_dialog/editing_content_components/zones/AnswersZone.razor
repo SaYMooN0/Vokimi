@@ -2,7 +2,9 @@
 
 <p class="title-line">
     <label class="answers-count-label">Answers (@Answers.Count)</label>
-    <button @onclick="()=>isHidden = !isHidden" type="button">@(isHidden ? "Show" : "Hide")</button>
+    <div class="hide-answers-btn" @onclick="()=>isHidden = !isHidden" type="button">
+        @(isHidden ? "Show" : "Hide")
+    </div>
 </p>
 @if (!isHidden) {
     <div class="answers-container">
@@ -18,7 +20,7 @@
                         <TextOnlyAnswerCreation @bind-AnswerText="(answer.value as TextOnlyAnswerForm).Text" />
                         break;
                     case AnswersType.ImageOnly:
-                        <ImageOnlyAnswerCreation @bind-AnswerImage="(answer.value as ImageOnlyAnswerForm).ImagePath" />
+                        <ImageOnlyAnswerCreation @bind-AnswerImage="(answer.value as ImageOnlyAnswerForm).ImagePath" QuestionId="@QuestionId" />
                         break;
                     case AnswersType.TextAndImage:
                         <TextAndImageAnswerCreation @bind-AnswerText="(answer.value as TextAndImageAnswerForm).Text"
@@ -45,17 +47,11 @@
 <div class="add-answer-btn" @onclick="AddNewAnswer">Add Answer</div>
 @code {
     private bool isHidden = false;
-    private void RemoveAnswer(BaseAnswerForm answer) {
-        @if (AnswersType == AnswersType.TextAndImage || AnswersType == AnswersType.ImageOnly) {
-            string? path = (answer as ImageOnlyAnswerForm).ImagePath;
-            if (!string.IsNullOrEmpty(path)) {
-                throw new NotImplementedException();
-            }
-        }
+    private void RemoveAnswer(BaseAnswerForm answer) =>
         Answers.Remove(answer);
-    }
 
 
+    [Parameter] public DraftTestQuestionId QuestionId { get; set; }
     [Parameter] public AnswersType AnswersType { get; set; }
     [Parameter] public List<BaseAnswerForm> Answers { get; set; }
     public void AddNewAnswer() {

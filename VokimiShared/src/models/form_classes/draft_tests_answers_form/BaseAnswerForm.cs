@@ -3,5 +3,6 @@
     public abstract class BaseAnswerForm
     {
         public int Points { get; set; }
+        public abstract Err Validate();
     }
 }
