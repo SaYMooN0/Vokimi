@@ -9,43 +9,45 @@
     </p>
 }
 else {
-    <form class="dialog-content" @onsubmit="SaveData" name="formData">
-        <svg viewBox="0 0 64 64" class="close-btn" @onclick="CloseAction" type="button">
-            <path d="M62 10.571L53.429 2L32 23.429L10.571 2L2 10.571L23.429 32L2 53.429L10.571 62L32 40.571L53.429 62L62 53.429L40.571 32z"></path>
-        </svg>
+    <div class="dialog-content">
+        <label class="dialog-header">
+            Question Editing
+            <svg viewBox="0 0 64 64" class="close-btn" @onclick="CloseAction" type="button">
+                <path d="M62 10.571L53.429 2L32 23.429L10.571 2L2 10.571L23.429 32L2 53.429L10.571 62L32 40.571L53.429 62L62 53.429L40.571 32z"></path>
+            </svg>
+        </label>
+        <form class="form-content" @onsubmit="SaveData" name="formData">
+            <div class="top-input-zone">
+                <div class="text-input-area">
+                    <label for="question-text-label" class="question-text-label">Question Text:</label>
+                    <textarea id="question-text-input" @bind="formData.Text" />
+                </div>
+                <div class="cover-input-area">
+                    @if (string.IsNullOrEmpty(formData.ImagePath)) {
+                        <div class="add-image-button">
+                            Add image
+                        </div>
+                    }
+                    else {
 
-        <h3 class="dialog-title">Question Editing</h3>
-
-        <div class="top-input-zone">
-            <div class="text-input-area">
-                <label for="question-text-label" class="question-text-label">Question Text:</label>
-                <textarea id="question-text-input" @bind="formData.Text" />
+                    }
+                </div>
             </div>
-            <div class="cover-input-area">
-                @if (string.IsNullOrEmpty(formData.ImagePath)) {
-                    <div class="add-image-button">
-                        Add image
-                    </div>
-                }
-                else {
 
-                }
+            <div class="shuffle-answers-input-line">
+                Shuffle Answers:
+                <BasicTooltip Text="Shuffle Answers" />
+                <CustomCheckbox @bind-Checked="formData.ShuffleAnswers" />
             </div>
-        </div>
 
-        <div class="shuffle-answers-input-line">
-            Shuffle Answers:
-            <BasicTooltip Text="Shuffle Answers" />
-            <CustomCheckbox @bind-Checked="formData.ShuffleAnswers" />
-        </div>
+            <IsMultipleChoiceZone FormData="formData" />
 
-        <IsMultipleChoiceZone FormData="formData" />
+            <AnswersZone Answers="@formData.Answers" AnswersType="@formData.AnswersType" QuestionId="@QuestionId" />
 
-        <AnswersZone Answers="@formData.Answers" AnswersType="@formData.AnswersType" QuestionId="@QuestionId" />
-
-        <p class="error-line">@savingError</p>
-        <SaveButton Onclick="SaveData" />
-    </form>
+            <p class="error-line">@savingError</p>
+            <SaveButton Onclick="SaveData" Text="Save Changes" />
+        </form>
+    </div>
 }
 
 @code {

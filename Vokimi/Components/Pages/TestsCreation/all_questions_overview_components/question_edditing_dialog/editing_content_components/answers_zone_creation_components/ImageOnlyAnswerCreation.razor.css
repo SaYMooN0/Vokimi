@@ -17,6 +17,7 @@
 
 .error-string {
     font-family: Roboto;
+    color: var(--red-del);
 }
 
 .img-input-container {

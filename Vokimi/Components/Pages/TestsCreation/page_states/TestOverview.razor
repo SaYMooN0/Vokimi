@@ -22,13 +22,12 @@
         <QuestionsAreaContent Questions="TestDto.Questions"
                               NewQuestionAction="NewQuestionAction"
                               GoToQiestionsOverview="() => ChangePageState.InvokeAsync(TestCreationPageState.AllQuestionsOverview)"
-                              EditQuestionAction="EditQuestionAction"/>
+                              EditQuestionAction="EditQuestionAction" />
 
     </div>
-    <div class="conclusion-area">
-        Add Test Conclusion(Optional)
-        <button>Add</button>
+    <div class="results-area">
     </div>
+    <ConclusionAreaContent ConclusionId="TestDto.ConclusionId" />
     <div class="styles-area">
         Change Test Styles(Optional)
         <button>Change</button>

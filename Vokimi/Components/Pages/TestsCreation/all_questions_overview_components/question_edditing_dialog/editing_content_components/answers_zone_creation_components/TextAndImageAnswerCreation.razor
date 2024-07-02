@@ -1,9 +1,26 @@
-﻿<div class="answer-main-content">
-    <input placeholder="Answer text" type="text" @onchange="@OnTextChanged" value="@AnswerText" />
-    <div>image input</div>
+﻿@inject VokimiStorageService vokimiStorageService
+
+
+<div class="answer-main-content">
+    <textarea type="text" @onchange="@OnTextChanged" value="@AnswerText" placeholder="Type here text of the answer..." />
+    <div class="image-input-zone">
+        @if (!string.IsNullOrEmpty(AnswerImage)) {
+            <img src="@ImgOperationsHelper.ImageUrlWithVersion(AnswerImage)" />
+        }
+        <InputFile id="@id" OnChange="HandleFileChange" accept=".jpg,.png,.webp" hidden />
+        <label class="error-string">@errorString</label>
+        <label for="@id" class="change-img-btn">@(string.IsNullOrEmpty(AnswerImage) ? "Add image" : "Change")</label>
+    </div>
+
 </div>
 
 @code {
+    private string id = Guid.NewGuid().ToString();
+    private string errorString = "";
+
+
+    [Parameter] public DraftTestQuestionId QuestionId { get; set; }
+
     [Parameter] public string AnswerText { get; set; }
     [Parameter] public EventCallback<string> AnswerTextChanged { get; set; }
 
@@ -13,5 +30,26 @@
     private async Task OnTextChanged(ChangeEventArgs e) {
         AnswerText = (string)e.Value;
         await AnswerTextChanged.InvokeAsync(AnswerText);
+    }
+    private async Task HandleFileChange(InputFileChangeEventArgs e) {
+        var file = e.File;
+        int maxAllowedSize = 3145728; /* 3MB */
+
+        if (file is not null) {
+            if (file.Size > maxAllowedSize) {
+                errorString = $"File is too big. Max allowed size: 3MB";
+                return;
+            }
+            try {
+                using (var stream = file.OpenReadStream(maxAllowedSize: maxAllowedSize)) {
+                    (await vokimiStorageService.SaveDraftTestAnswerImage(stream, QuestionId)).Switch(
+                      path => { AnswerImage = path; AnswerImageChanged.InvokeAsync(path); },
+                        err => errorString = $"Error uploading cover: {err.Message}"
+                    );
+                }
+            } catch (Exception ex) {
+                errorString = $"Server error. Please try again later";
+            }
+        }
     }
 }

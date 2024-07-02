@@ -1,0 +1,18 @@
+﻿.no-added-conclustion-title {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    font-family: "Quicksand";
+    font-weight: bold;
+    font-size: 30px;
+    margin-bottom: 10px;
+}
+
+.add-conclustion-btn {
+    padding: 10px 20px;
+    background-color: cadetblue;
+}
+
+.conclusion-added-title {
+}

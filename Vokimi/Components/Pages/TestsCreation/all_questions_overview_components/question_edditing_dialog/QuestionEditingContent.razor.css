@@ -1,13 +1,27 @@
 ﻿.dialog-content {
     width: 1300px;
+    display: grid;
+    grid-template-rows: auto 1fr;
+}
+
+.dialog-header {
+    width: 100%;
+    position: relative;
+    text-align: center;
+    font-size: 28px;
+    margin-top: 4px;
+    font-family: Roboto;
+    padding-bottom:10px;
+}
+
+.form-content {
     display: flex;
     flex-direction: column;
     align-items: start;
-    position: relative;
+    width: 100%;
     max-height: 90vh;
     overflow-y: auto;
 }
-
 
 .close-btn {
     position: absolute;
@@ -18,20 +32,14 @@
     aspect-ratio: 1/1;
     cursor: pointer;
     fill: #c8c6cb;
-    transition:all 0.08s ease-in;
+    transition: all 0.08s ease-in;
 }
 
     .close-btn:hover {
         fill: #9e9ba3;
-        transform:scale(1.04);
+        transform: scale(1.04);
     }
 
-.dialog-title {
-    align-self: center;
-    font-size: 28px;
-    margin-top: 4px;
-    font-family: Roboto;
-}
 
 .top-input-zone {
     display: grid;
