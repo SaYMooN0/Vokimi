@@ -4,8 +4,6 @@
 @inject IHttpContextAccessor httpContextAccessor
 
 
-
-
 @rendermode InteractiveServer
 @attribute [Authorize]
 @page "/newtest/gen/{testId}"
@@ -20,23 +18,19 @@
     }
 
     else if (creator is not null && draftTest is not null) {
-        <QuestionEditingDialog @ref="@questionEditingDialog" creatorId="@creator.Id" testId="@draftTest.Id" />
         @switch (pageState) {
             case TestCreationPageState.Overview:
-                <TestOverview ChangePageState="ChangePageState"
-                              TestDto="new DraftGenericTestDto(draftTest)"
-                              NewQuestionAction="()=>{ChangePageState(TestCreationPageState.AllQuestionsOverview);questionEditingDialog.NewQuestion();}"
-                              EditQuestionAction="(id)=>{ChangePageState(TestCreationPageState.AllQuestionsOverview);questionEditingDialog.EditQuestion(id);}" />
+                <TestOverview ChangePageStateToMainInfoEditing="()=>ChangePageState(TestCreationPageState.MainInfoEditing)"
+                              ChangePageStateToQuestionEditing="ChangePageStateToQuestionEditing"
+                              TestDto="new DraftGenericTestDto(draftTest)" />
                 break;
             case TestCreationPageState.MainInfoEditing:
                 <MainInfoEditing Test="new DraftGenericTestDto(draftTest)"
                                  BackToOverviewAction="()=>ChangePageState(TestCreationPageState.Overview)" />
                 break;
-            case TestCreationPageState.AllQuestionsOverview:
-                <AllQuestionsOverview TestId="@draftTest.Id"
-                                      BackToOverviewAction="()=>ChangePageState(TestCreationPageState.Overview)"
-                                      EditQuestionAction="questionEditingDialog.EditQuestion"
-                                      NewQuestionAction="questionEditingDialog.NewQuestion" />
+            case TestCreationPageState.QuestionEditing:
+                <QuestionEditing QuestionId="currentQuestionToEditId"
+                                 GoBackAction="()=>ChangePageState(TestCreationPageState.Overview)" />
                 break;
             case TestCreationPageState.ResultsCreation:
                 <ResultsCreation />
@@ -61,8 +55,14 @@
     [Parameter]
     public string TestId { get; set; } = string.Empty;
 
+    private DraftTestQuestionId currentQuestionToEditId;
 
-    private QuestionEditingDialog questionEditingDialog { get; set; }
+    private void ChangePageStateToQuestionEditing(DraftTestQuestionId questionId) {
+        currentQuestionToEditId = questionId;
+        ChangePageState(TestCreationPageState.QuestionEditing);
+    }
+
+
     private string pageInitializationError = string.Empty;
     private TestCreationPageState pageState { get; set; } = TestCreationPageState.Overview;
     private DraftTestId? parsedTestId = null;
@@ -71,7 +71,7 @@
     {
         Overview,
         MainInfoEditing,
-        AllQuestionsOverview,
+        QuestionEditing,
         ResultsCreation,
         StylesEditing,
         TagsAdding

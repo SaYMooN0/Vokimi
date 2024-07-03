@@ -115,11 +115,11 @@ namespace Vokimi.Services
                 ushort orderIndex = (ushort)newData.Answers.IndexOf(answerForm);
                 BaseAnswer answer = answerForm switch {
                     ImageOnlyAnswerForm imageOnlyAnswerForm => ImageOnlyAnswer
-                        .CreateNew(questionId, imageOnlyAnswerForm.Points, orderIndex, imageOnlyAnswerForm.ImagePath),
+                        .CreateNew(questionId, 0, orderIndex, imageOnlyAnswerForm.ImagePath),
                     TextAndImageAnswerForm textAndImageAnswerForm => TextAndImageAnswer
-                        .CreateNew(questionId, textAndImageAnswerForm.Points, orderIndex, textAndImageAnswerForm.Text, textAndImageAnswerForm.ImagePath),
+                        .CreateNew(questionId, 0, orderIndex, textAndImageAnswerForm.Text, textAndImageAnswerForm.ImagePath),
                     TextOnlyAnswerForm textOnlyAnswerForm => TextOnlyAnswer
-                        .CreateNew(questionId, textOnlyAnswerForm.Points, orderIndex, textOnlyAnswerForm.Text),
+                        .CreateNew(questionId, 0, orderIndex, textOnlyAnswerForm.Text),
                     _ => throw new InvalidOperationException("Unknown answer type")
                 };
 

@@ -28,22 +28,14 @@
 </div>
 
 <div>
-    <button class="go-to-questions-btn" @onclick="GoToQiestionsOverview">
-        More Info
-    </button>
     <button class="new-question-btn" @onclick="NewQuestionAction">
         New Question
     </button>
 </div>
 @code {
-    [Parameter]
-    public Action NewQuestionAction { get; set; }
-    [Parameter]
-    public Action GoToQiestionsOverview { get; set; }
-    [Parameter]
-    public List<QuestionBriefInfoDto> Questions { get; set; }
-    [Parameter]
-    public Action<DraftTestQuestionId> EditQuestionAction { get; set; }
+    [Parameter] public Action NewQuestionAction { get; set; }
+    [Parameter] public List<QuestionBriefInfoDto> Questions { get; set; }
+    [Parameter] public Action<DraftTestQuestionId> EditQuestionAction { get; set; }
 
     private int questionToDeleteIndex;
     private ActionConfirmationDialog confirmationDialogRef;

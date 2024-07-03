@@ -1,6 +1,10 @@
-﻿@using Vokimi.Components.Pages.TestsCreation.test_overview_areas
+﻿@using Vokimi.Components.Pages.TestsCreation.test_overview_components.dialogs
+@using Vokimi.Components.Pages.TestsCreation.test_overview_components.overview_areas
+
 
 @rendermode InteractiveServer
+
+<NewQuestionCreationDialog @ref="@questionCreationDialog" TestId="@TestDto.Id" />
 
 
 <div class="state-container">
@@ -8,7 +12,7 @@
         <div class="main-info-area">
             <label class="area-title">Test Main Info</label>
             <MainInfoAreaContent MainInfoDto="TestDto.MainInfo"
-                                 GoToMainInfoEditing="() => ChangePageState.InvokeAsync(TestCreationPageState.MainInfoEditing)" />
+                                 GoToMainInfoEditing="ChangePageStateToMainInfoEditing" />
         </div>
         <div class="test-cover-area">
             <label class="area-title">Test Cover</label>
@@ -20,9 +24,8 @@
         <label class="question-area-title">Test Questions (@TestDto.Questions.Count)</label>
 
         <QuestionsAreaContent Questions="TestDto.Questions"
-                              NewQuestionAction="NewQuestionAction"
-                              GoToQiestionsOverview="() => ChangePageState.InvokeAsync(TestCreationPageState.AllQuestionsOverview)"
-                              EditQuestionAction="EditQuestionAction" />
+                              NewQuestionAction="()=>questionCreationDialog.Open()"
+                              EditQuestionAction="ChangePageStateToQuestionEditing" />
 
     </div>
     <div class="results-area">
@@ -35,19 +38,15 @@
 </div>
 
 @code {
+    private NewQuestionCreationDialog questionCreationDialog { get; set; }
 
-    [Parameter] public Action NewQuestionAction { get; set; }
-    [Parameter] public Action<DraftTestQuestionId> EditQuestionAction { get; set; }
-    [Parameter]
-    public DraftGenericTestDto TestDto { get; set; }
-    [Parameter]
-    public EventCallback<TestCreationPageState> ChangePageState { get; set; }
+
+    [Parameter] public DraftGenericTestDto TestDto { get; set; }
+    [Parameter] public Action ChangePageStateToMainInfoEditing { get; set; }
+    [Parameter] public Action<DraftTestQuestionId> ChangePageStateToQuestionEditing { get; set; }
 
     protected override void OnParametersSet() {
         base.OnParametersSet();
     }
-
-
-
 
 }

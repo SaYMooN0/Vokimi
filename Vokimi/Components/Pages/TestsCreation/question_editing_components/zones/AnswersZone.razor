@@ -1,4 +1,4 @@
-﻿@using Vokimi.Components.Pages.TestsCreation.all_questions_overview_components.question_edditing_dialog.editing_content_components.answers_zone_creation_components
+﻿@using Vokimi.Components.Pages.TestsCreation.question_editing_components.answers_zone_creation_components
 
 <p class="title-line">
     <label class="answers-count-label">Answers (@Answers.Count)</label>
@@ -6,13 +6,30 @@
         @(isHidden ? "Show" : "Hide")
     </div>
 </p>
+<ResultAssigningDialog @ref="resultAssigningDialogRef" />
+
+
 @if (!isHidden) {
     <div class="answers-container">
         @foreach (var answer in Answers.Select((value, index) => new { value, index })) {
             <div class="answer">
                 <label class="answer-number">#@(answer.index + 1)</label>
-                <div class="points-container">
-                    Points: <input type="number" @bind-value="answer.value.Points" />
+                <div class="related-results-container">
+                    @foreach (var res in answer.value.RelatedResultIds) {
+                        <div class="chosen-result">
+                            <label>
+                                @res
+                            </label>
+                            <div class="remove-result-btn" @onclick="()=>answer.value.RelatedResultIds.Remove(res)">
+                                -
+                            </div>
+                        </div>
+                    }
+                    @if (answer.value.RelatedResultIds.Count < 5) {
+                        <div class="add-new-result-btn" @onclick="()=>resultAssigningDialogRef.Open()">
+                            Add related result
+                        </div>
+                    }
                 </div>
 
                 @switch (AnswersType) {
@@ -24,7 +41,8 @@
                         break;
                     case AnswersType.TextAndImage:
                         <TextAndImageAnswerCreation @bind-AnswerText="(answer.value as TextAndImageAnswerForm).Text"
-                                                    @bind-AnswerImage="(answer.value as TextAndImageAnswerForm).ImagePath" />
+                                                    @bind-AnswerImage="(answer.value as TextAndImageAnswerForm).ImagePath"
+                                                    QuestionId="@QuestionId" />
                         break;
                     default:
                         throw new NotImplementedException();
@@ -46,9 +64,10 @@
 }
 <div class="add-answer-btn" @onclick="AddNewAnswer">Add Answer</div>
 @code {
+    private ResultAssigningDialog resultAssigningDialogRef;
     private bool isHidden = false;
-    private void RemoveAnswer(BaseAnswerForm answer) =>
-        Answers.Remove(answer);
+    private void RemoveAnswer(BaseAnswerForm answer) => Answers.Remove(answer);
+
 
 
     [Parameter] public DraftTestQuestionId QuestionId { get; set; }

@@ -1,0 +1,56 @@
+﻿@inject TestsCreationDbOperationsService testsCreationDbOperationsService
+
+
+
+<BaseDialog DialogId="question-editing-dialog" @ref="baseDialogRef">
+    <div class="content">
+        <label class="text-label">Enter the text of the question (it can be changed later)</label>
+        <input @bind="questionText" placeholder="Question text" name="@Guid.NewGuid()" class="question-text-input" />
+
+        <label class="choose-type-label">Choose Answers Type:</label>
+        <select @bind="answersType">
+            @foreach (var t in Enum.GetValues(typeof(AnswersType))) {
+                <option value="@t">@t</option>
+            }
+        </select>
+
+        <label class="server-message">@serverMessage</label>
+        <div class="bottom-btns-container">
+            <div class="cancel-btn" @onclick="Close">Cancel</div>
+            <div class="continue-btn" @onclick="SaveNewQuestion">Continue</div>
+        </div>
+
+    </div>
+
+
+</BaseDialog>
+@code {
+    private BaseDialog baseDialogRef{ get; set; }
+
+    private string serverMessage { get; set; }
+    private string questionText { get; set; }
+    private AnswersType answersType { get; set; } = AnswersType.TextOnly;
+
+    [Parameter] public DraftTestId TestId { get; set; }
+
+    private async void SaveNewQuestion() {
+        if (string.IsNullOrEmpty(questionText) || questionText.Length < 10) {
+            serverMessage = "Question text cannot be less than 10 characters";
+            return;
+        }
+        else if (questionText.Length > 127) {
+            serverMessage = "Question text cannot be more than 127 characters";
+            return;
+        }
+        DraftTestQuestion question = DraftTestQuestion.CreateNew(questionText, answersType, TestId);
+        Err err = await testsCreationDbOperationsService.AddQuestionToGenericTest(TestId, question);
+        if (err.NotNone()) {
+            serverMessage = err.ToString();
+            return;
+        }
+        Close();
+    }
+    public async Task Open() =>
+        await baseDialogRef.OpenAsync();
+    private async void Close() => await baseDialogRef.CloseAsync();
+}

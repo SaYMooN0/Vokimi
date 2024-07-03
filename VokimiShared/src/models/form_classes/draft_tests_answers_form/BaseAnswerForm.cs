@@ -2,7 +2,7 @@
 {
     public abstract class BaseAnswerForm
     {
-        public int Points { get; set; }
+        public List<string> RelatedResultIds { get; set; } = [];
         public abstract Err Validate();
     }
 }

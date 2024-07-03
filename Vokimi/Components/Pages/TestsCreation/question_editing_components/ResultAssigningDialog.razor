@@ -1,0 +1,13 @@
+﻿@inject TestsCreationDbOperationsService testsCreationDbOperationsService
+
+
+
+<BaseDialog DialogId="result-assigning-dialog" @ref="baseDialogRef">
+    dialog
+</BaseDialog>
+@code {
+    private BaseDialog baseDialogRef { get; set; }
+    public async Task Open() =>
+        await baseDialogRef.OpenAsync();
+    private async void Close() => await baseDialogRef.CloseAsync();
+}

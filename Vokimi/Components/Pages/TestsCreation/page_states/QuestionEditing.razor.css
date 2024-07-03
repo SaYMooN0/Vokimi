@@ -11,7 +11,7 @@
     font-size: 28px;
     margin-top: 4px;
     font-family: Roboto;
-    padding-bottom:10px;
+    padding-bottom: 10px;
 }
 
 .form-content {
@@ -23,23 +23,22 @@
     overflow-y: auto;
 }
 
-.close-btn {
+.go-back-btn {
     position: absolute;
     top: 10px;
-    right: 10px;
-    height: 22px;
-    padding: 2px;
-    aspect-ratio: 1/1;
-    cursor: pointer;
-    fill: #c8c6cb;
-    transition: all 0.08s ease-in;
+    left: 10px;
+    padding: 4px 12px;
+    display: flex;
+    justify-content:center;
+    align-items:center;
+    gap:10px;
+    background-color:firebrick;
+    cursor:pointer;
 }
 
-    .close-btn:hover {
-        fill: #9e9ba3;
-        transform: scale(1.04);
+    .go-back-btn svg {
+        height: 26px;
     }
-
 
 .top-input-zone {
     display: grid;

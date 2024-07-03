@@ -39,10 +39,9 @@
 
     [SupplyParameterFromForm]
     public TestMainInfoEditingForm formData { get; set; } = new();
-    [Parameter]
-    public DraftGenericTestDto Test { get; set; }
-    [Parameter]
-    public Action BackToOverviewAction { get; set; }
+
+    [Parameter] public DraftGenericTestDto Test { get; set; }
+    [Parameter] public Action BackToOverviewAction { get; set; }
 
     protected override async Task OnParametersSetAsync() {
         await base.OnParametersSetAsync();

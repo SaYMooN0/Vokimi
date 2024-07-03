@@ -63,7 +63,6 @@ namespace VokimiShared.src.models.form_classes
                         var imageOnlyAnswer = answer as ImageOnlyAnswer;
                         if (imageOnlyAnswer != null) {
                             answers.Add(new ImageOnlyAnswerForm {
-                                Points = imageOnlyAnswer.Points,
                                 ImagePath = imageOnlyAnswer.ImagePath
                             });
                         }
@@ -72,7 +71,6 @@ namespace VokimiShared.src.models.form_classes
                         var textAndImageAnswer = answer as TextAndImageAnswer;
                         if (textAndImageAnswer != null) {
                             answers.Add(new TextAndImageAnswerForm {
-                                Points = textAndImageAnswer.Points,
                                 Text = textAndImageAnswer.Text,
                                 ImagePath = textAndImageAnswer.ImagePath
                             });
@@ -82,7 +80,6 @@ namespace VokimiShared.src.models.form_classes
                         var textOnlyAnswer = answer as TextOnlyAnswer;
                         if (textOnlyAnswer != null) {
                             answers.Add(new TextOnlyAnswerForm {
-                                Points = textOnlyAnswer.Points,
                                 Text = textOnlyAnswer.Text
                             });
                         }
