@@ -55,5 +55,10 @@
     {
         public DraftTestQuestionId() : this(Guid.NewGuid()) { }
         public override string ToString() => Value.ToString();
+    }  
+    public readonly record struct DraftTestResultId(Guid Value)
+    {
+        public DraftTestResultId() : this(Guid.NewGuid()) { }
+        public override string ToString() => Value.ToString();
     }
 }

@@ -3,11 +3,37 @@
 
 
 <BaseDialog DialogId="result-assigning-dialog" @ref="baseDialogRef">
-    dialog
+    <div class="dialog-content">
+        <label class="choose-label">Choose id of the related result</label>
+        <div class="possible-results-container">
+            @foreach (var result in PossibleResults) {
+                <div class="possible-result">
+                    <input id="@groupName-@result" type="radio" name="@groupName" value="@result">
+                    <label for="@groupName-@result">@result</label>
+                </div>
+            }
+            <div class="add-new-res-btn">Add New</div>
+        </div>
+
+        <div class="bottom-btns-container">
+            <div @onclick="Close">Cancel</div>
+            <div>Save</div>
+        </div>
+    </div>
 </BaseDialog>
 @code {
+    private string groupName = Guid.NewGuid().ToString();
+
+    private string? ChosenResult { get; set; }
+    private List<string> PossibleResults { get; set; } = [];
     private BaseDialog baseDialogRef { get; set; }
-    public async Task Open() =>
+
+    public async Task Open(List<string> possibleResults) {
+        PossibleResults = possibleResults;
+        ChosenResult = null;
+        StateHasChanged();
         await baseDialogRef.OpenAsync();
-    private async void Close() => await baseDialogRef.CloseAsync();
+    }
+    private async void Close() =>
+        await baseDialogRef.CloseAsync();
 }

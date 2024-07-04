@@ -107,7 +107,6 @@ namespace Vokimi.src.data
                 {
                     mc.Property(x => x.MinAnswers).HasColumnName("MinAnswers");
                     mc.Property(x => x.MaxAnswers).HasColumnName("MaxAnswers");
-                    mc.Property(x => x.UseAverageScore).HasColumnName("UseAverageScore");
                 });
 
                 entity.HasMany(x => x.Answers)

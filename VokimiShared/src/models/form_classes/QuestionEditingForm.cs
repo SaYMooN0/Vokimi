@@ -15,7 +15,6 @@ namespace VokimiShared.src.models.form_classes
         public bool IsMultipleChoice { get; set; }
         public ushort MinAnswersCount { get; set; }
         public ushort MaxAnswersCount { get; set; }
-        public bool UseAverageScore { get; set; }
         public List<BaseAnswerForm> Answers { get; set; } = [];
         public static QuestionEditingForm FromDraftTestQuestion(DraftTestQuestion question) => new() {
             Text = question.Text,
@@ -25,7 +24,6 @@ namespace VokimiShared.src.models.form_classes
             IsMultipleChoice = question.IsMultipleChoice,
             MinAnswersCount = ExtractMinAnswersCount(question),
             MaxAnswersCount = ExtractMaxAnswersCount(question),
-            UseAverageScore = question.MultipleChoiceData is not null ? question.MultipleChoiceData.UseAverageScore : true,
             Answers = ExtractAnswers(question)
         };
         public Err Validate() {

@@ -67,7 +67,6 @@ namespace VokimiShared.src.models.db_classes.test_creation
     {
         public ushort MinAnswers { get; init; }
         public ushort MaxAnswers { get; init; }
-        public bool UseAverageScore { get; init; }
     }
 
 }

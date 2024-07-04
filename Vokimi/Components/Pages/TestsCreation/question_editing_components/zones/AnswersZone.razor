@@ -26,8 +26,11 @@
                         </div>
                     }
                     @if (answer.value.RelatedResultIds.Count < 5) {
-                        <div class="add-new-result-btn" @onclick="()=>resultAssigningDialogRef.Open()">
-                            Add related result
+                        <div class="add-new-result-btn" @onclick="()=>resultAssigningDialogRef.Open(PickPossibleResultsForAnswer(answer.value))">
+                            <svg viewBox="0 0 448 512">
+                                <path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z" />
+                            </svg>
+                            related result
                         </div>
                     }
                 </div>
@@ -64,6 +67,8 @@
 }
 <div class="add-answer-btn" @onclick="AddNewAnswer">Add Answer</div>
 @code {
+
+
     private ResultAssigningDialog resultAssigningDialogRef;
     private bool isHidden = false;
     private void RemoveAnswer(BaseAnswerForm answer) => Answers.Remove(answer);
@@ -73,7 +78,8 @@
     [Parameter] public DraftTestQuestionId QuestionId { get; set; }
     [Parameter] public AnswersType AnswersType { get; set; }
     [Parameter] public List<BaseAnswerForm> Answers { get; set; }
-    public void AddNewAnswer() {
+
+    private void AddNewAnswer() {
         isHidden = false;
         switch (AnswersType) {
             case AnswersType.TextOnly:
@@ -88,5 +94,8 @@
             default:
                 throw new NotImplementedException();
         }
+    }
+    private List<string> PickPossibleResultsForAnswer(BaseAnswerForm answer) {
+        return ["id1", "id2", "id3"];
     }
 }

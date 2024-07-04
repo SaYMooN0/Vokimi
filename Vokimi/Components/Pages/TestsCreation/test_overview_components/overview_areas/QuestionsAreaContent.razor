@@ -1,6 +1,13 @@
-﻿<ActionConfirmationDialog @ref="confirmationDialogRef"
+﻿@using Vokimi.Components.Pages.TestsCreation.test_overview_components.dialogs
+@inject TestsCreationDbOperationsService testsCreationDbOperationsService
+
+<ActionConfirmationDialog @ref="confirmationDialogRef"
                           ConfirmAction="DeleteQuestion"
                           ConfirmButtonText="Delete" />
+
+<NewQuestionCreationDialog @ref="@questionCreationDialogRef" TestId="@TestId" ParentStateHasChanged="FetchQuestions" />
+
+<label class="question-area-title">Test Questions (@Questions.Count)</label>
 <div class="question-vms-container">
     @for (int i = 0; i < Questions.Count(); i++) {
         var q = Questions[i];
@@ -28,17 +35,20 @@
 </div>
 
 <div>
-    <button class="new-question-btn" @onclick="NewQuestionAction">
+    <button class="new-question-btn" @onclick="()=>questionCreationDialogRef.Open()">
         New Question
     </button>
 </div>
 @code {
-    [Parameter] public Action NewQuestionAction { get; set; }
-    [Parameter] public List<QuestionBriefInfoDto> Questions { get; set; }
+    private NewQuestionCreationDialog questionCreationDialogRef;
+    private ActionConfirmationDialog confirmationDialogRef;
+
+    private List<QuestionBriefInfoDto> Questions { get; set; } = [];
+
+    [Parameter] public DraftTestId TestId { get; set; }
     [Parameter] public Action<DraftTestQuestionId> EditQuestionAction { get; set; }
 
     private int questionToDeleteIndex;
-    private ActionConfirmationDialog confirmationDialogRef;
 
     private void DeleteQuestion() {
         //from db
@@ -47,5 +57,15 @@
     private void OnDelteQuestionPressed(int i) {
         questionToDeleteIndex = i;
         confirmationDialogRef.Open($"Are you sure you want to delete #{i + 1} question?");
+    }
+
+    protected override async Task OnInitializedAsync() {
+        await FetchQuestions();
+        base.OnParametersSet();
+    }
+    private async Task FetchQuestions() {
+        var dbQuestions = await testsCreationDbOperationsService.GetDraftTestQuestionsById(TestId);
+        Questions = dbQuestions.Select(q => new QuestionBriefInfoDto(q)).ToList();
+        StateHasChanged();
     }
 }

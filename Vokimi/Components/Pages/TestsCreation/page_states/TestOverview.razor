@@ -4,7 +4,6 @@
 
 @rendermode InteractiveServer
 
-<NewQuestionCreationDialog @ref="@questionCreationDialog" TestId="@TestDto.Id" />
 
 
 <div class="state-container">
@@ -21,10 +20,8 @@
     </div>
 
     <div class="questions-area">
-        <label class="question-area-title">Test Questions (@TestDto.Questions.Count)</label>
 
-        <QuestionsAreaContent Questions="TestDto.Questions"
-                              NewQuestionAction="()=>questionCreationDialog.Open()"
+        <QuestionsAreaContent TestId="@TestDto.Id"
                               EditQuestionAction="ChangePageStateToQuestionEditing" />
 
     </div>
@@ -38,15 +35,10 @@
 </div>
 
 @code {
-    private NewQuestionCreationDialog questionCreationDialog { get; set; }
 
 
     [Parameter] public DraftGenericTestDto TestDto { get; set; }
     [Parameter] public Action ChangePageStateToMainInfoEditing { get; set; }
     [Parameter] public Action<DraftTestQuestionId> ChangePageStateToQuestionEditing { get; set; }
-
-    protected override void OnParametersSet() {
-        base.OnParametersSet();
-    }
 
 }

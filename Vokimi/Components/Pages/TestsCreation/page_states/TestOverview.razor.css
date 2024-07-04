@@ -33,14 +33,7 @@
     align-items: center;
 }
 
-.question-area-title {
-    font-family: "Quicksand";
-    font-weight: bold;
-    font-size: 32px;
-    display: block;
-    margin-left: 100px;
-    margin-top: 10px;
-}
+
 
 @media (max-width: 1400px) {
     .state-container {

@@ -106,7 +106,7 @@
             return;
         }
 
-        draftTest = await testsCreationDbOperationsService.GetTestById<DraftGenericTest>((DraftTestId)parsedTestId, TestTemplate.Generic);
+        draftTest = await testsCreationDbOperationsService.GetDraftTestById<DraftGenericTest>((DraftTestId)parsedTestId, TestTemplate.Generic);
         if (draftTest is null) {
             pageInitializationError = "Unknown test";
             return;

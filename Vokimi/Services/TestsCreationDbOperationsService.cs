@@ -46,10 +46,12 @@ namespace Vokimi.Services
         }
         public async Task<TestTemplate?> GetTestTypeById(DraftTestId id) =>
             (await _db.DraftTestsSharedInfo.FirstOrDefaultAsync(i => i.Id == id))?.Template;
-        public async Task<T?> GetTestById<T>(DraftTestId id, TestTemplate template) where T : BaseDraftTest =>
+        public async Task<T?> GetDraftTestById<T>(DraftTestId id, TestTemplate template) where T : BaseDraftTest =>
             await _db.Set<T>().FirstOrDefaultAsync(i => i.Id == id && i.Template == template);
         public async Task<DraftTestMainInfo?> GetDraftTestMainInfoById(DraftTestMainInfoId id) =>
             await _db.DraftTestMainInfo.FirstOrDefaultAsync(mi => mi.Id == id);
+        public async Task<List<DraftTestQuestion>> GetDraftTestQuestionsById(DraftTestId id) =>
+            await _db.DraftTestQuestions.Where(q=>q.DraftTestId==id).ToListAsync();
         public async Task<Err> UpdateTestCover(DraftTestMainInfoId mainInfoId, string newPath) {
             var mainInfo = await GetDraftTestMainInfoById(mainInfoId);
             if (mainInfo is null) {
@@ -88,7 +90,7 @@ namespace Vokimi.Services
             return Err.None;
         }
         public async Task<Err> AddQuestionToGenericTest(DraftTestId testId, DraftTestQuestion draftTestQuestion) {
-            DraftGenericTest? test = await GetTestById<DraftGenericTest>(testId, TestTemplate.Generic);
+            DraftGenericTest? test = await GetDraftTestById<DraftGenericTest>(testId, TestTemplate.Generic);
             if (test is null) {
                 return new Err("Unknown test");
             }
@@ -134,7 +136,6 @@ namespace Vokimi.Services
                 MultipleChoiceAdditionalData multiChoiceInfo = new() {
                     MaxAnswers = newData.MaxAnswersCount,
                     MinAnswers = newData.MinAnswersCount,
-                    UseAverageScore = newData.UseAverageScore,
                 };
 
                 question.UpdateAsMultipleChoice(newData.Text, newData.ImagePath, newData.ShuffleAnswers, answers, multiChoiceInfo);

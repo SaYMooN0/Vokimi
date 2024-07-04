@@ -1,6 +1,6 @@
 ﻿@inject TestsCreationDbOperationsService testsCreationDbOperationsService
 
-
+@rendermode InteractiveServer
 
 <BaseDialog DialogId="question-editing-dialog" @ref="baseDialogRef">
     <div class="content">
@@ -32,6 +32,7 @@
     private AnswersType answersType { get; set; } = AnswersType.TextOnly;
 
     [Parameter] public DraftTestId TestId { get; set; }
+    [Parameter] public EventCallback ParentStateHasChanged{ get; set; }
 
     private async void SaveNewQuestion() {
         if (string.IsNullOrEmpty(questionText) || questionText.Length < 10) {
@@ -48,9 +49,11 @@
             serverMessage = err.ToString();
             return;
         }
-        Close();
+        await Close();
+        await ParentStateHasChanged.InvokeAsync();
+
     }
     public async Task Open() =>
         await baseDialogRef.OpenAsync();
-    private async void Close() => await baseDialogRef.CloseAsync();
+    private async Task Close() => await baseDialogRef.CloseAsync();
 }

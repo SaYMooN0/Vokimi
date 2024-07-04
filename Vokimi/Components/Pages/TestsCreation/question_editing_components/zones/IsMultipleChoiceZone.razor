@@ -8,12 +8,6 @@
     <input id="min-answers-count" type="number" @bind="FormData.MinAnswersCount" />
     <label for="max-answers-count" class="">Maximum Answers Count:</label>
     <input id="max-answers-count" type="number" @bind="FormData.MaxAnswersCount" />
-    <label for="use-average-score" class="">Use Average Score:</label>
-    <label class="multi-choice-line">
-        Use Average Score:
-        <span>tool tip</span>
-        <CustomCheckbox @bind-Checked="FormData.UseAverageScore" />
-    </label>
 </div>
 
 @code {
