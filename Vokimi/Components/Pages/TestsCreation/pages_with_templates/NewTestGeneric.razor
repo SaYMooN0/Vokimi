@@ -1,8 +1,8 @@
-﻿@inject TestsCreationDbOperationsService testsCreationDbOperationsService
+﻿@using Vokimi.Components.Pages.TestsCreation.dialogs
+@inject TestsCreationDbOperationsService testsCreationDbOperationsService
 @inject UsersDbOperationsService usersDbOperationsService
 @inject AuthHelperService authHelperService
 @inject IHttpContextAccessor httpContextAccessor
-
 
 @rendermode InteractiveServer
 @attribute [Authorize]
@@ -11,40 +11,44 @@
 <PageTitle>New Test</PageTitle>
 
 
-
 <div class="central-align">
     @if (!string.IsNullOrEmpty(pageInitializationError)) {
         <p>@pageInitializationError</p>
     }
-
     else if (creator is not null && draftTest is not null) {
-        @switch (pageState) {
-            case TestCreationPageState.Overview:
-                <TestOverview ChangePageStateToMainInfoEditing="()=>ChangePageState(TestCreationPageState.MainInfoEditing)"
-                              ChangePageStateToQuestionEditing="ChangePageStateToQuestionEditing"
-                              TestDto="new DraftGenericTestDto(draftTest)" />
-                break;
-            case TestCreationPageState.MainInfoEditing:
-                <MainInfoEditing Test="new DraftGenericTestDto(draftTest)"
-                                 BackToOverviewAction="()=>ChangePageState(TestCreationPageState.Overview)" />
-                break;
-            case TestCreationPageState.QuestionEditing:
-                <QuestionEditing QuestionId="currentQuestionToEditId"
-                                 GoBackAction="()=>ChangePageState(TestCreationPageState.Overview)" />
-                break;
-            case TestCreationPageState.ResultsCreation:
-                <ResultsCreation />
-                break;
-            case TestCreationPageState.StylesEditing:
-                <StylesEditing />
-                break;
-            case TestCreationPageState.TagsAdding:
-                <TagsAdding></TagsAdding>
-                break;
-            default:
-                <h2>default state</h2>
-                break;
-        }
+        <CascadingValue Value="@draftTest.Id" Name="TestId">
+            <NewResultCreatingDalog @ref="newResultCreatingDialogRef" />
+
+
+            @switch (pageState) {
+                case TestCreationPageState.Overview:
+                    <TestOverview ChangePageStateToMainInfoEditing="()=>ChangePageState(TestCreationPageState.MainInfoEditing)"
+                                  ChangePageStateToQuestionEditing="ChangePageStateToQuestionEditing"
+                                  TestDto="new DraftGenericTestDto(draftTest)" />
+                    break;
+                case TestCreationPageState.MainInfoEditing:
+                    <MainInfoEditing Test="new DraftGenericTestDto(draftTest)"
+                                     BackToOverviewAction="()=>ChangePageState(TestCreationPageState.Overview)" />
+                    break;
+                case TestCreationPageState.QuestionEditing:
+                    <QuestionEditing QuestionId="currentQuestionToEditId"
+                                     GoBackAction="()=>ChangePageState(TestCreationPageState.Overview)"
+                                     OpenResultCreatingDialog="()=>newResultCreatingDialogRef.Open()" />
+                    break;
+                case TestCreationPageState.ResultsCreation:
+                    <ResultsCreation />
+                    break;
+                case TestCreationPageState.StylesEditing:
+                    <StylesEditing />
+                    break;
+                case TestCreationPageState.TagsAdding:
+                    <TagsAdding></TagsAdding>
+                    break;
+                default:
+                    <h2>default state</h2>
+                    break;
+            }
+        </CascadingValue>
     }
     else {
         <h2 class="error-occurred">An error has occurred. Try to refresh the page</h2>
@@ -54,14 +58,6 @@
 @code {
     [Parameter]
     public string TestId { get; set; } = string.Empty;
-
-    private DraftTestQuestionId currentQuestionToEditId;
-
-    private void ChangePageStateToQuestionEditing(DraftTestQuestionId questionId) {
-        currentQuestionToEditId = questionId;
-        ChangePageState(TestCreationPageState.QuestionEditing);
-    }
-
 
     private string pageInitializationError = string.Empty;
     private TestCreationPageState pageState { get; set; } = TestCreationPageState.Overview;
@@ -76,6 +72,15 @@
         StylesEditing,
         TagsAdding
     }
+
+    private NewResultCreatingDalog newResultCreatingDialogRef;
+
+    private DraftTestQuestionId currentQuestionToEditId;
+    private void ChangePageStateToQuestionEditing(DraftTestQuestionId questionId) {
+        currentQuestionToEditId = questionId;
+        ChangePageState(TestCreationPageState.QuestionEditing);
+    }
+
 
     private AppUser creator { get; set; }
     private DraftGenericTest draftTest { get; set; }
@@ -106,7 +111,7 @@
             return;
         }
 
-        draftTest = await testsCreationDbOperationsService.GetDraftTestById<DraftGenericTest>((DraftTestId)parsedTestId, TestTemplate.Generic);
+        draftTest = await testsCreationDbOperationsService.GetDraftTestById(parsedTestId.Value) as DraftGenericTest;
         if (draftTest is null) {
             pageInitializationError = "Unknown test";
             return;

@@ -16,15 +16,7 @@ namespace VokimiShared.src.models.db_classes.test_creation
         public TestConclusionId? ConclusionId { get; init; }
         public virtual TestConclusion? Conclusion { get; protected set; }
         public TestTemplate Template { get; protected set; }
-        public override bool Equals(object obj) {
-            if (obj is BaseDraftTest other) {
-                return Id.Equals(other.Id);
-            }
-            return false;
-        }
-
-        public override int GetHashCode() =>
-            Id.GetHashCode();
+        public virtual ICollection<DraftTestResult> PossibleResults { get; set; } = new List<DraftTestResult>();
 
     }
 }

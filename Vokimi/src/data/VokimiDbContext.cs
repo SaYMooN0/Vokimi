@@ -20,9 +20,11 @@ namespace Vokimi.src.data
         public DbSet<DraftTestMainInfo> DraftTestMainInfo { get; set; }
         public DbSet<TestConclusion> TestConclusions { get; set; }
         public DbSet<DraftTestQuestion> DraftTestQuestions { get; set; }
+        public DbSet<BaseAnswer> AnswersSharedInfo { get; set; }
         public DbSet<ImageOnlyAnswer> ImageOnlyAnswers { get; set; }
         public DbSet<TextAndImageAnswer> TextAndImageAnswers { get; set; }
         public DbSet<TextOnlyAnswer> TextOnlyAnswers { get; set; }
+        public DbSet<DraftTestResult> DraftTestResults { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
             optionsBuilder.UseLazyLoadingProxies();
@@ -75,12 +77,12 @@ namespace Vokimi.src.data
                       .WithMany()
                       .HasForeignKey(x => x.ConclusionId);
 
-                entity.ToTable("DraftTestsSharedInfo");
+                entity.HasMany(x => x.PossibleResults)
+                      .WithOne()
+                      .HasForeignKey(x => x.TestId);
             });
 
-            modelBuilder.Entity<DraftGenericTest>(entity =>
-            {
-                entity.ToTable("DraftGenericTests");
+            modelBuilder.Entity<DraftGenericTest>(entity => {
 
                 entity.HasMany(x => x.Questions)
                       .WithOne()
@@ -98,13 +100,11 @@ namespace Vokimi.src.data
                 entity.HasKey(x => x.Id);
                 entity.Property(x => x.Id).HasConversion(v => v.Value, v => new TestConclusionId(v));
             });
-            modelBuilder.Entity<DraftTestQuestion>(entity =>
-            {
+            modelBuilder.Entity<DraftTestQuestion>(entity => {
                 entity.HasKey(x => x.Id);
                 entity.Property(x => x.Id).HasConversion(v => v.Value, v => new DraftTestQuestionId(v));
 
-                entity.OwnsOne(x => x.MultipleChoiceData, mc =>
-                {
+                entity.OwnsOne(x => x.MultipleChoiceData, mc => {
                     mc.Property(x => x.MinAnswers).HasColumnName("MinAnswers");
                     mc.Property(x => x.MaxAnswers).HasColumnName("MaxAnswers");
                 });
@@ -113,19 +113,27 @@ namespace Vokimi.src.data
                       .WithOne()
                       .HasForeignKey(x => x.QuestionId);
 
-                entity.Property(x => x.DraftTestId).IsRequired();  
+                entity.Property(x => x.DraftTestId).IsRequired();
             });
             modelBuilder.Entity<BaseAnswer>(entity => {
                 entity.HasKey(x => x.AnswerId);
                 entity.Property(x => x.AnswerId).HasConversion(v => v.Value, v => new AnswerId(v));
-                entity.ToTable("AnswersSharedInfo");
+
+                entity.HasMany(x => x.RelatedResults)
+                    .WithMany(r => r.AnswersLeadingToResult)
+                    .UsingEntity<Dictionary<string, object>>(
+                        "AnswersLeadingToResultsRelations",
+                        r => r.HasOne<DraftTestResult>().WithMany().HasForeignKey("DraftTestResultId"),
+                        l => l.HasOne<BaseAnswer>().WithMany().HasForeignKey("BaseAnswerId"));
             });
 
-            modelBuilder.Entity<ImageOnlyAnswer>(entity => { entity.ToTable("ImageOnlyAnswers"); });
-
-            modelBuilder.Entity<TextAndImageAnswer>(entity => { entity.ToTable("TextAndImageAnswers"); });
-
-            modelBuilder.Entity<TextOnlyAnswer>(entity => { entity.ToTable("TextOnlyAnswers"); });
+            modelBuilder.Entity<DraftTestResult>(entity => {
+                entity.HasKey(x => x.Id);
+                entity.Property(x => x.Id).HasConversion(v => v.Value, v => new DraftTestResultId(v));
+                entity.Property(x => x.StringId).IsRequired();
+                entity.Property(x => x.Text).IsRequired();
+                entity.Property(x => x.ImagePath).IsRequired(false);
+            });
         }
     }
 }

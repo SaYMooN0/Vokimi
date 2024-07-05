@@ -82,6 +82,10 @@
 }
 
 .chosen-result {
+    display: flex;
+    flex-direction: row;
+    background-color: cadetblue;
+    gap:2px;
 }
 
 .remove-result-btn {

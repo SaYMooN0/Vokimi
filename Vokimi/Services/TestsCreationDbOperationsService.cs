@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OneOf;
+using System.Collections;
+using System.Collections.Generic;
 using Vokimi.src.data;
 using VokimiShared.src;
 using VokimiShared.src.enums;
@@ -24,34 +26,39 @@ namespace Vokimi.Services
             DraftTestMainInfo mainInfo = DraftTestMainInfo.CreateNewFromName(testName);
             DraftGenericTest test = DraftGenericTest.CreateNew(creator.Id, mainInfo.Id);
 
-            try {
-                await _db.DraftTestMainInfo.AddAsync(mainInfo);
-                await _db.SaveChangesAsync();
+            using (var transaction = await _db.Database.BeginTransactionAsync()) {
+                try {
+                    await _db.DraftTestMainInfo.AddAsync(mainInfo);
+                    await _db.SaveChangesAsync();
 
-                switch (template) {
-                    case TestTemplate.Generic:
-                        await _db.DraftGenericTests.AddAsync(test);
-                        break;
-                    case TestTemplate.Knowledge:
-                        throw new NotImplementedException();
-                    default:
-                        throw new ArgumentException("Invalid template type");
+                    switch (template) {
+                        case TestTemplate.Generic:
+                            await _db.DraftGenericTests.AddAsync(test);
+                            break;
+                        case TestTemplate.Knowledge:
+                            throw new NotImplementedException();
+                        default:
+                            throw new ArgumentException("Invalid template type");
+                    }
+                    await _db.SaveChangesAsync();
+
+                    await transaction.CommitAsync();
+                } catch (Exception ex) {
+                    await transaction.RollbackAsync();
+                    return new Err(ex);
                 }
-                await _db.SaveChangesAsync();
-
-            } catch (Exception ex) {
-                return new Err(ex);
             }
+
             return test.Id;
         }
         public async Task<TestTemplate?> GetTestTypeById(DraftTestId id) =>
             (await _db.DraftTestsSharedInfo.FirstOrDefaultAsync(i => i.Id == id))?.Template;
-        public async Task<T?> GetDraftTestById<T>(DraftTestId id, TestTemplate template) where T : BaseDraftTest =>
-            await _db.Set<T>().FirstOrDefaultAsync(i => i.Id == id && i.Template == template);
+        public async Task<BaseDraftTest> GetDraftTestById(DraftTestId id) =>
+            await _db.DraftTestsSharedInfo.FirstOrDefaultAsync(i => i.Id == id);
         public async Task<DraftTestMainInfo?> GetDraftTestMainInfoById(DraftTestMainInfoId id) =>
             await _db.DraftTestMainInfo.FirstOrDefaultAsync(mi => mi.Id == id);
         public async Task<List<DraftTestQuestion>> GetDraftTestQuestionsById(DraftTestId id) =>
-            await _db.DraftTestQuestions.Where(q=>q.DraftTestId==id).ToListAsync();
+            await _db.DraftTestQuestions.Where(q => q.DraftTestId == id).ToListAsync();
         public async Task<Err> UpdateTestCover(DraftTestMainInfoId mainInfoId, string newPath) {
             var mainInfo = await GetDraftTestMainInfoById(mainInfoId);
             if (mainInfo is null) {
@@ -90,18 +97,22 @@ namespace Vokimi.Services
             return Err.None;
         }
         public async Task<Err> AddQuestionToGenericTest(DraftTestId testId, DraftTestQuestion draftTestQuestion) {
-            DraftGenericTest? test = await GetDraftTestById<DraftGenericTest>(testId, TestTemplate.Generic);
+            DraftGenericTest? test = await GetDraftTestById(testId) as DraftGenericTest;
             if (test is null) {
                 return new Err("Unknown test");
             }
-            test.Questions.Add(draftTestQuestion);
-            try {
-                _db.DraftGenericTests.Update(test);
-                await _db.SaveChangesAsync();
-            } catch (Exception ex) {
-                return new Err("Server error. Please try again later");
+
+            using (var transaction = await _db.Database.BeginTransactionAsync()) {
+                try {
+                    test.Questions.Add(draftTestQuestion);
+                    await _db.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                    return Err.None;
+                } catch (Exception ex) {
+                    await transaction.RollbackAsync();
+                    return new Err("Server error. Please try again later");
+                }
             }
-            return Err.None;
         }
         public Task<DraftTestQuestion?> GetDraftTestQuestionById(DraftTestQuestionId id) =>
             _db.DraftTestQuestions.FirstOrDefaultAsync(i => i.Id == id);
@@ -110,54 +121,115 @@ namespace Vokimi.Services
             DraftTestQuestion? question = await GetDraftTestQuestionById(questionId);
             if (question is null) { return new Err("Unknown question"); }
 
-            await DeleteAnswerForDraftTestQuestion(questionId);
-            var answers = new List<BaseAnswer>();
+            using (var transaction = await _db.Database.BeginTransactionAsync()) {
+                try {
+                    await ClearAnswersForDraftTestQuestion(questionId);
+                    List<BaseAnswer> answers = new();
 
-            foreach (var answerForm in newData.Answers) {
-                ushort orderIndex = (ushort)newData.Answers.IndexOf(answerForm);
-                BaseAnswer answer = answerForm switch {
-                    ImageOnlyAnswerForm imageOnlyAnswerForm => ImageOnlyAnswer
-                        .CreateNew(questionId, 0, orderIndex, imageOnlyAnswerForm.ImagePath),
-                    TextAndImageAnswerForm textAndImageAnswerForm => TextAndImageAnswer
-                        .CreateNew(questionId, 0, orderIndex, textAndImageAnswerForm.Text, textAndImageAnswerForm.ImagePath),
-                    TextOnlyAnswerForm textOnlyAnswerForm => TextOnlyAnswer
-                        .CreateNew(questionId, 0, orderIndex, textOnlyAnswerForm.Text),
-                    _ => throw new InvalidOperationException("Unknown answer type")
-                };
+                    foreach (var answerForm in newData.Answers) {
+                        if (answerForm.Validate().NotNone())
+                            continue;
 
-                if (answerForm.Validate().NotNone())
-                    continue;
+                        ushort orderIndex = (ushort)newData.Answers.IndexOf(answerForm);
+                        BaseAnswer answer = answerForm switch {
+                            ImageOnlyAnswerForm imageOnlyAnswerForm => ImageOnlyAnswer
+                                .CreateNew(questionId, orderIndex, imageOnlyAnswerForm.ImagePath),
+                            TextAndImageAnswerForm textAndImageAnswerForm => TextAndImageAnswer
+                                .CreateNew(questionId, orderIndex, textAndImageAnswerForm.Text, textAndImageAnswerForm.ImagePath),
+                            TextOnlyAnswerForm textOnlyAnswerForm => TextOnlyAnswer
+                                .CreateNew(questionId, orderIndex, textOnlyAnswerForm.Text),
+                            _ => throw new InvalidOperationException("Unknown answer type")
+                        };
+                        _db.Add(answer);
+                        answers.Add(answer);
+                    }
 
-                _db.Add(answer);
-                answers.Add(answer);
-            }
+                    if (newData.IsMultipleChoice) {
+                        MultipleChoiceAdditionalData multiChoiceInfo = new() {
+                            MaxAnswers = newData.MaxAnswersCount,
+                            MinAnswers = newData.MinAnswersCount,
+                        };
 
-            if (newData.IsMultipleChoice) {
-                MultipleChoiceAdditionalData multiChoiceInfo = new() {
-                    MaxAnswers = newData.MaxAnswersCount,
-                    MinAnswers = newData.MinAnswersCount,
-                };
+                        question.UpdateAsMultipleChoice(newData.Text, newData.ImagePath, newData.ShuffleAnswers, answers, multiChoiceInfo);
+                    }
+                    else {
+                        question.UpdateAsSingleChoice(newData.Text, newData.ImagePath, newData.ShuffleAnswers, answers);
+                    }
 
-                question.UpdateAsMultipleChoice(newData.Text, newData.ImagePath, newData.ShuffleAnswers, answers, multiChoiceInfo);
-            }
-            else {
-                question.UpdateAsSingleChoice(newData.Text, newData.ImagePath, newData.ShuffleAnswers, answers);
-            }
-            try {
-                _db.DraftTestQuestions.Update(question);
-                await _db.SaveChangesAsync();
-                return Err.None;
-
-            } catch (Exception ex) {
-                return new Err("Server error. Please try again later");
+                    _db.DraftTestQuestions.Update(question);
+                    await _db.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                    return Err.None;
+                } catch (Exception ex) {
+                    await transaction.RollbackAsync();
+                    return new Err("Server error. Please try again later");
+                }
             }
         }
-
-        public async Task<Err> DeleteAnswerForDraftTestQuestion(DraftTestQuestionId questionId) {
+        public async Task<Err> ClearAnswersForDraftTestQuestion(DraftTestQuestionId questionId) {
             DraftTestQuestion? question = await GetDraftTestQuestionById(questionId);
             if (question is null) { return new Err("Unknown question"); }
             question.Answers.Clear();
             return Err.None;
+        }
+        public async Task<Err> CreateNewDraftTestResult(DraftTestId testId, string resultId) {
+            var result = DraftTestResult.CreateNew(resultId, testId);
+            try {
+                BaseDraftTest? test = await GetDraftTestById(testId);
+                if (test is null) {
+                    return new Err("Unknown test");
+                }
+                using (var transaction = await _db.Database.BeginTransactionAsync()) {
+                    try {
+                        _db.DraftTestResults.Add(result);
+                        test.PossibleResults.Add(result);
+
+                        await _db.SaveChangesAsync();
+                        await transaction.CommitAsync();
+                    } catch (Exception ex) {
+                        await transaction.RollbackAsync();
+                        return new Err("Server error. Please try again later.");
+                    }
+                }
+
+                return Err.None;
+            } catch (Exception ex) {
+                return new Err($"Server error. Please try again later.");
+            }
+        }
+        public async Task<DraftTestResult?> GetDraftTestResultById(DraftTestResultId id) =>
+            await _db.DraftTestResults.FirstOrDefaultAsync(i => i.Id == id);
+        public async Task<Err> AssignDraftTestResultToAnswer<AnswerType>(DraftTestResultId resultId, AnswerId answerId) where AnswerType : BaseAnswer {
+            using (var transaction = await _db.Database.BeginTransactionAsync()) {
+                try {
+                    var result = await GetDraftTestResultById(resultId);
+                    if (result is null) {
+                        return new Err("Unknown result");
+                    }
+
+                    var answer = await _db.AnswersSharedInfo.FirstOrDefaultAsync(a => a.AnswerId == answerId);
+                    if (answer is null) {
+                        return new Err("Unknown answer");
+                    }
+
+                    result.AnswersLeadingToResult.Add(answer);
+                    answer.RelatedResults.Add(result);
+
+                    await _db.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                    return Err.None;
+                } catch (Exception ex) {
+                    await transaction.RollbackAsync();
+                    return new Err("Server error. Please try again later");
+                }
+            }
+        }
+        public async Task<OneOf<List<string>, Err>> GetResultStringIdsForDraftTest(DraftTestId testId) {
+            BaseDraftTest? test = await GetDraftTestById(testId);
+            if (test is null) {
+                return new Err("No test found");
+            }
+            return test.PossibleResults.Select(r => r.StringId).ToList();
         }
     }
 }

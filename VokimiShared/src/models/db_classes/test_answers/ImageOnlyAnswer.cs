@@ -12,13 +12,11 @@ namespace VokimiShared.src.models.db_classes.test_answers
         public string ImagePath { get; init; }
         public static ImageOnlyAnswer CreateNew(
             DraftTestQuestionId questionId,
-            int points,
             ushort order,
             string imagePath) =>
                 new() {
                     AnswerId = new(),
                     QuestionId = questionId,
-                    Points = points,
                     OrderInQuestion = order,
                     ImagePath = imagePath
                 };

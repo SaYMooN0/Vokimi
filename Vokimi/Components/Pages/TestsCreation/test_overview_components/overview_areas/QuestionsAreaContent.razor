@@ -5,7 +5,7 @@
                           ConfirmAction="DeleteQuestion"
                           ConfirmButtonText="Delete" />
 
-<NewQuestionCreationDialog @ref="@questionCreationDialogRef" TestId="@TestId" ParentStateHasChanged="FetchQuestions" />
+<NewQuestionCreationDialog @ref="@questionCreationDialogRef"  ParentStateHasChanged="FetchQuestions" />
 
 <label class="question-area-title">Test Questions (@Questions.Count)</label>
 <div class="question-vms-container">
@@ -45,7 +45,7 @@
 
     private List<QuestionBriefInfoDto> Questions { get; set; } = [];
 
-    [Parameter] public DraftTestId TestId { get; set; }
+    [CascadingParameter(Name = "TestId")] public DraftTestId TestId { get; set; }
     [Parameter] public Action<DraftTestQuestionId> EditQuestionAction { get; set; }
 
     private int questionToDeleteIndex;

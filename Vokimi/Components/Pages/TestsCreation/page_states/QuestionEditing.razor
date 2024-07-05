@@ -46,7 +46,7 @@ else {
 
             <IsMultipleChoiceZone FormData="formData" />
 
-            <AnswersZone Answers="@formData.Answers" AnswersType="@formData.AnswersType" QuestionId="@QuestionId" />
+            <AnswersZone Answers="@formData.Answers" AnswersType="@formData.AnswersType" QuestionId="@QuestionId" OpenResultCreatingDialog="OpenResultCreatingDialog" />
 
             <p class="error-line">@savingError</p>
             <SaveButton Onclick="SaveData" Text="Save Changes" />
@@ -62,6 +62,7 @@ else {
 
     [Parameter] public DraftTestQuestionId QuestionId { get; set; }
     [Parameter] public Action GoBackAction { get; set; }
+    [Parameter] public Action OpenResultCreatingDialog { get; set; }
 
     protected override async Task OnParametersSetAsync() {
         DraftTestQuestion? question = await testsCreationDbOperationsService.GetDraftTestQuestionById(QuestionId);

@@ -61,7 +61,8 @@ namespace VokimiShared.src.models.form_classes
                         var imageOnlyAnswer = answer as ImageOnlyAnswer;
                         if (imageOnlyAnswer != null) {
                             answers.Add(new ImageOnlyAnswerForm {
-                                ImagePath = imageOnlyAnswer.ImagePath
+                                ImagePath = imageOnlyAnswer.ImagePath,
+                                RelatedResultIds=imageOnlyAnswer.RelatedResults.Select(r=>r.StringId).ToList()
                             });
                         }
                         break;
@@ -70,7 +71,9 @@ namespace VokimiShared.src.models.form_classes
                         if (textAndImageAnswer != null) {
                             answers.Add(new TextAndImageAnswerForm {
                                 Text = textAndImageAnswer.Text,
-                                ImagePath = textAndImageAnswer.ImagePath
+                                ImagePath = textAndImageAnswer.ImagePath,
+                                RelatedResultIds = textAndImageAnswer.RelatedResults.Select(r => r.StringId).ToList()
+
                             });
                         }
                         break;
@@ -78,7 +81,8 @@ namespace VokimiShared.src.models.form_classes
                         var textOnlyAnswer = answer as TextOnlyAnswer;
                         if (textOnlyAnswer != null) {
                             answers.Add(new TextOnlyAnswerForm {
-                                Text = textOnlyAnswer.Text
+                                Text = textOnlyAnswer.Text,
+                                RelatedResultIds = textOnlyAnswer.RelatedResults.Select(r => r.StringId).ToList()
                             });
                         }
                         break;

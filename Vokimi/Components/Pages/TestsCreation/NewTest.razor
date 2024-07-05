@@ -1,14 +1,14 @@
 ﻿@inject TestsCreationDbOperationsService testsCreationDbOperationsService
 @inject UsersDbOperationsService usersDbOperationsService
 @inject AuthHelperService authHelperService
-@inject NavigationManager navigationManager 
+@inject NavigationManager navigationManager
 
 @page "/newtest"
 @page "/newtest/{testId}"
 
 
 <PageTitle>New Test</PageTitle>
-<NewTestErrorComponent Message="@pageInitializationError" />
+<div class="error-component">@pageInitializationError"</div>
 
 @code {
     [Parameter]
@@ -43,12 +43,12 @@
             pageInitializationError = "An error has occurred. Try to log out of your account and log in again.";
             return;
         }
-        TestTemplate? type = await testsCreationDbOperationsService.GetTestTypeById(parsedTestId.Value);
-        if (type is null) {
+        var test = await testsCreationDbOperationsService.GetDraftTestById(parsedTestId.Value);
+        if (test is null) {
             pageInitializationError = "Unknown test";
             return;
         }
-        navigationManager.NavigateTo($"/newtest/{type.Value.ShortId()}/{parsedTestId.Value}");
+        navigationManager.NavigateTo($"/newtest/{test.Template.ShortId()}/{parsedTestId.Value}");
 
     }
 }

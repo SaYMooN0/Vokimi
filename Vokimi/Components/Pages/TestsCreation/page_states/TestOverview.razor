@@ -1,9 +1,7 @@
-﻿@using Vokimi.Components.Pages.TestsCreation.test_overview_components.dialogs
-@using Vokimi.Components.Pages.TestsCreation.test_overview_components.overview_areas
-
+﻿@using Vokimi.Components.Pages.TestsCreation.test_overview_components.overview_areas
+@using Vokimi.Components.Pages.TestsCreation.test_overview_components.dialogs
 
 @rendermode InteractiveServer
-
 
 
 <div class="state-container">
@@ -20,9 +18,7 @@
     </div>
 
     <div class="questions-area">
-
-        <QuestionsAreaContent TestId="@TestDto.Id"
-                              EditQuestionAction="ChangePageStateToQuestionEditing" />
+        <QuestionsAreaContent EditQuestionAction="ChangePageStateToQuestionEditing" />
 
     </div>
     <div class="results-area">
@@ -35,10 +31,7 @@
 </div>
 
 @code {
-
-
     [Parameter] public DraftGenericTestDto TestDto { get; set; }
     [Parameter] public Action ChangePageStateToMainInfoEditing { get; set; }
     [Parameter] public Action<DraftTestQuestionId> ChangePageStateToQuestionEditing { get; set; }
-
 }
