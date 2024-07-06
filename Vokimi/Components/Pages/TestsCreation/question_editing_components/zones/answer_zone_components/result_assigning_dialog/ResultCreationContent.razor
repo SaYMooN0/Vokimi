@@ -1,0 +1,61 @@
+﻿@using System.Text.RegularExpressions
+
+
+@inject TestsCreationDbOperationsService testsCreationDbOperationsService
+
+<input @bind="resultId" placeholder="Type new result id" name="@Guid.NewGuid()" class="result-id-input"/>
+<p class="error-string">@errorMessage</p>
+
+
+@code {
+    [Parameter] public List<string> AlreadyExistingResultIds { get; set; }
+    [CascadingParameter(Name = "TestId")] public DraftTestId TestId { get; set; }
+
+    private readonly string id = "new-result-dialog";
+    private BaseDialog baseDialogRef;
+    private string errorMessage;
+    private string resultId;
+
+    private async Task Close() => await baseDialogRef.CloseAsync();
+    public async Task Open() =>
+        await baseDialogRef.OpenAsync();
+
+    private readonly Regex ResultStringIdValidatingRegex = new("^[a-zA-Z0-9_-]+$");
+
+
+    public async Task<string?> SaveNewResult() {
+        errorMessage=string.Empty;
+        resultId = resultId.Trim();
+        if (
+            string.IsNullOrWhiteSpace(resultId) ||
+            resultId.Length > TestCreationConsts.ResultMaxCharacters ||
+            resultId.Length < TestCreationConsts.ResultMinCharacters) {
+
+            errorMessage =
+                $"Result id must be between {TestCreationConsts.ResultMinCharacters} and {TestCreationConsts.ResultMaxCharacters} characters";
+            StateHasChanged();
+            return null;
+        }
+
+        if (!ResultStringIdValidatingRegex.IsMatch(resultId)) {
+            errorMessage = "Result id can only contain letters, numbers, underscores, and hyphens";
+            StateHasChanged();
+            return null;
+        }
+
+        if (AlreadyExistingResultIds.Contains(resultId)) {
+            errorMessage = "Result with such id already exists";
+            StateHasChanged();
+            return null;
+        }
+        Err err = await testsCreationDbOperationsService.CreateNewDraftTestResult(TestId, resultId);
+        if (err.NotNone()) {
+            errorMessage = err.ToString();
+            StateHasChanged();
+            return null;
+        }
+        return resultId;
+
+    }
+}
+

@@ -46,7 +46,7 @@ else {
 
             <IsMultipleChoiceZone FormData="formData" />
 
-            <AnswersZone Answers="@formData.Answers" AnswersType="@formData.AnswersType" QuestionId="@QuestionId" OpenResultCreatingDialog="OpenResultCreatingDialog" />
+            <AnswersZone Answers="@formData.Answers" AnswersType="@formData.AnswersType" QuestionId="@QuestionId" />
 
             <p class="error-line">@savingError</p>
             <SaveButton Onclick="SaveData" Text="Save Changes" />

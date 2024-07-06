@@ -1,0 +1,34 @@
+﻿<div class="related-results-container">
+    @foreach (var res in Results) {
+        <div class="chosen-result">
+            <label>
+                @res
+            </label>
+            <div class="remove-result-btn" @onclick="()=>RemoveResult(res)">
+                -
+            </div>
+        </div>
+    }
+    @if (Results.Count < 5) {
+        <div class="add-new-result-btn" @onclick="OpenResultAssigningDialog">
+            <svg viewBox="0 0 448 512">
+                <path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z" />
+            </svg>
+            related result
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public List<string> Results { get; set; }
+    [Parameter] public Action<List<string>, Action> AssignResultAction { get; set; }
+
+    private void RemoveResult(string res) {
+        Results.Remove(res);
+        StateHasChanged();
+    }
+
+    private void OpenResultAssigningDialog() =>
+        AssignResultAction.Invoke(Results, StateHasChanged);
+
+}

@@ -10,7 +10,7 @@
 }
 
     .answer-main-content img {
-        justify-self:center;  
+        justify-self: center;
         height: 220px;
         border-radius: 8px;
     }
@@ -78,6 +78,10 @@
     cursor: pointer;
     transition: all 0.16s;
 }
+
+    .change-btn:hover {
+        background-color: var(--primary-hov);
+    }
 /*.add-img-btn {
     padding: 8px 24px;
     display: flex;

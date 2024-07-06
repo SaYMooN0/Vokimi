@@ -1,0 +1,86 @@
+﻿@inject TestsCreationDbOperationsService testsCreationDbOperationsService
+
+
+
+<link rel="stylesheet" href="/css/result_assigning_dialog.css" />
+<link rel="stylesheet" href="~/css/result_assigning_dialog.css" />
+
+
+<BaseDialog DialogId="result-assigning-dialog" @ref="baseDialogRef">
+    <div class="dialog-content">
+        @if (string.IsNullOrEmpty(errorString)) {
+            @if (isResultCreationContent) {
+                <ResultCreationContent @ref="resultCreationContentRef"
+                                       AlreadyExistingResultIds="@allResultStringIdsForTest" />
+            }
+            else {
+                <ResultAssigningContent @ref="resultAssigningContentRef"
+                                        ResultIds="@FilterResulsToChooseFrom()"
+                                        ChangeToResultCreating="()=>isResultCreationContent=true" />
+            }
+            <div class="bottom-btns-container">
+                <div @onclick="Close">Cancel</div>
+                <div @onclick="OnSaveClick">Save</div>
+            </div>
+
+        }
+        else {
+            <p class="error-string">@errorString</p>
+        }
+    </div>
+</BaseDialog>
+
+@code {
+    private BaseDialog baseDialogRef { get; set; }
+    private ResultCreationContent resultCreationContentRef { get; set; }
+    private ResultAssigningContent resultAssigningContentRef { get; set; }
+    private bool isResultCreationContent = false;
+    private string errorString = "";
+
+
+    [CascadingParameter(Name = "TestId")] public DraftTestId TestId { get; set; }
+
+    private List<string> currentResultsListToModifyRef = [];
+    private List<string> allResultStringIdsForTest = [];
+    private Action RerenderResutsViewComponents;
+
+
+    protected override async Task OnInitializedAsync() {
+        base.OnInitialized();
+        (await testsCreationDbOperationsService.GetResultStringIdsForDraftTest(TestId)).Switch(
+            list => allResultStringIdsForTest = list,
+            err => errorString = err.ToString()
+        );
+        StateHasChanged();
+    }
+
+
+
+    public async Task Open(List<string> answerResultsToModify, Action rerenderResulViewComponent) {
+        isResultCreationContent = false;
+        errorString = string.Empty;
+        currentResultsListToModifyRef = answerResultsToModify;
+        RerenderResutsViewComponents = rerenderResulViewComponent;
+        StateHasChanged();
+        await baseDialogRef.OpenAsync();
+    }
+    private async void Close() =>
+        await baseDialogRef.CloseAsync();
+
+    private List<string> FilterResulsToChooseFrom() =>
+        allResultStringIdsForTest.Except(currentResultsListToModifyRef).ToList();
+
+
+    private async void OnSaveClick() {
+        string? newResId = isResultCreationContent ?
+            await resultCreationContentRef.SaveNewResult() :
+            resultAssigningContentRef.SaveResult();
+
+        if (!string.IsNullOrEmpty(newResId)) {
+            currentResultsListToModifyRef.Add(newResId);
+            allResultStringIdsForTest.Add(newResId);
+            RerenderResutsViewComponents();
+            Close();
+        }
+    }
+}

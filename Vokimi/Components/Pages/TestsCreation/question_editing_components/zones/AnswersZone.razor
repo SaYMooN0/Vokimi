@@ -1,4 +1,7 @@
-﻿@using Vokimi.Components.Pages.TestsCreation.question_editing_components.answers_zone_creation_components
+﻿@using Vokimi.Components.Pages.TestsCreation.question_editing_components.zones.answer_zone_components.result_assigning_dialog
+@using Vokimi.Components.Pages.TestsCreation.question_editing_components.zones.answer_zone_components.answers_creation_components
+@using Vokimi.Components.Pages.TestsCreation.question_editing_components.zones.answer_zone_components
+
 
 <p class="title-line">
     <label class="answers-count-label">Answers (@Answers.Count)</label>
@@ -6,77 +9,59 @@
         @(isHidden ? "Show" : "Hide")
     </div>
 </p>
-<ResultAssigningDialog @ref="resultAssigningDialogRef"
-                       CreateNewResultAction="OpenResultCreatingDialog"
-                       StateHasChangedAction="()=>StateHasChanged()" />
+<ResultAssigningDialog @ref="resultAssigningDialogRef" />
 
 
-@if (!isHidden) {
-    <div class="answers-container">
-        @foreach (var answer in Answers.Select((value, index) => new { value, index })) {
-            <div class="answer">
-                <label class="answer-number">#@(answer.index + 1)</label>
-                <div class="related-results-container">
-                    @foreach (var res in answer.value.RelatedResultIds) {
-                        <div class="chosen-result">
-                            <label>
-                                @res
-                            </label>
-                            <div class="remove-result-btn" @onclick="()=>answer.value.RelatedResultIds.Remove(res)">
-                                -
-                            </div>
-                        </div>
-                    }
-                    @if (answer.value.RelatedResultIds.Count < 5) {
-                        <div class="add-new-result-btn" @onclick="()=>resultAssigningDialogRef.Open(answer.value)">
-                            <svg viewBox="0 0 448 512">
-                                <path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z" />
-                            </svg>
-                            related result
-                        </div>
-                    }
-                </div>
+<div class='@(isHidden?"answers-container-hidden":"answers-container")'>
+    @foreach (var answer in Answers.Select((value, index) => new { value, index })) {
+        <div class="answer">
+            <label class="answer-number">#@(answer.index + 1)</label>
+          
+                <AnswerResultsViewComponents Results="@answer.value.RelatedResultIds"
+                                             AssignResultAction="(list, action)=>resultAssigningDialogRef.Open(list, action)" />
 
-                @switch (AnswersType) {
-                    case AnswersType.TextOnly:
-                        <TextOnlyAnswerCreation @bind-AnswerText="(answer.value as TextOnlyAnswerForm).Text" />
-                        break;
-                    case AnswersType.ImageOnly:
-                        <ImageOnlyAnswerCreation @bind-AnswerImage="(answer.value as ImageOnlyAnswerForm).ImagePath" QuestionId="@QuestionId" />
-                        break;
-                    case AnswersType.TextAndImage:
-                        <TextAndImageAnswerCreation @bind-AnswerText="(answer.value as TextAndImageAnswerForm).Text"
-                                                    @bind-AnswerImage="(answer.value as TextAndImageAnswerForm).ImagePath"
-                                                    QuestionId="@QuestionId" />
-                        break;
-                    default:
-                        throw new NotImplementedException();
-                }
-                <div class="delete-answer-btn" @onclick="()=>RemoveAnswer(answer.value)">
-                    <svg fill="none" viewBox="0 0 50 59" class="bin">
-                        <path d="M0 7.5C0 5.01472 2.01472 3 4.5 3H45.5C47.9853 3 50 5.01472 50 7.5V7.5C50 8.32843 49.3284 9 48.5 9H1.5C0.671571 9 0 8.32843 0 7.5V7.5Z"></path>
-                        <path d="M17 3C17 1.34315 18.3431 0 20 0H29.3125C30.9694 0 32.3125 1.34315 32.3125 3V3H17V3Z"></path>
-                        <path d="M2.18565 18.0974C2.08466 15.821 3.903 13.9202 6.18172 13.9202H43.8189C46.0976 13.9202 47.916 15.821 47.815 18.0975L46.1699 55.1775C46.0751 57.3155 44.314 59.0002 42.1739 59.0002H7.8268C5.68661 59.0002 3.92559 57.3155 3.83073 55.1775L2.18565 18.0974ZM18.0003 49.5402C16.6196 49.5402 15.5003 48.4209 15.5003 47.0402V24.9602C15.5003 23.5795 16.6196 22.4602 18.0003 22.4602C19.381 22.4602 20.5003 23.5795 20.5003 24.9602V47.0402C20.5003 48.4209 19.381 49.5402 18.0003 49.5402ZM29.5003 47.0402C29.5003 48.4209 30.6196 49.5402 32.0003 49.5402C33.381 49.5402 34.5003 48.4209 34.5003 47.0402V24.9602C34.5003 23.5795 33.381 22.4602 32.0003 22.4602C30.6196 22.4602 29.5003 23.5795 29.5003 24.9602V47.0402Z"
-                              clip-rule="evenodd"
-                              fill-rule="evenodd"></path>
-                        <path d="M2 13H48L47.6742 21.28H2.32031L2 13Z"></path>
-                    </svg>
-                </div>
+           
+
+            @switch (AnswersType) {
+                case AnswersType.TextOnly:
+                    <TextOnlyAnswerCreation @bind-AnswerText="(answer.value as TextOnlyAnswerForm).Text" />
+                    break;
+                case AnswersType.ImageOnly:
+                    <ImageOnlyAnswerCreation @bind-AnswerImage="(answer.value as ImageOnlyAnswerForm).ImagePath" QuestionId="@QuestionId" />
+                    break;
+                case AnswersType.TextAndImage:
+                    <TextAndImageAnswerCreation @bind-AnswerText="(answer.value as TextAndImageAnswerForm).Text"
+                                                @bind-AnswerImage="(answer.value as TextAndImageAnswerForm).ImagePath"
+                                                QuestionId="@QuestionId" />
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
+            <div class="delete-answer-btn" @onclick="()=>RemoveAnswer(answer.value)">
+                <svg fill="none" viewBox="0 0 50 59" class="bin">
+                    <path d="M0 7.5C0 5.01472 2.01472 3 4.5 3H45.5C47.9853 3 50 5.01472 50 7.5V7.5C50 8.32843 49.3284 9 48.5 9H1.5C0.671571 9 0 8.32843 0 7.5V7.5Z"></path>
+                    <path d="M17 3C17 1.34315 18.3431 0 20 0H29.3125C30.9694 0 32.3125 1.34315 32.3125 3V3H17V3Z"></path>
+                    <path d="M2.18565 18.0974C2.08466 15.821 3.903 13.9202 6.18172 13.9202H43.8189C46.0976 13.9202 47.916 15.821 47.815 18.0975L46.1699 55.1775C46.0751 57.3155 44.314 59.0002 42.1739 59.0002H7.8268C5.68661 59.0002 3.92559 57.3155 3.83073 55.1775L2.18565 18.0974ZM18.0003 49.5402C16.6196 49.5402 15.5003 48.4209 15.5003 47.0402V24.9602C15.5003 23.5795 16.6196 22.4602 18.0003 22.4602C19.381 22.4602 20.5003 23.5795 20.5003 24.9602V47.0402C20.5003 48.4209 19.381 49.5402 18.0003 49.5402ZM29.5003 47.0402C29.5003 48.4209 30.6196 49.5402 32.0003 49.5402C33.381 49.5402 34.5003 48.4209 34.5003 47.0402V24.9602C34.5003 23.5795 33.381 22.4602 32.0003 22.4602C30.6196 22.4602 29.5003 23.5795 29.5003 24.9602V47.0402Z"
+                          clip-rule="evenodd"
+                          fill-rule="evenodd"></path>
+                    <path d="M2 13H48L47.6742 21.28H2.32031L2 13Z"></path>
+                </svg>
             </div>
-        }
+        </div>
+    }
 
-    </div>
-}
+</div>
+
 <div class="add-answer-btn" @onclick="AddNewAnswer">Add Answer</div>
 @code {
 
 
     private ResultAssigningDialog resultAssigningDialogRef;
+
     private bool isHidden = false;
     private void RemoveAnswer(BaseAnswerForm answer) => Answers.Remove(answer);
 
 
-    [Parameter] public Action OpenResultCreatingDialog { get; set; }
     [Parameter] public DraftTestQuestionId QuestionId { get; set; }
     [Parameter] public AnswersType AnswersType { get; set; }
     [Parameter] public List<BaseAnswerForm> Answers { get; set; }

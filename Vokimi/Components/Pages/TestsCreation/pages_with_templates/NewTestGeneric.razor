@@ -1,5 +1,4 @@
-﻿@using Vokimi.Components.Pages.TestsCreation.dialogs
-@inject TestsCreationDbOperationsService testsCreationDbOperationsService
+﻿@inject TestsCreationDbOperationsService testsCreationDbOperationsService
 @inject UsersDbOperationsService usersDbOperationsService
 @inject AuthHelperService authHelperService
 @inject IHttpContextAccessor httpContextAccessor
@@ -17,7 +16,6 @@
     }
     else if (creator is not null && draftTest is not null) {
         <CascadingValue Value="@draftTest.Id" Name="TestId">
-            <NewResultCreatingDalog @ref="newResultCreatingDialogRef" />
 
 
             @switch (pageState) {
@@ -32,8 +30,7 @@
                     break;
                 case TestCreationPageState.QuestionEditing:
                     <QuestionEditing QuestionId="currentQuestionToEditId"
-                                     GoBackAction="()=>ChangePageState(TestCreationPageState.Overview)"
-                                     OpenResultCreatingDialog="()=>newResultCreatingDialogRef.Open()" />
+                                     GoBackAction="()=>ChangePageState(TestCreationPageState.Overview)"/>
                     break;
                 case TestCreationPageState.ResultsCreation:
                     <ResultsCreation />
@@ -72,8 +69,6 @@
         StylesEditing,
         TagsAdding
     }
-
-    private NewResultCreatingDalog newResultCreatingDialogRef;
 
     private DraftTestQuestionId currentQuestionToEditId;
     private void ChangePageStateToQuestionEditing(DraftTestQuestionId questionId) {

@@ -126,6 +126,10 @@ namespace Vokimi.Services
                     await ClearAnswersForDraftTestQuestion(questionId);
                     List<BaseAnswer> answers = new();
 
+                    Dictionary<string, DraftTestResultId> results = _db.DraftTestResults
+                       .Where(t => t.TestId == question.DraftTestId)
+                       .ToDictionary(res => res.StringId, res => res.Id);
+
                     foreach (var answerForm in newData.Answers) {
                         if (answerForm.Validate().NotNone())
                             continue;
@@ -140,6 +144,20 @@ namespace Vokimi.Services
                                 .CreateNew(questionId, orderIndex, textOnlyAnswerForm.Text),
                             _ => throw new InvalidOperationException("Unknown answer type")
                         };
+
+
+                        foreach (string resultStringId in answerForm.RelatedResultIds) {
+                            if (results.TryGetValue(resultStringId, out DraftTestResultId resultId)) {
+                                DraftTestResult? result = await GetDraftTestResultById(resultId);
+
+                                if (result is null) {
+                                    continue;
+                                }
+
+                                answer.RelatedResults.Add(result);
+                            }
+                        }
+
                         _db.Add(answer);
                         answers.Add(answer);
                     }
@@ -199,31 +217,6 @@ namespace Vokimi.Services
         }
         public async Task<DraftTestResult?> GetDraftTestResultById(DraftTestResultId id) =>
             await _db.DraftTestResults.FirstOrDefaultAsync(i => i.Id == id);
-        public async Task<Err> AssignDraftTestResultToAnswer<AnswerType>(DraftTestResultId resultId, AnswerId answerId) where AnswerType : BaseAnswer {
-            using (var transaction = await _db.Database.BeginTransactionAsync()) {
-                try {
-                    var result = await GetDraftTestResultById(resultId);
-                    if (result is null) {
-                        return new Err("Unknown result");
-                    }
-
-                    var answer = await _db.AnswersSharedInfo.FirstOrDefaultAsync(a => a.AnswerId == answerId);
-                    if (answer is null) {
-                        return new Err("Unknown answer");
-                    }
-
-                    result.AnswersLeadingToResult.Add(answer);
-                    answer.RelatedResults.Add(result);
-
-                    await _db.SaveChangesAsync();
-                    await transaction.CommitAsync();
-                    return Err.None;
-                } catch (Exception ex) {
-                    await transaction.RollbackAsync();
-                    return new Err("Server error. Please try again later");
-                }
-            }
-        }
         public async Task<OneOf<List<string>, Err>> GetResultStringIdsForDraftTest(DraftTestId testId) {
             BaseDraftTest? test = await GetDraftTestById(testId);
             if (test is null) {

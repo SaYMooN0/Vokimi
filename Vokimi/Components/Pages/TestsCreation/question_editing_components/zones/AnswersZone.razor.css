@@ -26,6 +26,9 @@
         color: #757581;
     }
 
+.answers-container-hidden {
+    display: none;
+}
 
 .answers-container {
     width: 100%;
@@ -73,52 +76,8 @@
     font-size: 20px;
 }
 
-.related-results-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 6px;
-}
 
-.chosen-result {
-    display: flex;
-    flex-direction: row;
-    background-color: cadetblue;
-    gap:2px;
-}
 
-.remove-result-btn {
-}
-
-.add-new-result-btn {
-    background-color: var(--primary);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 4px;
-    padding: 4px 8px;
-    border-radius: 6px;
-    color: white;
-    font-family: Roboto;
-    font-size: 18px;
-    cursor: pointer;
-    transition: 0.12s all ease-in;
-}
-
-    .add-new-result-btn svg {
-        height: 18px;
-        fill: white;
-    }
-
-    .add-new-result-btn:hover {
-        background-color: var(--primary-hov);
-        border-radius: 4px;
-    }
-
-    .add-new-result-btn:active {
-        transform: scale(0.97);
-    }
 
 .delete-answer-btn {
     align-self: center;

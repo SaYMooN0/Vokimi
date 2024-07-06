@@ -1,9 +1,4 @@
-﻿.dialog-content {
-    width: 800px;
-    display: grid;
-    grid-template-rows: auto 1fr auto auto;
-}
-
+﻿
 .choose-label {
     justify-self: center;
     margin-top: 6px;
@@ -50,34 +45,3 @@
     font-family: Roboto;
 }
 
-.bottom-btns-container {
-    justify-self: right;
-    align-self: end;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    margin: auto 10px 10px auto;
-    gap: 10px;
-    width: fit-content;
-}
-
-    .bottom-btns-container div {
-        padding: 2px 0;
-        width: 120px;
-        font-family: Quicksand;
-        text-align: center;
-        border: 3px solid var(--primary);
-        border-radius: 6px;
-        color: var(--primary);
-        font-size: 22px;
-        font-weight: bolder;
-        cursor: pointer;
-        transition: all 0.16s ease-in-out;
-    }
-
-        .bottom-btns-container div:hover {
-            letter-spacing: 2px;
-        }
-
-        .bottom-btns-container div:active {
-            transform: scale(0.96);
-        }
