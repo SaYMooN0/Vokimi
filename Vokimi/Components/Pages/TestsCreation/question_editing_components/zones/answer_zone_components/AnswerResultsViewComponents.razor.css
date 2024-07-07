@@ -1,33 +1,58 @@
 ﻿.related-results-container {
+    margin: 16px 0;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 6px;
+    gap: 7px;
 }
 
 .chosen-result {
-    display: flex;
-    flex-direction: row;
-    background-color: cadetblue;
-    gap: 2px;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr auto;
+}
+
+.result-id-label {
+    font-family: Roboto;
+    text-align: center;
+    font-size: 18px;
 }
 
 .remove-result-btn {
+    box-sizing: border-box;
+    padding: 2px;
+    border-radius: 26%;
+    background: var(--grey);
+    height: 24px;
+    aspect-ratio: 1/1;
+    fill: white;
+    cursor: pointer;
+    transition: all 0.18s ease-in;
 }
+
+    .remove-result-btn:hover {
+        background-color: var(--red-del);
+    }
+
+    .remove-result-btn:active {
+        padding: 4px;
+    }
+
 .add-new-result-btn {
+    width: 94%;
     background-color: var(--primary);
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 4px;
-    padding: 4px 8px;
-    border-radius: 6px;
+    gap: 2px;
+    padding: 4px 0;
+    border-radius: 4px;
     color: white;
     font-family: Roboto;
     font-size: 18px;
     cursor: pointer;
-    transition: 0.12s all ease-in;
+    transition: all 0.12s ease-in;
 }
 
     .add-new-result-btn svg {
@@ -37,7 +62,8 @@
 
     .add-new-result-btn:hover {
         background-color: var(--primary-hov);
-        border-radius: 4px;
+        gap: 4px;
+        width: 98%;
     }
 
     .add-new-result-btn:active {

@@ -1,14 +1,23 @@
 ﻿<div class="multi-choince-input-line">
-    Multiple choice:
-    <BasicTooltip Text="If chosen, the sum of the points from the answers will be divided by the count of chosen answers" />
-    <CustomCheckbox @bind-Checked="FormData.IsMultipleChoice" />
+    <div class="input-label">
+        Is multiple choice:
+        <CustomCheckbox @bind-Checked="FormData.IsMultipleChoice" />
+    </div>
+    <div class="multiple-choice-form-block @showMultipleChoiceCssClass">
+
+        <label for="min-answers-count" class="input-label">
+            Minimum answers count:
+            <input id="min-answers-count" type="number" @bind="FormData.MinAnswersCount" />
+        </label>
+
+        <label for="max-answers-count" class="input-label">
+            Maximum answers count:
+            <input id="max-answers-count" type="number" @bind="FormData.MaxAnswersCount" />
+        </label>
+
+    </div>
 </div>
-<div class="multiple-choice-form-block @showMultipleChoiceCssClass">
-    <label for="min-answers-count" class="">Minimum Answers Count:</label>
-    <input id="min-answers-count" type="number" @bind="FormData.MinAnswersCount" />
-    <label for="max-answers-count" class="">Maximum Answers Count:</label>
-    <input id="max-answers-count" type="number" @bind="FormData.MaxAnswersCount" />
-</div>
+
 
 @code {
     [Parameter]

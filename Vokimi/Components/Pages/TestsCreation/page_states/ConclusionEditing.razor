@@ -1,0 +1,17 @@
+﻿<label class="test-conclustion-label">
+    Test Conclusion
+</label>
+<div class="add-feedback-zone">
+    <label>
+        Add feedback
+        <CustomCheckbox @bind-Checked="AddFeedback" />
+    </label>
+</div>
+
+
+@code {
+    private bool AddFeedback { get; set; }
+
+    [CascadingParameter(Name = "TestId")] public DraftTestId TestId { get; set; }
+
+}

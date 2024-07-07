@@ -3,7 +3,6 @@
 
 
 <link rel="stylesheet" href="/css/result_assigning_dialog.css" />
-<link rel="stylesheet" href="~/css/result_assigning_dialog.css" />
 
 
 <BaseDialog DialogId="result-assigning-dialog" @ref="baseDialogRef">
@@ -15,7 +14,6 @@
             }
             else {
                 <ResultAssigningContent @ref="resultAssigningContentRef"
-                                        ResultIds="@FilterResulsToChooseFrom()"
                                         ChangeToResultCreating="()=>isResultCreationContent=true" />
             }
             <div class="bottom-btns-container">
@@ -61,14 +59,15 @@
         errorString = string.Empty;
         currentResultsListToModifyRef = answerResultsToModify;
         RerenderResutsViewComponents = rerenderResulViewComponent;
+
+        var resulsToChooseFrom = allResultStringIdsForTest.Except(currentResultsListToModifyRef);
+        resultAssigningContentRef.UpdateDataOnOpen(resulsToChooseFrom);
+
         StateHasChanged();
         await baseDialogRef.OpenAsync();
     }
     private async void Close() =>
         await baseDialogRef.CloseAsync();
-
-    private List<string> FilterResulsToChooseFrom() =>
-        allResultStringIdsForTest.Except(currentResultsListToModifyRef).ToList();
 
 
     private async void OnSaveClick() {
@@ -76,11 +75,18 @@
             await resultCreationContentRef.SaveNewResult() :
             resultAssigningContentRef.SaveResult();
 
-        if (!string.IsNullOrEmpty(newResId)) {
+        if (string.IsNullOrEmpty(newResId)) { return; }
+
+        if (currentResultsListToModifyRef.Count() >= TestCreationConsts.MaxResultsCountForAnswer) {
+            errorString = $"You can't assign more than {TestCreationConsts.MaxResultsCountForAnswer} results to one answer";
+            StateHasChanged();
+        }
+        else {
             currentResultsListToModifyRef.Add(newResId);
             allResultStringIdsForTest.Add(newResId);
             RerenderResutsViewComponents();
             Close();
         }
+
     }
 }

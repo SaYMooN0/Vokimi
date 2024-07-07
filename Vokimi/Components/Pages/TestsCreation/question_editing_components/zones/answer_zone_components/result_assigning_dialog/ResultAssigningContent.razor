@@ -18,7 +18,7 @@
 <p class="error-string">@errorString</p>
 
 @code {
-    [Parameter] public List<string> ResultIds { get; set; } = [];
+    private IEnumerable<string> ResultIds { get; set; } = [];
     [Parameter] public Action ChangeToResultCreating { get; set; }
     [CascadingParameter(Name = "TestId")] public DraftTestId TestId { get; set; }
 
@@ -34,11 +34,12 @@
             StateHasChanged();
             return null;
         }
-        if (ResultIds.Count >= TestCreationConsts.MaxResultsCountForAnswer) {
-            errorString = $"You can't assign more than {TestCreationConsts.MaxResultsCountForAnswer} results to one answer";
-            StateHasChanged();
-            return null;
-        }
         return ChosenResult;
+    }
+    public void UpdateDataOnOpen(IEnumerable<string> resultIds) {
+        ChosenResult = null;
+        ResultIds = resultIds;
+        errorString = null;
+
     }
 }

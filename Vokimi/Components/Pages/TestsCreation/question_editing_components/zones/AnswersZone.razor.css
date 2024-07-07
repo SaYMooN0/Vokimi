@@ -63,17 +63,14 @@
     min-height: 120px;
     width: 98%;
     display: grid;
-    grid-template-columns: 170px 1fr auto;
-    position: relative;
+    grid-template-columns: auto 164px 1fr auto;
 }
 
 .answer-number {
-    position: absolute;
-    top: 4px;
-    left: 4px;
+    margin:10px 4px 0 2px;
     font-family: Roboto;
     color: var(--grey);
-    font-size: 20px;
+    font-size: 18px;
 }
 
 
@@ -93,18 +90,16 @@
     cursor: pointer;
     transition: all 0.2s;
     position: relative;
-    overflow: hidden;
     background-color: var(--grey);
 }
 
     .delete-answer-btn svg {
         width: 46%;
-        fill: #fff;
+        fill: white;
     }
 
     .delete-answer-btn:hover {
         background-color: var(--red-del);
-        overflow: visible;
     }
 
     .delete-answer-btn:active {

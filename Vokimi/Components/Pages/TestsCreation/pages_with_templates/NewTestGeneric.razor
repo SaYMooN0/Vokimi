@@ -20,9 +20,10 @@
 
             @switch (pageState) {
                 case TestCreationPageState.Overview:
-                    <TestOverview ChangePageStateToMainInfoEditing="()=>ChangePageState(TestCreationPageState.MainInfoEditing)"
+                    <TestOverview TestDto="new DraftGenericTestDto(draftTest)"
+                                  ChangePageStateToMainInfoEditing="()=>ChangePageState(TestCreationPageState.MainInfoEditing)"
                                   ChangePageStateToQuestionEditing="ChangePageStateToQuestionEditing"
-                                  TestDto="new DraftGenericTestDto(draftTest)" />
+                                  ChangePageStateToConclusionEditing="()=>ChangePageState(TestCreationPageState.ConclusionEditing)" />
                     break;
                 case TestCreationPageState.MainInfoEditing:
                     <MainInfoEditing Test="new DraftGenericTestDto(draftTest)"
@@ -30,10 +31,13 @@
                     break;
                 case TestCreationPageState.QuestionEditing:
                     <QuestionEditing QuestionId="currentQuestionToEditId"
-                                     GoBackAction="()=>ChangePageState(TestCreationPageState.Overview)"/>
+                                     GoBackAction="()=>ChangePageState(TestCreationPageState.Overview)" />
                     break;
                 case TestCreationPageState.ResultsCreation:
                     <ResultsCreation />
+                    break;
+                case TestCreationPageState.ConclusionEditing:
+                    <ConclusionEditing />
                     break;
                 case TestCreationPageState.StylesEditing:
                     <StylesEditing />
@@ -67,7 +71,8 @@
         QuestionEditing,
         ResultsCreation,
         StylesEditing,
-        TagsAdding
+        TagsAdding,
+        ConclusionEditing
     }
 
     private DraftTestQuestionId currentQuestionToEditId;

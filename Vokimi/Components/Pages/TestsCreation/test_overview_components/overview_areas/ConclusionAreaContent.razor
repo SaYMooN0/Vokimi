@@ -2,30 +2,34 @@
 <ActionConfirmationDialog @ref="confirmationDialogRef"
                           ConfirmAction="DeleteConclusion"
                           ConfirmButtonText="Delete" />
-@if (ConclusionId is null) {
-    <div class="no-added-conclustion-title">
-        Test Conclusion(Optional):
-        <div class="add-conclustion-btn">
-            Add
-        </div>
-    </div>
-}
-else {
+@if (AnyConclusionAdded) {
     <div class="conclusion-added-title">
         <label>Test Conclusion Added</label>
         <div class="conclusion-actions-container">
-            <button>Edit</button>
-            <button @onclick='()=>confirmationDialogRef.Open("Do you really want to delete the test conclusion?")'>Delete</button>
+            <div class="edit-btn" @onclick="ChangePageStateToConclusionEditing">Edit</div>
+            <div class="remove-btn" @onclick='()=>confirmationDialogRef.Open("Do you really want to remove test conclusion?")'>
+                Remove
+            </div>
         </div>
     </div>
 
+}
+else {
+
+    <div class="no-added-conclustion-title">
+        Test Conclusion(Optional):
+        <div class="add-conclustion-btn" @onclick="ChangePageStateToConclusionEditing">
+            Add
+        </div>
+    </div>
 }
 
 @code {
     private ActionConfirmationDialog confirmationDialogRef;
 
-    [Parameter]
-    public TestConclusionId? ConclusionId { get; set; }
+    [Parameter] public bool AnyConclusionAdded { get; set; }
+    [Parameter] public Action ChangePageStateToConclusionEditing { get; set; }
+
     private void EditConclusion() { }
     private void DeleteConclusion() {
 
