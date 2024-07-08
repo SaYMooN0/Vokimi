@@ -28,15 +28,14 @@
 
     private async Task HandleFileChange(InputFileChangeEventArgs e) {
         var file = e.File;
-        int maxAllowedSize = 3145728; /* 3MB */
 
         if (file is not null) {
-            if (file.Size > maxAllowedSize) {
-                coverUploadingError = $"File is too big. Max allowed size: 3MB";
+            if (file.Size > TestCreationConsts.MaxImageSizeInBytes) {
+                coverUploadingError = $"File is too big. Max allowed size: {TestCreationConsts.MaxImageSizeInMB}";
                 return;
             }
             try {
-                using (var stream = file.OpenReadStream(maxAllowedSize: maxAllowedSize)) {
+                using (var stream = file.OpenReadStream(maxAllowedSize: TestCreationConsts.MaxImageSizeInBytes)) {
                     var result = await vokimiStorageService.SaveDraftTestCover(Vm.TestId, stream);
                     result.Switch(
                         async path => {

@@ -9,5 +9,7 @@ namespace VokimiShared.src.constants_store_classes
             MaxResultsCountForAnswer = 5,
             ResultMaxCharacters = 12,
             ResultMinCharacters = 3;
+        public const int MaxImageSizeInBytes = 3145728;
+        public static int MaxImageSizeInMB => MaxImageSizeInBytes / 1048576;
     }
 }

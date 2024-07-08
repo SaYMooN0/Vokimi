@@ -4,17 +4,22 @@
     font-size: 32px;
     display: block;
     margin-left: 100px;
-    margin-top: 10px;
+    margin: 14px 40px;
 }
+
 .question-vms-container {
     display: flex;
     flex-direction: column;
 }
 
 .question-view-component {
-    min-height: 80px;
+    min-height: 120px;
+    padding: 10px;
+    box-sizing: border-box;
+    border-radius: 10px;
     display: grid;
     grid-template-columns: 1fr auto;
+    box-shadow: rgba(52, 56, 228, 0.10) 0px 2px 4px 0px, rgba(52, 56, 228, 0.10) 0px 2px 16px 0px;
 }
 
 .question-info {
@@ -23,6 +28,7 @@
 }
 
 .question-actions {
+    align-self: center;
     height: 38px;
     display: flex;
     flex-direction: row;
@@ -62,7 +68,7 @@
     }
 
 .delete-question-btn {
-    height: 100% ;
+    height: 100%;
     aspect-ratio: 1/1;
     box-sizing: border-box;
     display: flex;

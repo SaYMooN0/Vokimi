@@ -88,6 +88,27 @@ public class VokimiStorageService
             } while (listResponse.IsTruncated);
         } catch (Exception ex) { }
     }
+    public async Task<OneOf<string, Err>> SaveDraftTestConclusionImage(
+        Stream fileStream, DraftTestId testId, string imgSessionKey) {
+        try {
+            string key = $"{ImgOperationsHelper.DraftTestConclusionsFolder}/{testId}/{imgSessionKey}";
+            var putRequest = new PutObjectRequest {
+                BucketName = _bucketName,
+                Key = key,
+                InputStream = fileStream
+            };
 
+            PutObjectResponse response = await _s3Client.PutObjectAsync(putRequest);
+
+            if (response.HttpStatusCode == System.Net.HttpStatusCode.OK) {
+                return key;
+            }
+            else {
+                return new Err("Failed to upload the file");
+            }
+        } catch (Exception ex) {
+            return new Err("Server error. Please try again later");
+        }
+    }
 
 }
