@@ -110,5 +110,44 @@ public class VokimiStorageService
             return new Err("Server error. Please try again later");
         }
     }
+    public async Task<Err> ClearDraftTestConclusionUnusedImages(DraftTestId testId, string? usedKey) {
+        try {
+            var listRequest = new ListObjectsV2Request {
+                BucketName = _bucketName,
+                Prefix = $"{ImgOperationsHelper.DraftTestConclusionsFolder}/{testId}/" 
+            };
+
+            ListObjectsV2Response listResponse;
+            do {
+                listResponse = await _s3Client.ListObjectsV2Async(listRequest);
+                var objectsToDelete = listResponse.S3Objects
+                    .Where(o => o.Key != usedKey)
+                    .Select(o => new KeyVersion { Key = o.Key })
+                    .ToList();
+
+                if (objectsToDelete.Count > 0) {
+                    var deleteRequest = new DeleteObjectsRequest {
+                        BucketName = _bucketName,
+                        Objects = objectsToDelete
+                    };
+
+                    var deleteResponse = await _s3Client.DeleteObjectsAsync(deleteRequest);
+
+                    if (deleteResponse.HttpStatusCode != System.Net.HttpStatusCode.OK) {
+                        return new Err("Failed to delete some unused images");
+                    }
+                }
+
+                listRequest.ContinuationToken = listResponse.NextContinuationToken;
+
+            } while (listResponse.IsTruncated);
+
+        } catch (Exception ex) {
+            return new Err("Server error. Please try again later");
+        }
+        return Err.None;
+
+    }
+
 
 }

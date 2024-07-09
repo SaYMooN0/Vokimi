@@ -1,4 +1,5 @@
 ﻿@inject VokimiStorageService vokimiStorageService
+@inject TestsCreationDbOperationsService testsCreationDbOperationsService
 
 <form class="form-container" name="formData" @onsubmit="HandleSubmit">
     <label class="test-conclustion-label">
@@ -25,7 +26,7 @@
                 <label class="img-uploading-error">@imageUploadingErr</label>
                 <div class="img-editing-btns">
                     <label for="img-input" class="change-btn">Change</label>
-                    <div class="remove-btn" @onclick="HandleImageRemoving">Remove</div>
+                    <label class="remove-btn" @onclick="HandleImageRemoving">Remove</label>
                 </div>
             </div>
 
@@ -46,45 +47,55 @@
 
 
     <div class="add-feedback-zone">
-        <label>
+        <label class="add-feedback-label">
             Add feedback
             <CustomCheckbox @bind-Checked="formData.AddFeedback" />
         </label>
 
-        <div class="multiple-choice-only-form-block @(formData.AddFeedback? "show":"hide")">
+        <div class="multiple-choice-only-form-block @(formData.AddFeedback? "show-feedback":"hide-feedback")">
             <label class="feedback-text-input-label">
                 Accompanying text:
                 <input type="text" @bind="@formData.FeedbackText" />
             </label>
             <label class="feedback-chars-count-label">
                 Maximum number of characters in feedback:
-                <input type="number" @bind="@formData.MaxCharactersForFeedback" />
+                <input type="number" @bind="@formData.MaxCharactersForFeedback"
+                       max="@TestCreationConsts.ConclusionMaxFeedbackCharsCount" />
             </label>
         </div>
 
     </div>
+    <p class="saving-error">@serverError</p>
+    <button type="submit" class="submit-button">Save</button>
 </form>
-
-
-
-
-
-
 
 
 @code {
     [SupplyParameterFromForm]
-    public ConclustionCreationForm formData { get; set; } = new();
+    public ConclusionCreationForm formData { get; set; } = new();
 
     [CascadingParameter(Name = "TestId")] public DraftTestId TestId { get; set; }
 
     private string imageUploadingErr = string.Empty;
+    private string serverError = string.Empty;
 
     protected override Task OnInitializedAsync() {
         return base.OnInitializedAsync();
     }
-    private void HandleSubmit() {
-
+    private async void HandleSubmit() {
+        Err validationError = Validate(formData);
+        if (validationError.NotNone()) {
+            serverError = validationError.Message;
+            StateHasChanged();
+            return;
+        }
+        Err savingError = await testsCreationDbOperationsService.UpdateDraftTestConclusion(TestId, formData);
+        if (savingError.NotNone()) {
+            serverError = savingError.Message;
+            StateHasChanged();
+            return;
+        }
+        await vokimiStorageService.ClearDraftTestConclusionUnusedImages(TestId, formData.ImagePath);
     }
     private string imgSessionKey = Guid.NewGuid().ToString();
     private async Task HandleImageChange(InputFileChangeEventArgs e) {
@@ -109,6 +120,28 @@
             }
         }
     }
-    private async Task HandleImageRemoving() { }
+    private async Task HandleImageRemoving() {
+        formData.ImagePath = string.Empty;
+    }
     private bool AnyImageAdded() => !string.IsNullOrEmpty(formData.ImagePath);
+
+
+    private Err Validate(ConclusionCreationForm form) {
+        if (string.IsNullOrWhiteSpace(form.Text)) {
+            return new Err("Text field cannot be empty");
+        }
+        if (form.Text.Length > TestCreationConsts.ConclusionMaxCharsInText) {
+            return new Err($"Conclusion text cannot be longer than {TestCreationConsts.ConclusionMaxCharsInText} characters");
+        }
+        if (form.AddFeedback && string.IsNullOrWhiteSpace(form.FeedbackText)) {
+            return new Err("Please fill Feedback 'Accompanying text' field");
+        }
+        if (form.AddFeedback && form.FeedbackText.Length > TestCreationConsts.ConclusionMaxAccompanyingFeedbackTextChars) {
+            return new Err($"Feedback 'Accompanying text' cannot be more than {TestCreationConsts.ConclusionMaxAccompanyingFeedbackTextChars} long");
+        }
+        if (form.AddFeedback && form.MaxCharactersForFeedback > TestCreationConsts.ConclusionMaxFeedbackCharsCount) {
+            return new Err($"Maximum number of characters in feedback cannot be more than {TestCreationConsts.ConclusionMaxFeedbackCharsCount}");
+        }
+        return Err.None;
+    }
 }

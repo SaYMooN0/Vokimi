@@ -11,5 +11,10 @@ namespace VokimiShared.src.constants_store_classes
             ResultMinCharacters = 3;
         public const int MaxImageSizeInBytes = 3145728;
         public static int MaxImageSizeInMB => MaxImageSizeInBytes / 1048576;
+
+        public const int
+            ConclusionMaxCharsInText = 255,
+            ConclusionMaxAccompanyingFeedbackTextChars = 255,
+            ConclusionMaxFeedbackCharsCount= 255;
     }
 }

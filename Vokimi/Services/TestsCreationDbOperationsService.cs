@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OneOf;
+using OneOf.Types;
 using Vokimi.src.data;
 using VokimiShared.src;
 using VokimiShared.src.enums;
@@ -190,28 +191,24 @@ namespace Vokimi.Services
         }
         public async Task<Err> CreateNewDraftTestResult(DraftTestId testId, string resultId) {
             var result = DraftTestResult.CreateNew(resultId, testId);
-            try {
-                BaseDraftTest? test = await GetDraftTestById(testId);
-                if (test is null) {
-                    return new Err("Unknown test");
-                }
-                using (var transaction = await _db.Database.BeginTransactionAsync()) {
-                    try {
-                        _db.DraftTestResults.Add(result);
-                        test.PossibleResults.Add(result);
-
-                        await _db.SaveChangesAsync();
-                        await transaction.CommitAsync();
-                    } catch (Exception ex) {
-                        await transaction.RollbackAsync();
-                        return new Err("Server error. Please try again later.");
-                    }
-                }
-
-                return Err.None;
-            } catch (Exception ex) {
-                return new Err($"Server error. Please try again later.");
+            BaseDraftTest? test = await GetDraftTestById(testId);
+            if (test is null) {
+                return new Err("Unknown test");
             }
+            using (var transaction = await _db.Database.BeginTransactionAsync()) {
+                try {
+                    _db.DraftTestResults.Add(result);
+                    test.PossibleResults.Add(result);
+
+                    await _db.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                } catch (Exception ex) {
+                    await transaction.RollbackAsync();
+                    return new Err("Server error. Please try again later.");
+                }
+            }
+
+            return Err.None;
         }
         public async Task<DraftTestResult?> GetDraftTestResultById(DraftTestResultId id) =>
             await _db.DraftTestResults.FirstOrDefaultAsync(i => i.Id == id);
@@ -221,6 +218,42 @@ namespace Vokimi.Services
                 return new Err("No test found");
             }
             return test.PossibleResults.Select(r => r.StringId).ToList();
+        }
+        public async Task<Err> UpdateDraftTestConclusion(DraftTestId testId, ConclusionCreationForm data) {
+            BaseDraftTest? test = await GetDraftTestById(testId);
+            if (test is null) {
+                return new Err("Unknown test");
+            }
+            TestConclusion conclusion = TestConclusion.CreateNew(data);
+
+            try {
+                test.UpdateConclusion(conclusion);
+                _db.DraftTestsSharedInfo.Update(test);
+                await _db.SaveChangesAsync();
+            } catch (Exception ex) {
+                return new Err("Server error. Please try again later.");
+            }
+
+            return Err.None;
+
+        }
+        public async Task<Err> RemoveDraftTestConclusion(DraftTestId testId) {
+            BaseDraftTest? test = await GetDraftTestById(testId);
+            if (test is null) {
+                return new Err("Unknown test");
+            }
+            try {
+                if (test.ConclusionId is not null && test.Conclusion is not null) {
+                    _db.TestConclusions.Remove(test.Conclusion);
+                }
+                test.RemoveConclusion();
+
+                _db.DraftTestsSharedInfo.Update(test);
+                await _db.SaveChangesAsync();
+            } catch (Exception ex) {
+                return new Err("Server error. Please try again later.");
+            }
+            return Err.None;
         }
     }
 }
