@@ -1,4 +1,5 @@
 ﻿@using Vokimi.Components.Pages.TestsCreation.question_editing_components.zones
+@using Vokimi.Components.Pages.TestsCreation.page_states.shared_components
 
 
 @inject TestsCreationDbOperationsService testsCreationDbOperationsService
@@ -11,15 +12,7 @@
 }
 else {
     <div class="dialog-content">
-        <div class="dialog-header">
-            <div class="go-back-btn" @onclick="GoBackAction">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
-                    <path d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l192 192c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256 246.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-192 192z" />
-                </svg>
-                Go Back
-            </div>
-            Question Editing
-        </div>
+        <PageStateTopLabel LabelText="Question Editing" BackToOverviewAction="BackToOverviewAction" />
         <form class="form-content" @onsubmit="SaveData" name="formData">
             <div class="top-input-zone">
                 <div class="text-input-area">
@@ -68,7 +61,7 @@ else {
     public QuestionEditingForm formData { get; set; }
 
     [Parameter] public DraftTestQuestionId QuestionId { get; set; }
-    [Parameter] public Action GoBackAction { get; set; }
+    [Parameter] public Action BackToOverviewAction { get; set; }
     [Parameter] public Action OpenResultCreatingDialog { get; set; }
 
     protected override async Task OnParametersSetAsync() {

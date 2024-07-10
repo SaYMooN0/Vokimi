@@ -224,11 +224,17 @@ namespace Vokimi.Services
             if (test is null) {
                 return new Err("Unknown test");
             }
-            TestConclusion conclusion = TestConclusion.CreateNew(data);
+            if (test.Conclusion is null) {
+                TestConclusion conclusion = TestConclusion.CreateNew(data);
+                test.AddConclusion(conclusion);
+                _db.DraftTestsSharedInfo.Update(test);
+            }
+            else {
+                test.Conclusion.Update(data);
+                _db.TestConclusions.Update(test.Conclusion);
+            }
 
             try {
-                test.UpdateConclusion(conclusion);
-                _db.DraftTestsSharedInfo.Update(test);
                 await _db.SaveChangesAsync();
             } catch (Exception ex) {
                 return new Err("Server error. Please try again later.");
@@ -254,6 +260,13 @@ namespace Vokimi.Services
                 return new Err("Server error. Please try again later.");
             }
             return Err.None;
+        }
+        public async Task<TestConclusion?> GetDraftTestConclusionById(DraftTestId testId) {
+            BaseDraftTest? test = await GetDraftTestById(testId);
+            if (test is null) {
+                return null;
+            }
+            return test.Conclusion;
         }
     }
 }

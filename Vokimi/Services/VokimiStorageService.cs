@@ -110,11 +110,12 @@ public class VokimiStorageService
             return new Err("Server error. Please try again later");
         }
     }
-    public async Task<Err> ClearDraftTestConclusionUnusedImages(DraftTestId testId, string? usedKey) {
+    public async Task<Err> ClearDraftTestConclusionUnusedImages(DraftTestId testId, string? usedKey = null) {
         try {
+
             var listRequest = new ListObjectsV2Request {
                 BucketName = _bucketName,
-                Prefix = $"{ImgOperationsHelper.DraftTestConclusionsFolder}/{testId}/" 
+                Prefix = $"{ImgOperationsHelper.DraftTestConclusionsFolder}/{testId}/"
             };
 
             ListObjectsV2Response listResponse;

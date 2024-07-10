@@ -1,16 +1,52 @@
 ﻿.dialog-content {
     width: 800px;
-    height: 340px;
+    min-height: 140px;
     display: flex;
     flex-direction: column;
+    align-items: center;
+    box-shadow: 0px 0px 10px 5px rgba(0, 0, 0, 0.705);
 }
 
-    .dialog-content p {
-        font-family: "Roboto";
-    }
+.confirm-action-label {
+    margin-top: 6px;
+    color: var(--grey);
+    font-family: "Roboto";
+    font-size: 22px;
+}
+
+.dialog-message {
+    font-family: "Roboto";
+    font-size: 24px;
+}
+
+.error-message {
+    font-family: "Roboto";
+    font-size: 18px;
+    color: var(--del-red);
+}
 
 .dialog-buttons {
+    align-self: end;
     margin: auto 20px 20px auto;
     display: grid;
     grid-template-columns: 1fr 1fr;
+    gap: 6px;
+}
+
+    .dialog-buttons div {
+        padding: 10px 20px;
+        border-radius: 6px;
+        color: white;
+        font-family: Roboto;
+        font-size: 20px;
+        text-align: center;
+        cursor: pointer;
+    }
+
+.cancel-btn {
+    background-color: var(--grey);
+}
+
+.confirm-btn {
+    background-color: var(--primary);
 }

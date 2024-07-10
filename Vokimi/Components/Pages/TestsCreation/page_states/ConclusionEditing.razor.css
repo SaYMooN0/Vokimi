@@ -4,18 +4,6 @@
     box-sizing: border-box;
 }
 
-.test-conclustion-label {
-    margin-top: 20px;
-    width: 100%;
-    display: block;
-    text-align: center;
-    font-size: 32px;
-    font-family: Roboto;
-}
-
-.top-input-zone {
-}
-
 .hor-div {
     display: grid;
     grid-template-columns: 1fr auto;

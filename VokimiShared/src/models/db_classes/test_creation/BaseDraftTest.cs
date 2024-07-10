@@ -17,7 +17,7 @@ namespace VokimiShared.src.models.db_classes.test_creation
         public TestTemplate Template { get; protected set; }
         public virtual ICollection<DraftTestResult> PossibleResults { get; set; } = new List<DraftTestResult>();
 
-        public void UpdateConclusion(TestConclusion conclusion) {
+        public void AddConclusion(TestConclusion conclusion) {
             ConclusionId = conclusion.Id;
             Conclusion = conclusion;
         }

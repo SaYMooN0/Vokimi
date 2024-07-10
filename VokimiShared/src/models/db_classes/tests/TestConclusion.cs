@@ -6,11 +6,11 @@ namespace VokimiShared.src.models.db_classes.tests
     {
         public TestConclusionId Id { get; init; }
 
-        public string Text { get; init; }
-        public string? AdditionalImage { get; init; }
-        public bool Feedback { get; init; }
-        public string? FeedbackText { get; init; }
-        public uint? MaxCharactersForFeedback { get; init; }
+        public string Text { get; private set; }
+        public string? AdditionalImage { get; private set; }
+        public bool Feedback { get; private set; }
+        public string? FeedbackText { get; private set; }
+        public uint? MaxCharactersForFeedback { get; private set; }
         public static TestConclusion CreateNew(ConclusionCreationForm data) => new() {
             Id = new(),
             Text = data.Text,
@@ -19,5 +19,13 @@ namespace VokimiShared.src.models.db_classes.tests
             FeedbackText = data.FeedbackText,
             MaxCharactersForFeedback = data.MaxCharactersForFeedback
         };
+        public void Update(ConclusionCreationForm data) {
+            Text = data.Text;
+            AdditionalImage = data.ImagePath;
+            Feedback = data.AddFeedback;
+            FeedbackText = data.FeedbackText;
+            MaxCharactersForFeedback = data.MaxCharactersForFeedback;
+        }
+
     }
 }

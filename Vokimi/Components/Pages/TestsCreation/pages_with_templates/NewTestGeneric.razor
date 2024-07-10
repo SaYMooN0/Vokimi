@@ -31,13 +31,13 @@
                     break;
                 case TestCreationPageState.QuestionEditing:
                     <QuestionEditing QuestionId="currentQuestionToEditId"
-                                     GoBackAction="()=>ChangePageState(TestCreationPageState.Overview)" />
+                                     BackToOverviewAction="()=>ChangePageState(TestCreationPageState.Overview)" />
                     break;
                 case TestCreationPageState.ResultsCreation:
                     <ResultsCreation />
                     break;
                 case TestCreationPageState.ConclusionEditing:
-                    <ConclusionEditing />
+                    <ConclusionEditing BackToOverviewAction="()=>ChangePageState(TestCreationPageState.Overview)" />
                     break;
                 case TestCreationPageState.StylesEditing:
                     <StylesEditing />

@@ -1,23 +1,27 @@
-﻿
+﻿@inject TestsCreationDbOperationsService testsCreationDbOperationsService
+@inject VokimiStorageService vokimiStorageService
+
 <ActionConfirmationDialog @ref="confirmationDialogRef"
                           ConfirmAction="DeleteConclusion"
                           ConfirmButtonText="Delete" />
-@if (AnyConclusionAdded) {
-    <div class="conclusion-added-title">
-        <label>Test Conclusion Added</label>
+<div class="conclusion-area-content">
+    @if (AnyConclusionAdded) {
+        <label>
+            Test Conclusion: Added
+        </label>
         <div class="conclusion-actions-container">
-            <div class="edit-btn" @onclick="ChangePageStateToConclusionEditing">Edit</div>
-            <div class="remove-btn" @onclick='()=>confirmationDialogRef.Open("Do you really want to remove test conclusion?")'>
+            <div class="edit-btn" @onclick="ChangePageStateToConclusionEditing">
+                Edit Conclusion
+            </div>
+            <div class="remove-btn"
+                 @onclick='()=>confirmationDialogRef.Open("Do you really want to remove test conclusion?")'>
                 Remove
             </div>
         </div>
-    </div>
 
-}
-else {
-
-    <div class="no-added-conclustion-title">
-        Test Conclusion(Optional):
+    }
+    else {
+        <label>Test Conclusion(Optional):</label>
         <div class="add-conclustion-btn" @onclick="ChangePageStateToConclusionEditing">
             Add
             <svg viewBox="0 0 24 24" fill="none">
@@ -25,17 +29,25 @@ else {
                 <path d="M2.5 12C2.5 7.52166 2.5 5.28249 3.89124 3.89124C5.28249 2.5 7.52166 2.5 12 2.5C16.4783 2.5 18.7175 2.5 20.1088 3.89124C21.5 5.28249 21.5 7.52166 21.5 12C21.5 16.4783 21.5 18.7175 20.1088 20.1088C18.7175 21.5 16.4783 21.5 12 21.5C7.52166 21.5 5.28249 21.5 3.89124 20.1088C2.5 18.7175 2.5 16.4783 2.5 12Z" stroke="currentColor" stroke-width="1.5" />
             </svg>
         </div>
-    </div>
-}
+    }
+</div>
 
 @code {
     private ActionConfirmationDialog confirmationDialogRef;
 
+    [CascadingParameter(Name = "TestId")] public DraftTestId TestId { get; set; }
     [Parameter] public bool AnyConclusionAdded { get; set; }
     [Parameter] public Action ChangePageStateToConclusionEditing { get; set; }
 
     private void EditConclusion() { }
-    private void DeleteConclusion() {
-
+    private async Task<Err> DeleteConclusion() {
+        Err dbDelitingErr = await testsCreationDbOperationsService.RemoveDraftTestConclusion(TestId);
+        if (dbDelitingErr.NotNone()) {
+            return dbDelitingErr;
+        }
+        await vokimiStorageService.ClearDraftTestConclusionUnusedImages(TestId);
+        AnyConclusionAdded = false;
+        StateHasChanged();
+        return Err.None;
     }
 }

@@ -1,9 +1,13 @@
 ﻿<BaseDialog DialogId="@id" @ref="baseDialogRef">
     <div class="dialog-content">
-        <p>@dialogMessage</p>
+        <label class="confirm-action-label">Confirm your action</label>
+        <p class="dialog-message">@dialogMessage</p>
+        @if (!string.IsNullOrEmpty(errorMessage)) {
+            <p class="error-message">@errorMessage</p>
+        }
         <div class="dialog-buttons">
-            <button class="dialog-button" @onclick="Close">@CancelButtonText</button>
-            <button class="dialog-button" @onclick="ConfirmAction">@ConfirmButtonText</button>
+            <div class="cancel-btn" @onclick="Close">@CancelButtonText</div>
+            <div class="confirm-btn" @onclick="ConfitmButtonClick">@ConfirmButtonText</div>
         </div>
     </div>
 </BaseDialog>
@@ -11,11 +15,13 @@
 @code {
     private string id;
     private BaseDialog baseDialogRef;
-    private string dialogMessage;
+    private string
+        dialogMessage,
+        errorMessage;
 
     [Parameter] public string ConfirmButtonText { get; set; } = "Confirm";
     [Parameter] public string CancelButtonText { get; set; } = "Cancel";
-    [Parameter] public Action ConfirmAction { get; set; }
+    [Parameter] public Func<Task<Err>> ConfirmAction { get; set; }
     protected override void OnParametersSet() {
         id = Guid.NewGuid().ToString();
     }
@@ -24,6 +30,15 @@
         dialogMessage = message;
         StateHasChanged();
         await baseDialogRef.OpenAsync();
+    }
+    public async void ConfitmButtonClick() {
+        Err err = await ConfirmAction();
+        if (err.NotNone()) {
+            errorMessage = err.Message;
+            StateHasChanged();
+        }
+        else { Close(); }
+
     }
 
 }

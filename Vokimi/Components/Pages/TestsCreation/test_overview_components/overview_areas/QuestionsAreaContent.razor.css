@@ -44,7 +44,7 @@
 .edit-question-btn {
     height: 100%;
     width: fit-content;
-    padding: 10px 20px;
+    padding: 6px 20px;
     background-color: var(--primary);
     font-family: Roboto;
     color: white;
@@ -53,14 +53,13 @@
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
     transition-duration: 0.2s;
 }
 
     .edit-question-btn svg {
         height: 100%;
         aspect-ratio: 1/1;
-        fill: white;
     }
 
     .edit-question-btn:hover {
