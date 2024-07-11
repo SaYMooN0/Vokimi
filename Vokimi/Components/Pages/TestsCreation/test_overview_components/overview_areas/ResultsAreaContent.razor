@@ -1,0 +1,10 @@
+﻿<div class="results-area">
+    Results area:
+    <div class="edit-results-btn" @onclick="ChangePageStateToResultsEditing">Edit</div>
+</div>
+
+@code {
+
+    [CascadingParameter(Name = "TestId")] public DraftTestId TestId { get; set; }
+    [Parameter] public Action ChangePageStateToResultsEditing { get; set; }
+}

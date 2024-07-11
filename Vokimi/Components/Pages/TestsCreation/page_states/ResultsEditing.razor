@@ -1,0 +1,101 @@
+﻿@using Vokimi.Components.Pages.TestsCreation.page_states.shared_components
+@using Vokimi.Components.Pages.TestsCreation.results_creation_components
+
+@inject TestsCreationDbOperationsService testsCreationDbOperationsService
+
+<PageStateTopLabel LabelText="Results Editing" BackToOverviewAction="BackToOverviewAction" />
+
+<form class="results-editing-form" @onsubmit="HandleSubmit">
+    <div class="saved-results-label">
+        Saved Results
+        <div class="collapse-all-btn" @onclick="CollapseAllSavedResults">Collapse all</div>
+    </div>
+    <div class="saved-results-container">
+        @foreach (var r in formData.SavedResults) {
+            <ResultEditingComponentWrapper>
+                <ResultIdChildContent>
+                    <label>@r.StringId</label>
+                </ResultIdChildContent>
+                <InputsContent>
+                    <div>inputs pepep</div>
+                </InputsContent>
+            </ResultEditingComponentWrapper>
+        }
+    </div>
+    <div class="not-saved-results-label">
+        New Results:
+        <div class="collapse-all-btn" @onclick="CollapseAllNotSavedResults">Collapse all</div>
+    </div>
+    <div class="not-results-container">
+        @foreach (var r in formData.NotSavedResults) {
+            <ResultEditingComponentWrapper>
+                <ResultIdChildContent>
+                    <label class="result-id-input-label">
+                        Result id: <input type="text" />
+                    </label>
+                </ResultIdChildContent>
+                <InputsContent>
+                    <div>inputs pepep</div>
+                </InputsContent>
+            </ResultEditingComponentWrapper>
+        }
+    </div>
+    <p class="error-message">@errorMessage</p>
+    <button type="submit">Save</button>
+</form>
+
+@code {
+    private string errorMessage = string.Empty;
+
+    [Parameter] public Action BackToOverviewAction { get; set; }
+
+    [CascadingParameter(Name = "TestID")] public DraftTestId TestId { get; set; }
+
+    private TestResultsEditingForm formData = TestResultsEditingForm.Empty;
+
+    private List<ResultEditingComponentWrapper> savedResultsWrapperRefs = new();
+    private List<ResultEditingComponentWrapper> notSavedResultsWrapperRefs = new();
+
+    protected override async Task OnInitializedAsync() {
+        Err err = await FetchFormData();
+        if (err.NotNone()) {
+            errorMessage = err.Message;
+        }
+        await base.OnInitializedAsync();
+    }
+    private async void HandleSubmit() {
+        //save to db
+
+        // await FetchFormData();
+        // StateHasChanged();
+    }
+    private async Task<Err> FetchFormData() {
+        BaseDraftTest? test = await testsCreationDbOperationsService.GetDraftTestById(TestId);
+        if (test is null) {
+            formData = TestResultsEditingForm.Empty;
+            return new Err("Error fetching results data");
+        }
+        formData = TestResultsEditingForm.FromDraftTest(test);
+        return Err.None;
+    }
+    public void CollapseAllSavedResults() {
+        foreach (var wrapperRef in savedResultsWrapperRefs) {
+            wrapperRef.Hide();
+        }
+    }
+    public void CollapseAllNotSavedResults() {
+        foreach (var wrapperRef in notSavedResultsWrapperRefs) {
+            wrapperRef.Hide();
+        }
+    }
+    private void AddSavedResultWrapperRef(ResultEditingComponentWrapper wrapper) {
+        if (!savedResultsWrapperRefs.Contains(wrapper)) {
+            savedResultsWrapperRefs.Add(wrapper);
+        }
+    }
+    private void AddNotSavedResultWrapperRef(ResultEditingComponentWrapper wrapper) {
+        if (!notSavedResultsWrapperRefs.Contains(wrapper)) {
+            notSavedResultsWrapperRefs.Add(wrapper);
+        }
+    }
+}

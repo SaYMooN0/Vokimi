@@ -9,6 +9,7 @@ namespace VokimiShared.src.models.db_classes.test_creation
         public string StringId { get; init; }
         public string Text { get; private set; }
         public string? ImagePath { get; private set; }
+        public virtual ICollection<BaseAnswer> AnswersLeadingToResult { get; set; } = [];
         public static DraftTestResult CreateNew(string stringId, DraftTestId testId) => new() {
             Id = new(),
             TestId = testId,
@@ -16,7 +17,6 @@ namespace VokimiShared.src.models.db_classes.test_creation
             Text = string.Empty,
         };
 
-        public virtual ICollection<BaseAnswer> AnswersLeadingToResult { get; set; } = [];
 
     }
 }

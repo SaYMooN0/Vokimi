@@ -23,7 +23,8 @@
                     <TestOverview TestDto="new DraftGenericTestDto(draftTest)"
                                   ChangePageStateToMainInfoEditing="()=>ChangePageState(TestCreationPageState.MainInfoEditing)"
                                   ChangePageStateToQuestionEditing="ChangePageStateToQuestionEditing"
-                                  ChangePageStateToConclusionEditing="()=>ChangePageState(TestCreationPageState.ConclusionEditing)" />
+                                  ChangePageStateToConclusionEditing="()=>ChangePageState(TestCreationPageState.ConclusionEditing)"
+                                  ChangePageStateToResultsEditing="()=>ChangePageState(TestCreationPageState.ResultsEditing)"/>
                     break;
                 case TestCreationPageState.MainInfoEditing:
                     <MainInfoEditing Test="new DraftGenericTestDto(draftTest)"
@@ -33,8 +34,8 @@
                     <QuestionEditing QuestionId="currentQuestionToEditId"
                                      BackToOverviewAction="()=>ChangePageState(TestCreationPageState.Overview)" />
                     break;
-                case TestCreationPageState.ResultsCreation:
-                    <ResultsCreation />
+                case TestCreationPageState.ResultsEditing:
+                    <ResultsEditing BackToOverviewAction="()=>ChangePageState(TestCreationPageState.Overview)" />
                     break;
                 case TestCreationPageState.ConclusionEditing:
                     <ConclusionEditing BackToOverviewAction="()=>ChangePageState(TestCreationPageState.Overview)" />
@@ -64,12 +65,12 @@
     private TestCreationPageState pageState { get; set; } = TestCreationPageState.Overview;
     private DraftTestId? parsedTestId = null;
 
-    public enum TestCreationPageState
+    private enum TestCreationPageState
     {
         Overview,
         MainInfoEditing,
         QuestionEditing,
-        ResultsCreation,
+        ResultsEditing,
         StylesEditing,
         TagsAdding,
         ConclusionEditing

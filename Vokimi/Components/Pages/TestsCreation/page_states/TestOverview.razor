@@ -17,12 +17,9 @@
         </div>
     </div>
 
-    <div class="questions-area">
-        <QuestionsAreaContent EditQuestionAction="ChangePageStateToQuestionEditing" />
+    <QuestionsAreaContent EditQuestionAction="ChangePageStateToQuestionEditing" />
 
-    </div>
-    <div class="results-area">
-    </div>
+    <ResultsAreaContent ChangePageStateToResultsEditing="ChangePageStateToResultsEditing" />
     <ConclusionAreaContent AnyConclusionAdded="!(TestDto.ConclusionId is null)"
                            ChangePageStateToConclusionEditing="ChangePageStateToConclusionEditing" />
     <div class="styles-area">
@@ -35,5 +32,6 @@
     [Parameter] public DraftGenericTestDto TestDto { get; set; }
     [Parameter] public Action ChangePageStateToMainInfoEditing { get; set; }
     [Parameter] public Action ChangePageStateToConclusionEditing { get; set; }
+    [Parameter] public Action ChangePageStateToResultsEditing { get; set; }
     [Parameter] public Action<DraftTestQuestionId> ChangePageStateToQuestionEditing { get; set; }
 }
