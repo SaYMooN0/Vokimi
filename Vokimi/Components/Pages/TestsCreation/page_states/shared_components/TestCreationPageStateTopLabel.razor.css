@@ -1,9 +1,10 @@
 ﻿.top-label {
     position: fixed;
+    left: 0;
     box-sizing: border-box;
+    width: 100%;
     background-color: var(--back);
     height: 40px;
-    width: inherit;
     display: flex;
     justify-content: center;
     font-size: 28px;
@@ -13,7 +14,7 @@
 
 .go-back-btn {
     position: absolute;
-    left: 30px;
+    left: 10%;
     padding: 2px 0;
     box-sizing: border-box;
     display: flex;

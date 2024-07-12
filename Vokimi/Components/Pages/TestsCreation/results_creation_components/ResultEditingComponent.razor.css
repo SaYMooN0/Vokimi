@@ -1,0 +1,49 @@
+﻿.result-container {
+    box-shadow: rgb(63, 66, 106, 0.12) 0px 2px 2px 0px, rgb(101, 106, 178, 0.1) 0px -2px 2px 0px;
+    border-radius: 8px;
+    margin-top: 8px;
+    padding: 0;
+}
+
+.always-shown {
+    width: 100%;
+    padding: 0px 4px;
+    box-sizing: border-box;
+    display: grid;
+    grid-template-columns: 1fr auto;
+}
+
+.content-toogle-btn {
+    margin-right: 6px;
+    width: 36px;
+    padding: 0;
+    border-radius: 30%;
+    aspect-ratio: 1/1;
+    color: var(--grey);
+    transition: all 0.12s ease;
+    cursor: pointer;
+}
+
+    .content-toogle-btn path {
+        stroke-width: 2;
+    }
+
+    .content-toogle-btn:hover {
+        color: var(--primary);
+    }
+
+    .content-toogle-btn:active {
+        border-radius: 34%;
+    }
+
+.inputs-block-content {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    padding: 2px 10px;
+    gap: 6px;
+    box-sizing: border-box;
+}
+
+.hidden-content {
+    display: none;
+}

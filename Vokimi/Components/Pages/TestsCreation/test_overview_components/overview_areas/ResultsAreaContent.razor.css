@@ -1,2 +1,9 @@
-﻿body {
+﻿.edit-results-btn {
+    width:fit-content;
+    padding: 10px;
+    background-color: var(--primary);
 }
+
+    .edit-results-btn:hover {
+        background-color: var(--primary-hov);
+    }

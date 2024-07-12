@@ -1,2 +1,46 @@
-﻿body {
+﻿
+.results-editing-form {
+    width: 100%;
+    padding: 0 calc(12% - 80px);
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
 }
+
+.saved-results-label {
+    margin-top: 50px !important;
+}
+
+.results-section-label {
+    margin: 6px 0;
+    width: 100%;
+    box-sizing: border-box;
+    padding-left: 20px;
+    font-family: Roboto;
+    font-size: 26px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.collapse-all-btn {
+    font-size: 21px;
+    color: var(--grey);
+    cursor: pointer;
+}
+
+    .collapse-all-btn:hover {
+        text-decoration: underline;
+    }
+
+.new-result-btn {
+    align-self: end;
+    background: var(--primary);
+    font-family: Roboto;
+    color: white;
+    cursor: pointer;
+}
+
+    .new-result-btn:hover {
+        background: var(--primary-hov);
+    }

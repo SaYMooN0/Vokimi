@@ -1,0 +1,30 @@
+﻿<div class="result-container">
+    <div class="always-shown">
+        @ChildContent
+        <svg viewBox="0 0 24 24" fill="none"
+             class="content-toogle-btn" @onclick="()=>isHidden=!isHidden">
+            @if (isHidden) {
+                <path d="M18 15C18 15 13.5811 9.00001 12 9C10.4188 8.99999 6 15 6 15"
+                      stroke="currentColor" stroke-width="1.5"
+                      stroke-linecap="round" stroke-linejoin="round" />
+            }
+            else {
+                <path d="M18 9.00005C18 9.00005 13.5811 15 12 15C10.4188 15 6 9 6 9"
+                      stroke="currentColor" stroke-width="1.5"
+                      stroke-linecap="round" stroke-linejoin="round" />
+            }
+        </svg>
+    </div>
+    <div class="@(isHidden?"hidden-content":"inputs-block-content" )">
+        <ResultTextInput @bind-ResultText="ResultForm.Text"/>
+        <ResultImageInput />
+        <div class="remove-result-btn" @onclick="RemoveResultAction">delete</div>
+    </div>
+</div>
+@code {
+    private bool isHidden = false;
+    public void Hide() => isHidden = true;
+    [Parameter] public RenderFragment ChildContent { get; set; }
+    [Parameter] public Action RemoveResultAction { get; set; }
+    [Parameter] public IResultEditingForm ResultForm { get; set; }
+}

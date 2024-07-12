@@ -3,43 +3,34 @@
 
 @inject TestsCreationDbOperationsService testsCreationDbOperationsService
 
-<PageStateTopLabel LabelText="Results Editing" BackToOverviewAction="BackToOverviewAction" />
 
 <form class="results-editing-form" @onsubmit="HandleSubmit">
-    <div class="saved-results-label">
+    <TestCreationPageStateTopLabel LabelText="Results Editing" BackToOverviewAction="BackToOverviewAction" />
+    <div class="saved-results-label results-section-label">
         Saved Results
         <div class="collapse-all-btn" @onclick="CollapseAllSavedResults">Collapse all</div>
     </div>
-    <div class="saved-results-container">
-        @foreach (var r in formData.SavedResults) {
-            <ResultEditingComponentWrapper>
-                <ResultIdChildContent>
-                    <label>@r.StringId</label>
-                </ResultIdChildContent>
-                <InputsContent>
-                    <div>inputs pepep</div>
-                </InputsContent>
-            </ResultEditingComponentWrapper>
-        }
-    </div>
-    <div class="not-saved-results-label">
+    @foreach (var r in formData.SavedResults) {
+        <ResultEditingComponent @ref="AddSavedResultWrapperRef"
+                                ResultForm="r"
+                                RemoveResultAction="()=>{}">
+            <label>@r.StringId</label>
+        </ResultEditingComponent>
+    }
+    <div class="results-section-label">
         New Results:
         <div class="collapse-all-btn" @onclick="CollapseAllNotSavedResults">Collapse all</div>
     </div>
-    <div class="not-results-container">
-        @foreach (var r in formData.NotSavedResults) {
-            <ResultEditingComponentWrapper>
-                <ResultIdChildContent>
-                    <label class="result-id-input-label">
-                        Result id: <input type="text" />
-                    </label>
-                </ResultIdChildContent>
-                <InputsContent>
-                    <div>inputs pepep</div>
-                </InputsContent>
-            </ResultEditingComponentWrapper>
-        }
-    </div>
+    @foreach (var r in formData.NotSavedResults) {
+        <ResultEditingComponent @ref="AddNotSavedResultWrapperRef"
+                                ResultForm="r"
+                                RemoveResultAction="()=>{}">
+            <label class="result-id-input-label">
+                Result id: <input type="text" />
+            </label>
+        </ResultEditingComponent>
+    }
+    <div class="new-result-btn">New result</div>
     <p class="error-message">@errorMessage</p>
     <button type="submit">Save</button>
 </form>
@@ -53,8 +44,13 @@
 
     private TestResultsEditingForm formData = TestResultsEditingForm.Empty;
 
-    private List<ResultEditingComponentWrapper> savedResultsWrapperRefs = new();
-    private List<ResultEditingComponentWrapper> notSavedResultsWrapperRefs = new();
+    ResultEditingComponent AddSavedResultWrapperRef
+    { set => savedResultsWrapperRefs.Add(value); }
+    private List<ResultEditingComponent> savedResultsWrapperRefs = new();
+
+    ResultEditingComponent AddNotSavedResultWrapperRef
+    { set => notSavedResultsWrapperRefs.Add(value); }
+    private List<ResultEditingComponent> notSavedResultsWrapperRefs = new();
 
     protected override async Task OnInitializedAsync() {
         Err err = await FetchFormData();
@@ -86,16 +82,6 @@
     public void CollapseAllNotSavedResults() {
         foreach (var wrapperRef in notSavedResultsWrapperRefs) {
             wrapperRef.Hide();
-        }
-    }
-    private void AddSavedResultWrapperRef(ResultEditingComponentWrapper wrapper) {
-        if (!savedResultsWrapperRefs.Contains(wrapper)) {
-            savedResultsWrapperRefs.Add(wrapper);
-        }
-    }
-    private void AddNotSavedResultWrapperRef(ResultEditingComponentWrapper wrapper) {
-        if (!notSavedResultsWrapperRefs.Contains(wrapper)) {
-            notSavedResultsWrapperRefs.Add(wrapper);
         }
     }
 }

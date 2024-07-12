@@ -197,7 +197,6 @@ namespace Vokimi.Services
             }
             using (var transaction = await _db.Database.BeginTransactionAsync()) {
                 try {
-                    _db.DraftTestResults.Add(result);
                     test.PossibleResults.Add(result);
 
                     await _db.SaveChangesAsync();

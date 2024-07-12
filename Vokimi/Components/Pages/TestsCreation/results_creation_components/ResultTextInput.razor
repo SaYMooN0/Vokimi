@@ -1,5 +1,13 @@
-﻿<h3>ResultTextInput</h3>
-
+﻿<textarea class="result-text-input" type="text" @onchange="@OnTextChanged" value="@ResultText" />
 @code {
+    [Parameter]
+    public string ResultText { get; set; }
 
+    [Parameter]
+    public EventCallback<string> ResultTextChanged { get; set; }
+
+    private async Task OnTextChanged(ChangeEventArgs e) {
+        ResultText = (string)e.Value;
+        await ResultTextChanged.InvokeAsync(ResultText);
+    }
 }

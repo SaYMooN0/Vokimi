@@ -3,12 +3,12 @@
 
 @inject TestsCreationDbOperationsService testsCreationDbOperationsService
 
-<input @bind="resultId" placeholder="Type new result id" name="@Guid.NewGuid()" class="result-id-input"/>
+<input @bind="resultId" placeholder="Type new result id" name="@Guid.NewGuid()" class="result-id-input" />
 <p class="error-string">@errorMessage</p>
 
 
 @code {
-    [Parameter] public List<string> AlreadyExistingResultIds { get; set; }
+    [Parameter] public Func<Task<List<string>>> AlreadyExistingResultIds { get; set; }
     [CascadingParameter(Name = "TestId")] public DraftTestId TestId { get; set; }
 
     private readonly string id = "new-result-dialog";
@@ -18,44 +18,44 @@
 
     private async Task Close() => await baseDialogRef.CloseAsync();
     public async Task Open() =>
-        await baseDialogRef.OpenAsync();
+    await baseDialogRef.OpenAsync();
 
     private readonly Regex ResultStringIdValidatingRegex = new("^[a-zA-Z0-9_-]+$");
 
 
     public async Task<string?> SaveNewResult() {
-        errorMessage=string.Empty;
+        errorMessage = string.Empty;
         resultId = resultId.Trim();
         if (
             string.IsNullOrWhiteSpace(resultId) ||
             resultId.Length > TestCreationConsts.ResultMaxCharacters ||
             resultId.Length < TestCreationConsts.ResultMinCharacters) {
 
-            errorMessage =
-                $"Result id must be between {TestCreationConsts.ResultMinCharacters} and {TestCreationConsts.ResultMaxCharacters} characters";
-            StateHasChanged();
-            return null;
+            return ShowErrorAndReturnNull(
+                $"Result id must be between {TestCreationConsts.ResultMinCharacters} and {TestCreationConsts.ResultMaxCharacters} characters");
         }
 
         if (!ResultStringIdValidatingRegex.IsMatch(resultId)) {
-            errorMessage = "Result id can only contain letters, numbers, underscores, and hyphens";
-            StateHasChanged();
-            return null;
+            return
+            ShowErrorAndReturnNull("Result id can only contain letters, numbers, underscores, and hyphens");
+
         }
 
-        if (AlreadyExistingResultIds.Contains(resultId)) {
-            errorMessage = "Result with such id already exists";
-            StateHasChanged();
-            return null;
+        if ((await AlreadyExistingResultIds()).Contains(resultId)) {
+            return ShowErrorAndReturnNull("Result with such id already exists");
+
         }
         Err err = await testsCreationDbOperationsService.CreateNewDraftTestResult(TestId, resultId);
         if (err.NotNone()) {
-            errorMessage = err.ToString();
-            StateHasChanged();
-            return null;
+            return ShowErrorAndReturnNull(err.ToString());
         }
         return resultId;
 
+    }
+    private string? ShowErrorAndReturnNull(string error) {
+        errorMessage = error;
+        StateHasChanged();
+        return null;
     }
 }
 

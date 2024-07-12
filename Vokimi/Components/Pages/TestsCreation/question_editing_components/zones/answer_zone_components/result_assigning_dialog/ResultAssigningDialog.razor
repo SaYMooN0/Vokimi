@@ -7,10 +7,10 @@
 
 <BaseDialog DialogId="result-assigning-dialog" @ref="baseDialogRef">
     <div class="dialog-content">
-        @if (string.IsNullOrEmpty(errorString)) {
+        @if (string.IsNullOrWhiteSpace(errorString)) {
             @if (isResultCreationContent) {
                 <ResultCreationContent @ref="resultCreationContentRef"
-                                       AlreadyExistingResultIds="@allResultStringIdsForTest" />
+                                       AlreadyExistingResultIds="AllResultStringIdsForTest" />
             }
             else {
                 <ResultAssigningContent @ref="resultAssigningContentRef"
@@ -39,31 +39,32 @@
     [CascadingParameter(Name = "TestId")] public DraftTestId TestId { get; set; }
 
     private List<string> currentResultsListToModifyRef = [];
-    private List<string> allResultStringIdsForTest = [];
+    private async Task<List<string>> AllResultStringIdsForTest() =>
+        (await testsCreationDbOperationsService.GetResultStringIdsForDraftTest(TestId)).Match(
+           list => list,
+           err => {
+               errorString = err.ToString();
+               StateHasChanged();
+               return [];
+           }
+       );
+
     private Action RerenderResutsViewComponents;
-
-
-    protected override async Task OnInitializedAsync() {
-        base.OnInitialized();
-        (await testsCreationDbOperationsService.GetResultStringIdsForDraftTest(TestId)).Switch(
-            list => allResultStringIdsForTest = list,
-            err => errorString = err.ToString()
-        );
-        StateHasChanged();
-    }
-
 
 
     public async Task Open(List<string> answerResultsToModify, Action rerenderResulViewComponent) {
         isResultCreationContent = false;
         errorString = string.Empty;
+        StateHasChanged();
+
         currentResultsListToModifyRef = answerResultsToModify;
         RerenderResutsViewComponents = rerenderResulViewComponent;
 
-        var resulsToChooseFrom = allResultStringIdsForTest.Except(currentResultsListToModifyRef);
+        var resulsToChooseFrom = (await AllResultStringIdsForTest())
+            .Where(r => !currentResultsListToModifyRef.Contains(r))
+            .ToList();
         resultAssigningContentRef.UpdateDataOnOpen(resulsToChooseFrom);
 
-        StateHasChanged();
         await baseDialogRef.OpenAsync();
     }
     private async void Close() =>
@@ -83,7 +84,6 @@
         }
         else {
             currentResultsListToModifyRef.Add(newResId);
-            allResultStringIdsForTest.Add(newResId);
             RerenderResutsViewComponents();
             Close();
         }

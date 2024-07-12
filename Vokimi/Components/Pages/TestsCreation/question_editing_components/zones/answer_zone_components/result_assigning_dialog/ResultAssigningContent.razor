@@ -18,7 +18,8 @@
 <p class="error-string">@errorString</p>
 
 @code {
-    private IEnumerable<string> ResultIds { get; set; } = [];
+    private List<string> ResultIds=[];
+
     [Parameter] public Action ChangeToResultCreating { get; set; }
     [CascadingParameter(Name = "TestId")] public DraftTestId TestId { get; set; }
 
@@ -36,10 +37,10 @@
         }
         return ChosenResult;
     }
-    public void UpdateDataOnOpen(IEnumerable<string> resultIds) {
-        ChosenResult = null;
+    public void UpdateDataOnOpen(List<string> resultIds) {
+        ChosenResult = string.Empty;
         ResultIds = resultIds;
-        errorString = null;
-
+        errorString = string.Empty;
+        StateHasChanged();
     }
 }
