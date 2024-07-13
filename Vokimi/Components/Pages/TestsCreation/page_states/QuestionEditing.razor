@@ -17,7 +17,7 @@ else {
             <div class="top-input-zone">
                 <div class="text-input-area">
                     <label for="question-text-label" class="question-text-label">Question Text:</label>
-                    <textarea id="question-text-input" @bind="formData.Text" />
+                    <textarea id="question-text-input" class="default-textarea" @bind="formData.Text" />
                 </div>
                 <div class="cover-input-area">
                     @if (string.IsNullOrEmpty(formData.ImagePath)) {

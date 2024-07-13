@@ -8,7 +8,9 @@
             GeneralFolder = "general",
             DraftTestAnswersFolder = "draft_tests_answers",
             DraftTestCoversFolder = "draft_tests_covers",
-            DraftTestConclusionsFolder = "draft_tests_conclusions";
+            DraftTestConclusionsFolder = "draft_tests_conclusions",
+            DraftTestResultsFolder = "draft_tests_results"
+            ;
         public static string DefaultTestCoverImg => $"{GeneralFolder}/test_cover_default.webp";
         public static string ImgUrl(string fileKey) =>
            $"vokimiimgs/GetImage/{fileKey}";

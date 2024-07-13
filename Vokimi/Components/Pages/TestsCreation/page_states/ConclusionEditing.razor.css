@@ -3,7 +3,9 @@
     padding: 0 calc(12% - 80px);
     box-sizing: border-box;
 }
-
+.top-input-zone{
+    margin-top:40px;
+}
 .hor-div {
     display: grid;
     grid-template-columns: 1fr auto;
@@ -34,21 +36,15 @@
     max-height: 240px;
     padding: 4px 6px;
     box-sizing: border-box;
-    border: 2px solid transparent;
     border-radius: 6px;
-    outline: none;
-    background-color: var(--back-2);
     font-size: 20px;
-    font-family: Roboto;
 }
 
 .hor-div .conclustion-text-input {
     max-height: 480px;
 }
 
-.conclustion-text-input:focus {
-    border-color: var(--primary);
-}
+
 
 .add-img-btn {
     margin-top: 12px;
@@ -85,6 +81,7 @@
 }
 
 .img-display {
+    height:100%;
     width: 100%;
     max-width: 440px;
     box-sizing: border-box;

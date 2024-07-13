@@ -40,10 +40,21 @@
     display: grid;
     grid-template-columns: 1fr auto auto;
     padding: 2px 10px;
-    gap: 6px;
+    gap: 10px;
     box-sizing: border-box;
+    animation: slideIn 0.4s forwards;
 }
 
 .hidden-content {
     display: none;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0.1;
+    }
+
+    to {
+        opacity: 1;
+    }
 }

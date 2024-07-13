@@ -16,8 +16,8 @@
         </svg>
     </div>
     <div class="@(isHidden?"hidden-content":"inputs-block-content" )">
-        <ResultTextInput @bind-ResultText="ResultForm.Text"/>
-        <ResultImageInput />
+        <ResultTextInput @bind-ResultText="ResultForm.Text" />
+        <ResultImageInput @bind-ImagePath="ResultForm.ImagePath" />
         <div class="remove-result-btn" @onclick="RemoveResultAction">delete</div>
     </div>
 </div>

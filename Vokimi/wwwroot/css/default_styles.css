@@ -1,0 +1,10 @@
+﻿.default-textarea {
+    outline: none;
+    background-color: var(--back-2);
+    border: 2px solid transparent;
+    font-family: Roboto;
+}
+
+    .default-textarea:focus {
+        border-color: var(--primary);
+    }
