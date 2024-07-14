@@ -2,38 +2,38 @@
 @using Vokimi.Components.Pages.TestsCreation.results_creation_components
 
 @inject TestsCreationDbOperationsService testsCreationDbOperationsService
+@inject VokimiStorageService vokimiStorageService
 
+<TestCreationPageStateTopLabel LabelText="Results Editing" BackToOverviewAction="BackToOverviewAction" />
+@if (formData.SavedResults.Count == 0 && formData.NotSavedResults.Count == 0) {
+    <NoResultsAddedLabel CreateNewResultAction="AddNewResult" />
+}
+else {
 
-<form class="results-editing-form" @onsubmit="HandleSubmit">
-    <TestCreationPageStateTopLabel LabelText="Results Editing" BackToOverviewAction="BackToOverviewAction" />
-    <div class="saved-results-label results-section-label">
-        Saved Results
-        <div class="collapse-all-btn" @onclick="CollapseAllSavedResults">Collapse all</div>
-    </div>
-    @foreach (var r in formData.SavedResults) {
-        <ResultEditingComponent @ref="AddSavedResultWrapperRef"
-                                ResultForm="r"
-                                RemoveResultAction="()=>{}">
-            <label>@r.StringId</label>
-        </ResultEditingComponent>
-    }
-    <div class="results-section-label">
-        New Results:
-        <div class="collapse-all-btn" @onclick="CollapseAllNotSavedResults">Collapse all</div>
-    </div>
-    @foreach (var r in formData.NotSavedResults) {
-        <ResultEditingComponent @ref="AddNotSavedResultWrapperRef"
-                                ResultForm="r"
-                                RemoveResultAction="()=>{}">
-            <label class="result-id-input-label">
-                Result id: <input type="text" />
-            </label>
-        </ResultEditingComponent>
-    }
-    <div class="new-result-btn">New result</div>
-    <p class="error-message">@errorMessage</p>
-    <button type="submit">Save</button>
-</form>
+    <form class="results-editing-form" @onsubmit="HandleSubmit">
+        <ResultsSectionHeader Text="Saved Results:" CollapseAction="CollapseAllSavedResults" />
+        @foreach (var r in formData.SavedResults) {
+            <ResultEditingComponent @ref="AddSavedResultWrapperRef"
+                                    ResultForm="r"
+                                    RemoveResultAction="()=>{formData.SavedResults.Remove(r); StateHasChanged();}">
+                <label class="result-id-label">@r.StringId</label>
+            </ResultEditingComponent>
+        }
+        <ResultsSectionHeader Text="New Results:" CollapseAction="CollapseAllNotSavedResults" />
+        @foreach (var r in formData.NotSavedResults) {
+            <ResultEditingComponent @ref="AddNotSavedResultWrapperRef"
+                                    ResultForm="r"
+                                    RemoveResultAction="()=>{formData.NotSavedResults.Remove(r); StateHasChanged();}">
+                <label class="result-id-input-label">
+                    Result id: <input @bind="r.ResultStringId" type="text" />
+                </label>
+            </ResultEditingComponent>
+        }
+        <div class="new-result-btn" @onclick="AddNewResult">New result</div>
+        <p class="error-message">@errorMessage</p>
+        <button type="submit" class="save-results-btn">Save</button>
+    </form>
+}
 
 @code {
     private string errorMessage = string.Empty;
@@ -60,13 +60,33 @@
         await base.OnInitializedAsync();
     }
     private async void HandleSubmit() {
-        //validate
+        Err validationErr = ValidateForm(formData);
+        if (validationErr.NotNone()) {
+            errorMessage = validationErr.Message;
+            StateHasChanged();
+            return;
+        }
 
-        //save to db
+        Err savingErr = await testsCreationDbOperationsService
+            .UpdateDraftTestResults(TestId, formData.SavedResults, formData.NotSavedResults);
 
-        //remove not used images
-        // await FetchFormData();
-        // StateHasChanged();
+        if (savingErr.NotNone()) {
+            errorMessage = savingErr.Message;
+            StateHasChanged();
+            return;
+        }
+        errorMessage = string.Empty;
+        await FetchFormData();
+        
+        StateHasChanged();
+        //after fetching results all results become saved
+        var usedImageKeys = formData.SavedResults
+            .Select(r => r.ImagePath)
+            .Where(s => !string.IsNullOrEmpty(s));
+        await vokimiStorageService.ClearUnusedDraftTestResultsImages(TestId, usedImageKeys);
+
+
+
     }
     private async Task<Err> FetchFormData() {
         BaseDraftTest? test = await testsCreationDbOperationsService.GetDraftTestById(TestId);
@@ -86,5 +106,31 @@
         foreach (var wrapperRef in notSavedResultsWrapperRefs) {
             wrapperRef.Hide();
         }
+    }
+    private Err ValidateForm(TestResultsEditingForm form) {
+        List<string> usedResIds = form.SavedResults.Select(r => r.StringId).ToList();
+        for (int i = 0; i < form.NotSavedResults.Count; i++) {
+            if (string.IsNullOrWhiteSpace(form.NotSavedResults[i].ResultStringId)) {
+                return new Err("Error: Result id cannot be empty");
+            }
+            string resErrorPref = $"New result error. Id: {form.NotSavedResults[i].ResultStringId}. ";
+            if (usedResIds.Contains(form.NotSavedResults[i].ResultStringId)) {
+                return new Err(resErrorPref + "There is already result with this id");
+            }
+            if (form.NotSavedResults[i].ResultStringId.Length < TestCreationConsts.ResultIdMinCharacters) {
+                return new Err(resErrorPref + $"Result id cannot be less than {TestCreationConsts.ResultIdMinCharacters} characters");
+            }
+            if (form.NotSavedResults[i].ResultStringId.Length > TestCreationConsts.ResultIdMaxCharacters) {
+                return new Err(resErrorPref + $"Result id cannot be more than {TestCreationConsts.ResultIdMaxCharacters} characters");
+            }
+
+            usedResIds.Add(form.NotSavedResults[i].ResultStringId);
+        }
+
+        return Err.None;
+    }
+    private void AddNewResult() {
+        formData.AddNewResult();
+        StateHasChanged();
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OneOf;
 using OneOf.Types;
+using System.Collections.Immutable;
 using Vokimi.src.data;
 using VokimiShared.src;
 using VokimiShared.src.enums;
@@ -11,6 +12,7 @@ using VokimiShared.src.models.db_classes.tests;
 using VokimiShared.src.models.db_classes.users;
 using VokimiShared.src.models.form_classes;
 using VokimiShared.src.models.form_classes.draft_tests_answers_form;
+using VokimiShared.src.models.form_classes.result_editing;
 
 namespace Vokimi.Services
 {
@@ -267,5 +269,68 @@ namespace Vokimi.Services
             }
             return test.Conclusion;
         }
+        public async Task<Err> UpdateDraftTestResults(DraftTestId testId,
+            List<ResultWithSaveIdForm> savedResults,
+            List<NotSavedResultForm> notSavedResults) {
+            using (var transaction = await _db.Database.BeginTransactionAsync()) {
+                try {
+                    BaseDraftTest? test = await GetDraftTestById(testId);
+                    if (test is null) {
+                        return new Err("Unknown test");
+                    }
+
+                    var resultsToRemove = new List<DraftTestResult>();
+
+                    ImmutableDictionary<DraftTestResultId, ResultWithSaveIdForm> savedResultsIds =
+                        savedResults.ToImmutableDictionary(r => r.Id, r => r);
+
+                    foreach (var r in test.PossibleResults) {
+                        if (savedResultsIds.TryGetValue(r.Id, out ResultWithSaveIdForm newData)) {
+                            r.Update(newData.Text, newData.ImagePath);
+                        }
+                        else {
+                            resultsToRemove.Add(r);
+                        }
+                    }
+                    foreach (var newRes in notSavedResults) {
+                        DraftTestResult r = DraftTestResult.CreateNew(
+                            newRes.ResultStringId,
+                            testId,
+                            newRes.Text,
+                            newRes.ImagePath
+                            );
+                        test.PossibleResults.Add(r);
+                    }
+
+                    foreach (var r in resultsToRemove) {
+                        await DeleteDraftTestResult(r);
+                    }
+
+
+                    await _db.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                    return Err.None;
+                } catch (Exception ex) {
+                    await transaction.RollbackAsync();
+                    return new Err("Server error. Please try again later");
+                }
+            }
+        }
+        private async Task<Err> DeleteDraftTestResult(DraftTestResult result) {
+
+            try {
+                foreach (var answer in result.AnswersLeadingToResult.ToList()) {
+                    answer.RelatedResults.Remove(result);
+                }
+
+                _db.DraftTestResults.Remove(result);
+
+                await _db.SaveChangesAsync();
+                return Err.None;
+            } catch (Exception ex) {
+                return new Err("Server error. Please try again later");
+            }
+        }
+
     }
 }

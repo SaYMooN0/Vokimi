@@ -28,11 +28,11 @@
         resultId = resultId.Trim();
         if (
             string.IsNullOrWhiteSpace(resultId) ||
-            resultId.Length > TestCreationConsts.ResultMaxCharacters ||
-            resultId.Length < TestCreationConsts.ResultMinCharacters) {
+            resultId.Length > TestCreationConsts.ResultIdMaxCharacters ||
+            resultId.Length < TestCreationConsts.ResultIdMinCharacters) {
 
             return ShowErrorAndReturnNull(
-                $"Result id must be between {TestCreationConsts.ResultMinCharacters} and {TestCreationConsts.ResultMaxCharacters} characters");
+                $"Result id must be between {TestCreationConsts.ResultIdMinCharacters} and {TestCreationConsts.ResultIdMaxCharacters} characters");
         }
 
         if (!ResultStringIdValidatingRegex.IsMatch(resultId)) {

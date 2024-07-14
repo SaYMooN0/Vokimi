@@ -1,0 +1,21 @@
+﻿.results-section-label {
+    margin: 6px 0;
+    width: 100%;
+    box-sizing: border-box;
+    padding-left: 20px;
+    font-family: Roboto;
+    font-size: 26px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.collapse-all-btn {
+    font-size: 21px;
+    color: var(--grey);
+    cursor: pointer;
+}
+
+    .collapse-all-btn:hover {
+        text-decoration: underline;
+    }

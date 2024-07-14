@@ -49,6 +49,16 @@
     display: none;
 }
 
+.remove-result-btn {
+    align-self: center;
+    background-color: var(--grey);
+    padding: 10px 20px;
+}
+
+    .remove-result-btn:hover {
+        background-color: var(--red-del);
+    }
+
 @keyframes slideIn {
     from {
         opacity: 0.1;
