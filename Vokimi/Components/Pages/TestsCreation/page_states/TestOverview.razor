@@ -19,19 +19,19 @@
 
     <QuestionsAreaContent EditQuestionAction="ChangePageStateToQuestionEditing" />
 
-    <ResultsAreaContent ChangePageStateToResultsEditing="ChangePageStateToResultsEditing" />
+    <ResultsAreaContent ChangePageStateToResultsEditing="ChangePageStateToResultsEditing"
+                        ResultsCount="@TestDto.ResultsCount" />
     <ConclusionAreaContent AnyConclusionAdded="!(TestDto.ConclusionId is null)"
                            ChangePageStateToConclusionEditing="ChangePageStateToConclusionEditing" />
-    <div class="styles-area">
-        Change Test Styles(Optional)
-        <button>Change</button>
-    </div>
-</div>
 
+    <StylesEditingAreaContent ChangePageStateToStylesEditing="ChangePageStateToStylesEditing" />
+
+</div>
 @code {
     [Parameter] public DraftGenericTestDto TestDto { get; set; }
     [Parameter] public Action ChangePageStateToMainInfoEditing { get; set; }
     [Parameter] public Action ChangePageStateToConclusionEditing { get; set; }
     [Parameter] public Action ChangePageStateToResultsEditing { get; set; }
+    [Parameter] public Action ChangePageStateToStylesEditing { get; set; }
     [Parameter] public Action<DraftTestQuestionId> ChangePageStateToQuestionEditing { get; set; }
 }

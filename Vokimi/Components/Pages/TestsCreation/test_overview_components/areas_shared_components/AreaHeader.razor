@@ -1,0 +1,27 @@
+﻿<div class="area-header">
+    <label>
+        @LabelText
+        @AreaIcon
+    </label>
+    @if (RightSideContent is not null) {
+        @RightSideContent
+
+    }
+</div>
+
+
+@code {
+    [Parameter] public string LabelText { get; set; }
+    [Parameter] public RenderFragment AreaIcon { get; set; }
+    [Parameter] public RenderFragment RightSideContent { get; set; }
+}
+<style>
+    .area-header svg {
+        height: 35px;
+        color: black;
+    }
+
+        .area-header svg path {
+            stroke-width: 2;
+        }
+</style>

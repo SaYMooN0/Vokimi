@@ -3,10 +3,12 @@
     font-family: "Roboto";
     font-size: 38px;
     color: var(--primary);
+    margin: 10px 0;
 }
 
 .templates-container {
     padding: 10px;
+    gap: 40px;
     display: flex;
     justify-content: space-evenly;
 }

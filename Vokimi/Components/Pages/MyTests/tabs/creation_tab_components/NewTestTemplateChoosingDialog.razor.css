@@ -2,36 +2,64 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
-    padding: 20px 30px;
-    width: 900px;
+    padding: 20px 40px;
+    width: auto;
+    position: relative;
 }
 
 .server-message {
+    align-self: center;
     font-family: "Roboto";
     font-size: 18px;
+    color: var(--red-del);
 }
 
 
 .close-btn {
-    background-color: #ff4d4d;
-    height: 40px;
-    padding: 2px;
+    position: absolute;
+    right: 12px;
+    top: 12px;
+    background-color: var(--grey);
+    height: 30px;
+    padding: 5px;
+    box-sizing: border-box;
     aspect-ratio: 1/1;
-    color: #fff;
+    border-radius: 50%;
+    fill: white;
+    cursor: pointer;
 }
 
-    .close-btn svg {
-        fill: white;
-        height: 100%;
+    .close-btn:hover {
+        background-color: var(--red-del);
     }
 
-    .close-btn:hover {
-        background-color: #ff1a1a;
+.test-name-info {
+    font-family: Roboto;
+    font-size: 26px;
+    padding: 10px 120px;
+}
+
+.test-name-input {
+    align-self: center;
+    width: 90%;
+    padding: 6px 10px;
+    border: 3px solid var(--back-2);
+    border-radius: 60px;
+    font-size: 24px;
+    outline: none;
+}
+
+    .test-name-input:focus {
+        border-color: var(--primary);
     }
+
 
 .continue-btn {
-    padding: 10px 20px;
-    font-size: 16px;
+    align-self: center;
+    width: fit-content;
+    padding: 8px 26px;
+    font-size: 20px;
+    letter-spacing: 1px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
@@ -45,6 +73,6 @@
     }
 
     .continue-btn.continue-inactive {
-        background-color: #6c757d !important;
+        background-color: var(--grey) !important;
         cursor: not-allowed;
     }

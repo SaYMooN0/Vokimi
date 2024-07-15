@@ -1,4 +1,6 @@
 ﻿@using Vokimi.Components.Pages.TestsCreation.test_overview_components.dialogs
+@using Vokimi.Components.Pages.TestsCreation.test_overview_components.areas_shared_components
+
 @inject TestsCreationDbOperationsService testsCreationDbOperationsService
 
 <ActionConfirmationDialog @ref="confirmationDialogRef"
@@ -7,7 +9,21 @@
 
 <NewQuestionCreationDialog @ref="@questionCreationDialogRef" ParentStateHasChanged="FetchQuestions" />
 
-<label class="question-area-title">Test Questions (@Questions.Count)</label>
+
+<AreaHeader LabelText=@($"Test Questions {Questions.Count}")>
+    <AreaIcon>
+        <svg viewBox="0 0 24 24" fill="none">
+            <path d="M2.5 12C2.5 7.52166 2.5 5.28249 3.89124 3.89124C5.28249 2.5 7.52166 2.5 12 2.5C16.4783 2.5 18.7175 2.5 20.1088 3.89124C21.5 5.28249 21.5 7.52166 21.5 12C21.5 16.4783 21.5 18.7175 20.1088 20.1088C18.7175 21.5 16.4783 21.5 12 21.5C7.52166 21.5 5.28249 21.5 3.89124 20.1088C2.5 18.7175 2.5 16.4783 2.5 12Z" stroke="currentColor" stroke-width="1.5" />
+            <path d="M10 9C10 7.89543 10.8954 7 12 7C13.1046 7 14 7.89543 14 9C14 9.39815 13.8837 9.76913 13.6831 10.0808C13.0854 11.0097 12 11.8954 12 13V13.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+            <path d="M11.992 17H12.001" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+    </AreaIcon>
+    <RightSideContent>
+        <button>
+            Hide btn
+        </button>
+    </RightSideContent>
+</AreaHeader>
 <div class="question-vms-container">
     @for (int i = 0; i < Questions.Count(); i++) {
         var q = Questions[i];
@@ -25,11 +41,10 @@
                         <path d="M21 12C21 16.2426 21 18.364 19.682 19.682C18.364 21 16.2426 21 12 21C7.75736 21 5.63604 21 4.31802 19.682C3 18.364 3 16.2426 3 12C3 7.75736 3 5.63604 4.31802 4.31802C5.63604 3 7.75736 3 12 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
                     </svg>
                 </div>
-                <div class="delete-question-btn" @onclick="()=>OnDelteQuestionPressed(localIndex)">
-                    <svg viewBox="0 0 448 512">
-                        <path d="M432 256c0 17.7-14.3 32-32 32L48 288c-17.7 0-32-14.3-32-32s14.3-32 32-32l352 0c17.7 0 32 14.3 32 32z" />
-                    </svg>
-                </div>
+                <svg class="delete-question-btn" @onclick="()=>OnDelteQuestionPressed(localIndex)" viewBox="0 0 24 24" fill="none">
+                    <path d="M16 12L8 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M2.5 12C2.5 7.52166 2.5 5.28249 3.89124 3.89124C5.28249 2.5 7.52166 2.5 12 2.5C16.4783 2.5 18.7175 2.5 20.1088 3.89124C21.5 5.28249 21.5 7.52166 21.5 12C21.5 16.4783 21.5 18.7175 20.1088 20.1088C18.7175 21.5 16.4783 21.5 12 21.5C7.52166 21.5 5.28249 21.5 3.89124 20.1088C2.5 18.7175 2.5 16.4783 2.5 12Z" stroke="currentColor" stroke-width="1.5" />
+                </svg>
             </div>
         </div>
     }

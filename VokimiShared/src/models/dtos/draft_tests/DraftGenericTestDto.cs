@@ -11,6 +11,7 @@ namespace VokimiShared.src.models.dtos.draft_tests
         public DateTime CreationDate { get; init; }
         public TestConclusionId? ConclusionId { get; protected set; }
         public int QuestionsCount { get;protected set; }
+        public int ResultsCount {  get; protected set; }
         public DraftGenericTestDto(DraftGenericTest test) {
             Id = test.Id;
             CreatorId = test.CreatorId;
@@ -18,6 +19,7 @@ namespace VokimiShared.src.models.dtos.draft_tests
             CreationDate = test.CreationDate;
             ConclusionId = test.Conclusion is null ? null : test.Conclusion.Id;
             QuestionsCount = test.Questions.Count;
+            ResultsCount=test.PossibleResults.Count;
         }
 
     }

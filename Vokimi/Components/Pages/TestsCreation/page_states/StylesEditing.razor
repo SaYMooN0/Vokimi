@@ -1,6 +1,44 @@
-﻿<h3>Styles</h3>
-<button>Skip</button>
+﻿@using Vokimi.Components.Pages.TestsCreation.page_states.shared_components
+
+<TestCreationPageStateTopLabel LabelText="Styles Editing" BackToOverviewAction="BackToOverviewAction" />
+<div class="page-state-content">
+    <div class="color-picker">
+        <div class="default-colors">
+            @foreach (var color in defaultColors) {
+                <div class="color-swatch" @onclick="() => ChooseColor(color)" style="background-color:@color;">
+                </div>
+            }
+        </div>
+        <div class="custom-color">
+            <label for="customColor">My Color</label>
+            <input type="color" id="customColor" @oninput="OnCustomColorChanged" />
+        </div>
+        <div class="chosen-color">
+            <label>Chosen Color:</label>
+            <div class="color-swatch" style="background-color:@chosenColor;">
+            </div>
+        </div>
+    </div>
+</div>
+
 
 @code {
+    private static string[] defaultColors = new[]
+    {
+        "#796cfa",
+        "#ff6c1f",
+        "#e46b67",
+        "#6d88f4",
+        "#f05593"
+    };
+    private string chosenColor = defaultColors[0];
 
+    private void ChooseColor(string color) {
+        chosenColor = color;
+    }
+
+    private void OnCustomColorChanged(ChangeEventArgs e) {
+        chosenColor = e.Value.ToString();
+    }
+    [Parameter] public Action BackToOverviewAction { get; set; }
 }

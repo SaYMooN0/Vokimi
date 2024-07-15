@@ -25,12 +25,12 @@
     </div>
 </TestsViewSection>
 
-<TestsViewSection SectionLabel=@($"Created Tests ({createdTestsCount})")>
+<TestsViewSection SectionLabel=@($"Published Tests ({publishedTestsCount})")>
     <div class="test-vms-container">
     </div>
 </TestsViewSection>
 
-<button>My Tests Statistic</button>
+<button>Published Tests Statistic</button>
 
 <div class="create-test-button" @onclick="OpenTemplateChoosingDialog">Create New</div>
 
@@ -38,7 +38,7 @@
 
 @code {
     private int draftTestsCount = 0;
-    private int createdTestsCount = 0;
+    private int publishedTestsCount = 0;
     private int testPackageCount = 4;
 
 

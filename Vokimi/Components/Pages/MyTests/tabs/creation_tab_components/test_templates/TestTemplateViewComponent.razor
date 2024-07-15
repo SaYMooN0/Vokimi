@@ -1,13 +1,15 @@
 ﻿<div class='template @(IsActive? "chosen-template" : "")' @onclick="OnClick">
-    <div class="icon">
+    <div class="icon-name-container">
         <DynamicComponent Type="Template.TemplateIconComponent()" />
+        <label class="name">
+            @GetTempalteName(Template)
+        </label>
     </div>
-    <label class="name">
-        @GetTempalteName(Template)
-    </label>
+
+
     <div class="features">
         @foreach (var f in Template.Features()) {
-            <p>• @f</p>
+            <label>• @f</label>
         }
     </div>
 </div>

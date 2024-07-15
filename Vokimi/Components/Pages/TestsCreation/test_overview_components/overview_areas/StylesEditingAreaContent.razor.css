@@ -1,10 +1,9 @@
-﻿.edit-results-btn {
-    width: fit-content;
-    font-family: Roboto;
+﻿.change-btn {
     padding: 6px;
     background-color: var(--primary);
+    cursor: pointer;
 }
 
-    .edit-results-btn:hover {
+    .change-btn:hover {
         background-color: var(--primary-hov);
     }

@@ -1,0 +1,19 @@
+﻿.area-header {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    width: 100%;
+    margin: 10px 40px;
+    box-sizing: border-box;
+}
+
+    .area-header label {
+        display: flex;
+        gap: 8px;
+        color: black;
+        font-family: "Quicksand";
+        font-weight: bold;
+        font-size: 30px;
+        display:flex;
+        align-items:center;
+    }
