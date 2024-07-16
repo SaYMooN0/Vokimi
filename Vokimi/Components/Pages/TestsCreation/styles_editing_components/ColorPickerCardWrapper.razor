@@ -1,0 +1,18 @@
+﻿<div class='card @(IsChosen? "chosen":"")' @onclick="Onclick">
+    @ChildContent
+    <label class="color-label">@Color</label>
+    <div class="is-chosen-indicator">
+        @if (IsChosen) {
+            <span></span>
+        }
+    </div>
+
+</div>
+
+
+@code {
+    [Parameter] public string Color { get; set; }
+    [Parameter] public bool IsChosen { get; set; }
+    [Parameter] public RenderFragment ChildContent { get; set; }
+    [Parameter] public Action Onclick { get; set; }
+}

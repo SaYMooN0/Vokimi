@@ -1,44 +1,22 @@
 ﻿@using Vokimi.Components.Pages.TestsCreation.page_states.shared_components
+@using Vokimi.Components.Pages.TestsCreation.styles_editing_components
 
 <TestCreationPageStateTopLabel LabelText="Styles Editing" BackToOverviewAction="BackToOverviewAction" />
-<div class="page-state-content">
-    <div class="color-picker">
-        <div class="default-colors">
-            @foreach (var color in defaultColors) {
-                <div class="color-swatch" @onclick="() => ChooseColor(color)" style="background-color:@color;">
-                </div>
-            }
-        </div>
-        <div class="custom-color">
-            <label for="customColor">My Color</label>
-            <input type="color" id="customColor" @oninput="OnCustomColorChanged" />
-        </div>
-        <div class="chosen-color">
-            <label>Chosen Color:</label>
-            <div class="color-swatch" style="background-color:@chosenColor;">
-            </div>
-        </div>
-    </div>
-</div>
+<form class="styles-editing-form" name="formData" @onsubmit="HandleSubmit">
+    <AccentColorPicker @bind-ChosenAccentColor="formData.AccentColor" />
+    <button class="save-btn" type="submit">Save</button>
+</form>
 
 
 @code {
-    private static string[] defaultColors = new[]
-    {
-        "#796cfa",
-        "#ff6c1f",
-        "#e46b67",
-        "#6d88f4",
-        "#f05593"
-    };
-    private string chosenColor = defaultColors[0];
-
-    private void ChooseColor(string color) {
-        chosenColor = color;
-    }
-
-    private void OnCustomColorChanged(ChangeEventArgs e) {
-        chosenColor = e.Value.ToString();
-    }
     [Parameter] public Action BackToOverviewAction { get; set; }
+
+    private TestStylesEditingForm formData { get; set; } = new();
+    protected override async Task OnInitializedAsync() {
+        //fetch form data from db
+        formData.AccentColor = TestCreationConsts.DefaultAccentColor;
+    }
+
+    private void HandleSubmit() {
+    }
 }

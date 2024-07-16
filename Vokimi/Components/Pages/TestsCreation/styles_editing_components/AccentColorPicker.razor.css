@@ -1,0 +1,53 @@
+﻿.colors-container {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+}
+
+.color-div {
+    height: 100px;
+    width: 100px;
+    border-radius: 6px;
+}
+
+#custom-color-container {
+    display: flex;
+    flex-direction: column;
+}
+
+#customColor {
+    appearance: none;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    background: none;
+    border: 0;
+    padding: 0;
+    height: 100px;
+    width: 100px;
+    cursor: pointer;
+}
+
+    #customColor:focus {
+        border-radius: 0;
+        outline: none;
+    }
+
+::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+::-webkit-color-swatch {
+    border: 0;
+    border-radius: 6px;
+}
+
+::-moz-color-swatch,
+::-moz-focus-inner {
+    border: 0;
+    border-radius: 6px;
+}
+
+::-moz-focus-inner {
+    padding: 0;
+    border-radius: 6px;
+}

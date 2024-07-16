@@ -1,0 +1,50 @@
+﻿<div class="color-picker">
+    <StylesEditingLabel Text="Choose test accent color" />
+    <div class="colors-container">
+        @foreach (var color in defaultColors) {
+            <ColorPickerCardWrapper Color="@color"
+                                    IsChosen="isDefaultColorChosen(color)"
+                                    Onclick="()=>{isCustomChosen=false; ChooseColor(color);}">
+                <div class="color-div" style="background-color:@color;">
+                </div>
+            </ColorPickerCardWrapper>
+
+        }
+        <ColorPickerCardWrapper IsChosen="isCustomChosen"
+                                Onclick="()=>isCustomChosen=true"
+                                Color="Custom">
+            <div id="custom-color-container">
+                <input type="color" id="customColor" @oninput="OnCustomColorChanged" />
+                <label for="customColor">My Color</label>
+            </div>
+
+
+        </ColorPickerCardWrapper>
+    </div>
+</div>
+
+@code {
+    private bool isCustomChosen = false;
+    private bool isDefaultColorChosen(string color) => !isCustomChosen && color == ChosenAccentColor;
+    private void ChooseColor(string newColor) {
+        ChosenAccentColor = newColor;
+        ChosenAccentColorChanged.InvokeAsync(newColor);
+        StateHasChanged();
+
+    }
+    private static string[] defaultColors = [
+    TestCreationConsts.DefaultAccentColor,
+    "#ff6c1f",
+    "#e46b67",
+    "#6d88f4",
+    "#f05593"
+    ];
+
+    private void OnCustomColorChanged(ChangeEventArgs e) => ChooseColor(e.Value.ToString());
+
+    [Parameter]
+    public string ChosenAccentColor { get; set; }
+
+    [Parameter]
+    public EventCallback<string> ChosenAccentColorChanged { get; set; }
+}

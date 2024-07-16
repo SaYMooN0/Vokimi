@@ -1,35 +1,7 @@
-.page-state-content {
-    margin: 40px;
-    width:100%;
-}
-.color-picker {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+.styles-editing-form {
+    margin-top: 40px;
 }
 
-.default-colors {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 10px;
+.save-btn {
+    padding: 10px 20px;
 }
-
-.color-swatch {
-    width: 30px;
-    height: 30px;
-    border: 1px solid #000;
-    cursor: pointer;
-}
-
-.custom-color {
-    margin-bottom: 10px;
-}
-
-.chosen-color {
-    display: flex;
-    align-items: center;
-}
-
-    .chosen-color .color-swatch {
-        margin-left: 10px;
-    }

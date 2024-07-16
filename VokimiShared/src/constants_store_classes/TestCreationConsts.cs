@@ -13,5 +13,7 @@
             ConclusionMaxCharsInText = 255,
             ConclusionMaxAccompanyingFeedbackTextChars = 255,
             ConclusionMaxFeedbackCharsCount = 255;
+
+        public const string DefaultAccentColor = "#796cfa";
     }
 }
