@@ -1,0 +1,27 @@
+﻿<StylesEditingLabel Text="Choose the arrows that will be on the previous and next buttons" />
+
+<div class="type-choosing-container">
+    @foreach (var arrowType in Enum.GetValues(typeof(ArrowIconType)).Cast<ArrowIconType>()) {
+        <ArrowTypeCard ArrowType="@arrowType" IsChosen="arrowType == ChosenType" Onclick="() => ChooseIconType(arrowType)" />
+    }
+</div>
+
+@code {
+    [Parameter]
+    public ArrowIconType ChosenType { get; set; }
+
+    [Parameter]
+    public EventCallback<ArrowIconType> ChosenTypeChanged { get; set; }
+
+    private void ChooseIconType(ArrowIconType type) {
+        ChosenType = type;
+        ChosenTypeChanged.InvokeAsync(type);
+    }
+}
+<style>
+    .arrow-icon {
+        height: 38px;
+        aspect-ratio: 1/1;
+        color: black;
+    }
+</style>

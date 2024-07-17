@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using VokimiShared.src.models.db_classes;
+using VokimiShared.src.models.db_classes.test;
 using VokimiShared.src.models.db_classes.test_answers;
 using VokimiShared.src.models.db_classes.test_creation;
 using VokimiShared.src.models.db_classes.tests;
@@ -25,6 +26,7 @@ namespace Vokimi.src.data
         public DbSet<TextAndImageAnswer> TextAndImageAnswers { get; set; }
         public DbSet<TextOnlyAnswer> TextOnlyAnswers { get; set; }
         public DbSet<DraftTestResult> DraftTestResults { get; set; }
+        public DbSet<TestStylesSheet> TestStyles { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
             optionsBuilder.UseLazyLoadingProxies();
@@ -80,6 +82,10 @@ namespace Vokimi.src.data
                 entity.HasMany(x => x.PossibleResults)
                       .WithOne()
                       .HasForeignKey(x => x.TestId);
+
+                entity.HasOne(x => x.StylesSheet)
+                     .WithMany()
+                     .HasForeignKey(x => x.StylesSheetId);
             });
 
             modelBuilder.Entity<DraftGenericTest>(entity => {
@@ -133,6 +139,11 @@ namespace Vokimi.src.data
                 entity.Property(x => x.StringId).IsRequired();
                 entity.Property(x => x.Text).IsRequired();
                 entity.Property(x => x.ImagePath).IsRequired(false);
+            });
+            modelBuilder.Entity<TestStylesSheet>(entity =>
+            {
+                entity.HasKey(x => x.Id);
+                entity.Property(x => x.Id).HasConversion(v => v.Value, v => new TestStylesSheetId(v));
             });
         }
     }

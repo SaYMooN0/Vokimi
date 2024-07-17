@@ -6,6 +6,7 @@ using Vokimi.src.data;
 using VokimiShared.src;
 using VokimiShared.src.enums;
 using VokimiShared.src.models.db_classes;
+using VokimiShared.src.models.db_classes.test;
 using VokimiShared.src.models.db_classes.test_answers;
 using VokimiShared.src.models.db_classes.test_creation;
 using VokimiShared.src.models.db_classes.tests;
@@ -25,11 +26,13 @@ namespace Vokimi.Services
         }
         public async Task<OneOf<DraftTestId, Err>> CreateNewDraftTest(string testName, TestTemplate template, AppUser creator) {
             DraftTestMainInfo mainInfo = DraftTestMainInfo.CreateNewFromName(testName);
-            DraftGenericTest test = DraftGenericTest.CreateNew(creator.Id, mainInfo.Id);
+            TestStylesSheet styles = TestStylesSheet.CreateNew();
+            DraftGenericTest test = DraftGenericTest.CreateNew(creator.Id, mainInfo.Id, styles.Id);
 
             using (var transaction = await _db.Database.BeginTransactionAsync()) {
                 try {
                     await _db.DraftTestMainInfo.AddAsync(mainInfo);
+                    await _db.TestStyles.AddAsync(styles);
                     await _db.SaveChangesAsync();
 
                     switch (template) {

@@ -17,13 +17,14 @@ namespace VokimiShared.src.models.db_classes.test_creation
         public DraftGenericTest() {
             Template = TestTemplate.Generic;
         }
-        public static DraftGenericTest CreateNew(AppUserId creatorId, DraftTestMainInfoId mainInfoId) =>
+        public static DraftGenericTest CreateNew(AppUserId creatorId, DraftTestMainInfoId mainInfoId, TestStylesSheetId stylesSheetId) =>
             new() {
                 Id = new(),
                 CreatorId = creatorId,
                 MainInfoId = mainInfoId,
                 CreationDate = DateTime.UtcNow,
-                ConclusionId = null
+                ConclusionId = null,
+                StylesSheetId = stylesSheetId
             };
     }
 }

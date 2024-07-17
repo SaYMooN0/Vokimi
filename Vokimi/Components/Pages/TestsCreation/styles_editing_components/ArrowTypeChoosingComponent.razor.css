@@ -1,0 +1,10 @@
+﻿.type-choosing-container {
+    width: fit-content;
+    justify-self: center;
+    align-self: center;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    gap: 30px;
+    margin-bottom: 6px;
+}

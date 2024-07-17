@@ -1,5 +1,7 @@
 .styles-editing-form {
     margin-top: 40px;
+    display: flex;
+    flex-direction: column;
 }
 
 .save-btn {

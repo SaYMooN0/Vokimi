@@ -1,0 +1,10 @@
+﻿<div class='arrows-type-card @(IsChosen? "chosen":"")' @onclick="@Onclick">
+    <DynamicComponent Type="@ArrowType.ArrowIconComponent(false)" />
+    <DynamicComponent Type="@ArrowType.ArrowIconComponent(true)" />
+</div>
+@code {
+    [Parameter] public ArrowIconType ArrowType { get; set; }
+    [Parameter] public bool IsChosen { get; set; }
+    [Parameter] public Action Onclick { get; set; }
+
+}
