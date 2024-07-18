@@ -1,23 +1,42 @@
 ﻿@using Vokimi.Components.Pages.TestsCreation.page_states.shared_components
 @using Vokimi.Components.Pages.TestsCreation.styles_editing_components
 
+@inject TestsCreationDbOperationsService testsCreationDbOperationsService
+
 <TestCreationPageStateTopLabel LabelText="Styles Editing" BackToOverviewAction="BackToOverviewAction" />
 <form class="styles-editing-form" name="formData" @onsubmit="HandleSubmit">
     <AccentColorPicker @bind-ChosenAccentColor="formData.AccentColor" />
     <ArrowTypeChoosingComponent @bind-ChosenType="formData.ArrowsType" />
+    <p class="error-message">@errorMessage</p>
     <button class="save-btn" type="submit">Save</button>
 </form>
 
 
 @code {
     [Parameter] public Action BackToOverviewAction { get; set; }
+    [CascadingParameter(Name = "TestId")] public DraftTestId TestId { get; set; }
 
     private TestStylesEditingForm formData { get; set; } = new();
+    private string errorMessage { get; set; }
+
     protected override async Task OnInitializedAsync() {
-        //fetch form data from db
+        errorMessage = string.Empty;
         formData = TestStylesEditingForm.Default;
+        (await testsCreationDbOperationsService.GetDraftTestStylesByDraftTestId(TestId)).Switch(
+            styles => formData = TestStylesEditingForm.FromTestStylesSheet(styles),
+            err => errorMessage = err.Message
+
+        );
     }
 
-    private void HandleSubmit() {
+    private async void HandleSubmit() {
+        errorMessage = string.Empty;
+        Err serverErr = await testsCreationDbOperationsService.UpdateStylesForDraftTest(TestId, formData);
+        if (serverErr.NotNone()) {
+            errorMessage = serverErr.Message;
+            StateHasChanged();
+            return;
+        }
+
     }
 }

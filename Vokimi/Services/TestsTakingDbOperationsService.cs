@@ -2,11 +2,11 @@
 
 namespace Vokimi.Services
 {
-    public class TestsDbOperationsService
+    public class TestsTakingDbOperationsService
     {
         private readonly VokimiDbContext _context;
 
-        public TestsDbOperationsService(VokimiDbContext context)
+        public TestsTakingDbOperationsService(VokimiDbContext context)
         {
             _context = context;
         }

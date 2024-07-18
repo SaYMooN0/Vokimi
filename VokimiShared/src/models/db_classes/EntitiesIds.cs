@@ -66,4 +66,14 @@
         public TestStylesSheetId() : this(Guid.NewGuid()) { }
         public override string ToString() => Value.ToString();
     }
+    public readonly record struct TestId(Guid Value)
+    {
+        public TestId() : this(Guid.NewGuid()) { }
+        public override string ToString() => Value.ToString();
+    } 
+    public readonly record struct MultiChoiceQuestionDataId(Guid Value)
+    {
+        public MultiChoiceQuestionDataId() : this(Guid.NewGuid()) { }
+        public override string ToString() => Value.ToString();
+    }
 }

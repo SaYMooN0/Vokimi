@@ -1,0 +1,30 @@
+﻿@switch (publisingState) {
+    case PublisingState.ErrorsChecking:
+        <h2>Errors checking</h2>
+        break;
+    case PublisingState.TagsAdding:
+        <h2>TagsAdding</h2>
+        break;
+    case PublisingState.SuccessfullyPublished:
+        <h2>Success</h2>
+        break;
+    default:
+        throw new NotImplementedException();
+}
+
+
+@code {
+    private enum PublisingState
+    {
+        ErrorsChecking,
+        TagsAdding,
+        SuccessfullyPublished
+    }
+    private PublisingState publisingState;
+    protected override Task OnInitializedAsync() {
+
+        publisingState = PublisingState.ErrorsChecking;
+
+        return base.OnInitializedAsync();
+    }
+}

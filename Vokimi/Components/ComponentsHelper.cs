@@ -21,6 +21,10 @@ namespace Vokimi.Components
                 (ArrowIconType.DefaultCircle, false) => typeof(ArrowDefaultCircleLeft),
                 (ArrowIconType.Double, true) => typeof(ArrowDoubleRight),
                 (ArrowIconType.Double, false) => typeof(ArrowDoubleLeft),
+                (ArrowIconType.DoubleSquare, true) => typeof(ArrowDoubleSquareRight),
+                (ArrowIconType.DoubleSquare, false) => typeof(ArrowDoubleSquareLeft),
+                (ArrowIconType.Long, true) => typeof(ArrowLongRight),
+                (ArrowIconType.Long, false) => typeof(ArrowLongLeft),
                 _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
             };
 

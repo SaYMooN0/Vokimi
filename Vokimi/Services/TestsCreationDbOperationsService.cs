@@ -128,7 +128,7 @@ namespace Vokimi.Services
             using (var transaction = await _db.Database.BeginTransactionAsync()) {
                 try {
                     await ClearAnswersForDraftTestQuestion(questionId);
-                    List<BaseAnswer> answers = new();
+                    List<BaseDraftTestAnswer> answers = new();
 
                     Dictionary<string, DraftTestResultId> results = _db.DraftTestResults
                        .Where(t => t.TestId == question.DraftTestId)
@@ -139,12 +139,12 @@ namespace Vokimi.Services
                             continue;
 
                         ushort orderIndex = (ushort)newData.Answers.IndexOf(answerForm);
-                        BaseAnswer answer = answerForm switch {
-                            ImageOnlyAnswerForm imageOnlyAnswerForm => ImageOnlyAnswer
+                        BaseDraftTestAnswer answer = answerForm switch {
+                            ImageOnlyAnswerForm imageOnlyAnswerForm => DraftTestImageOnlyAnswer
                                 .CreateNew(questionId, orderIndex, imageOnlyAnswerForm.ImagePath),
-                            TextAndImageAnswerForm textAndImageAnswerForm => TextAndImageAnswer
+                            TextAndImageAnswerForm textAndImageAnswerForm => DraftTestTextAndImageAnswer
                                 .CreateNew(questionId, orderIndex, textAndImageAnswerForm.Text, textAndImageAnswerForm.ImagePath),
-                            TextOnlyAnswerForm textOnlyAnswerForm => TextOnlyAnswer
+                            TextOnlyAnswerForm textOnlyAnswerForm => DraftTestTextOnlyAnswer
                                 .CreateNew(questionId, orderIndex, textOnlyAnswerForm.Text),
                             _ => throw new InvalidOperationException("Unknown answer type")
                         };
@@ -334,6 +334,22 @@ namespace Vokimi.Services
                 return new Err("Server error. Please try again later");
             }
         }
-
+        public async Task<OneOf<TestStylesSheet, Err>> GetDraftTestStylesByDraftTestId(DraftTestId testId) {
+            BaseDraftTest? test = await GetDraftTestById(testId);
+            if (test is null) {
+                return new Err("Unknown test");
+            }
+            return test.StylesSheet;
+        }
+        public async Task<Err> UpdateStylesForDraftTest(DraftTestId testId, TestStylesEditingForm formData) {
+            BaseDraftTest? test = await GetDraftTestById(testId);
+            if (test is null) {
+                return new Err("Unknown test");
+            }
+            test.StylesSheet.Update(formData.AccentColor, formData.ArrowsType);
+            _db.TestStyles.Update(test.StylesSheet);
+            await _db.SaveChangesAsync();
+            return Err.None;
+        }
     }
 }

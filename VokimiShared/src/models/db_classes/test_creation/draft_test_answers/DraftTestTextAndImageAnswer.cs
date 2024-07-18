@@ -1,10 +1,10 @@
 ﻿namespace VokimiShared.src.models.db_classes.test_answers
 {
-    public class TextAndImageAnswer : BaseAnswer
+    public class DraftTestTextAndImageAnswer : BaseDraftTestAnswer
     {
         public string Text { get; init; }
         public string ImagePath { get; init; }
-        public static TextAndImageAnswer CreateNew(
+        public static DraftTestTextAndImageAnswer CreateNew(
             DraftTestQuestionId questionId,
             ushort order,
             string text,

@@ -14,7 +14,13 @@
                                 Onclick="()=>isCustomChosen=true"
                                 Color="Custom">
             <div id="custom-color-container">
-                <input type="color" id="customColor" @oninput="OnCustomColorChanged" />
+                @if (isCustomChosen) {
+                    <input type="color" id="customColor" @oninput="OnCustomColorChanged" value="@ChosenAccentColor" />
+
+                }
+                else {
+                    <input type="color" id="customColor" @oninput="OnCustomColorChanged" />
+                }
                 <label for="customColor">My Color</label>
             </div>
 
@@ -24,7 +30,9 @@
 </div>
 
 @code {
-    private bool isCustomChosen = false;
+
+
+    private bool isCustomChosen;
     private bool isDefaultColorChosen(string color) => !isCustomChosen && color == ChosenAccentColor;
     private void ChooseColor(string newColor) {
         ChosenAccentColor = newColor;
@@ -39,7 +47,14 @@
     "#6d88f4",
     "#f05593"
     ];
-
+    protected override void OnParametersSet() {
+        if (defaultColors.Contains(ChosenAccentColor)) {
+            isCustomChosen = false;
+        }
+        else {
+            isCustomChosen = true;
+        }
+    }
     private void OnCustomColorChanged(ChangeEventArgs e) => ChooseColor(e.Value.ToString());
 
     [Parameter]

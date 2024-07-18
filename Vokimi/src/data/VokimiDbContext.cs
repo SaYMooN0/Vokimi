@@ -12,21 +12,26 @@ namespace Vokimi.src.data
     {
         public VokimiDbContext(DbContextOptions<VokimiDbContext> options) : base(options) { }
 
+        //users
         public DbSet<UnconfirmedAppUser> UnconfirmedAppUsers { get; set; }
         public DbSet<AppUser> AppUsers { get; set; }
         public DbSet<LoginInfo> LoginInfo { get; set; }
         public DbSet<UserAdditionalInfo> UserAdditionalInfo { get; set; }
+        //draft tests only
         public DbSet<BaseDraftTest> DraftTestsSharedInfo { get; set; }
         public DbSet<DraftGenericTest> DraftGenericTests { get; set; }
         public DbSet<DraftTestMainInfo> DraftTestMainInfo { get; set; }
-        public DbSet<TestConclusion> TestConclusions { get; set; }
         public DbSet<DraftTestQuestion> DraftTestQuestions { get; set; }
-        public DbSet<BaseAnswer> AnswersSharedInfo { get; set; }
-        public DbSet<ImageOnlyAnswer> ImageOnlyAnswers { get; set; }
-        public DbSet<TextAndImageAnswer> TextAndImageAnswers { get; set; }
-        public DbSet<TextOnlyAnswer> TextOnlyAnswers { get; set; }
+        public DbSet<BaseDraftTestAnswer> DraftTestAnswers { get; set; }
         public DbSet<DraftTestResult> DraftTestResults { get; set; }
+        //published and draft tests shared
+        public DbSet<TestConclusion> TestConclusions { get; set; }
         public DbSet<TestStylesSheet> TestStyles { get; set; }
+
+        //published tests only
+        public DbSet<DraftTestImageOnlyAnswer> ImageOnlyAnswers { get; set; }
+        public DbSet<DraftTestTextAndImageAnswer> TextAndImageAnswers { get; set; }
+        public DbSet<DraftTestTextOnlyAnswer> TextOnlyAnswers { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
             optionsBuilder.UseLazyLoadingProxies();
@@ -121,17 +126,25 @@ namespace Vokimi.src.data
 
                 entity.Property(x => x.DraftTestId).IsRequired();
             });
-            modelBuilder.Entity<BaseAnswer>(entity => {
-                entity.HasKey(x => x.AnswerId);
-                entity.Property(x => x.AnswerId).HasConversion(v => v.Value, v => new AnswerId(v));
+            modelBuilder.Entity<BaseDraftTestAnswer>(entity =>
+            {
+                entity.HasKey(e => e.AnswerId);
+                entity.Property(e => e.AnswerId).HasConversion(v => v.Value, v => new AnswerId(v));
+                entity.Property(e => e.QuestionId).IsRequired();
+                entity.Property(e => e.OrderInQuestion).IsRequired();
 
-                entity.HasMany(x => x.RelatedResults)
-                    .WithMany(r => r.AnswersLeadingToResult)
-                    .UsingEntity<Dictionary<string, object>>(
-                        "AnswersLeadingToResultsRelations",
-                        r => r.HasOne<DraftTestResult>().WithMany().HasForeignKey("DraftTestResultId"),
-                        l => l.HasOne<BaseAnswer>().WithMany().HasForeignKey("BaseAnswerId"));
+                entity.HasMany(e => e.RelatedResults)
+                      .WithMany(r => r.AnswersLeadingToResult)
+                      .UsingEntity<Dictionary<string, object>>(
+                          "BaseAnswerDraftTestResult",
+                          r => r.HasOne<DraftTestResult>().WithMany().HasForeignKey("DraftTestResultId"),
+                          l => l.HasOne<BaseDraftTestAnswer>().WithMany().HasForeignKey("BaseAnswerId")
+                      );
             });
+
+            modelBuilder.Entity<DraftTestImageOnlyAnswer>().ToTable("DraftTestAnswersImageOnly");
+            modelBuilder.Entity<DraftTestTextAndImageAnswer>().ToTable("DraftTestAnswersTextAndImage");
+            modelBuilder.Entity<DraftTestTextOnlyAnswer>().ToTable("DraftTestAnswersTextOnly");
 
             modelBuilder.Entity<DraftTestResult>(entity => {
                 entity.HasKey(x => x.Id);
@@ -140,8 +153,7 @@ namespace Vokimi.src.data
                 entity.Property(x => x.Text).IsRequired();
                 entity.Property(x => x.ImagePath).IsRequired(false);
             });
-            modelBuilder.Entity<TestStylesSheet>(entity =>
-            {
+            modelBuilder.Entity<TestStylesSheet>(entity => {
                 entity.HasKey(x => x.Id);
                 entity.Property(x => x.Id).HasConversion(v => v.Value, v => new TestStylesSheetId(v));
             });

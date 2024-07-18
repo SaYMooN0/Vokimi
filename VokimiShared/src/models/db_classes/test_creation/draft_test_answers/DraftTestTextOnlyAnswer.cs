@@ -1,9 +1,9 @@
 ﻿namespace VokimiShared.src.models.db_classes.test_answers
 {
-    public class TextOnlyAnswer : BaseAnswer
+    public class DraftTestTextOnlyAnswer : BaseDraftTestAnswer
     {
         public string Text { get; init; }
-        public static TextOnlyAnswer CreateNew(
+        public static DraftTestTextOnlyAnswer CreateNew(
             DraftTestQuestionId questionId,
             ushort order,
             string text) =>

@@ -1,6 +1,5 @@
 ﻿using VokimiShared.src.enums;
 using VokimiShared.src.models.db_classes.test_answers;
-using VokimiShared.src.models.db_classes.test_creation;
 
 namespace VokimiShared.src.models.db_classes.test_creation
 {
@@ -13,12 +12,9 @@ namespace VokimiShared.src.models.db_classes.test_creation
         public AnswersType AnswersType { get; init; }
         public bool IsMultipleChoice { get; private set; }
         public MultipleChoiceAdditionalData? MultipleChoiceData { get; private set; }
-        public virtual ICollection<BaseAnswer> Answers { get; private set; } = new List<BaseAnswer>();
+        public virtual ICollection<BaseDraftTestAnswer> Answers { get; private set; } = new List<BaseDraftTestAnswer>();
 
         public DraftTestId DraftTestId { get; init; }
-
-        public int MinPossiblePoints() => throw new NotImplementedException();
-        public int MaxPossiblePoints() => throw new NotImplementedException();
         public static DraftTestQuestion CreateNew(string text, AnswersType answersType, DraftTestId testId) => new() {
             Id = new(),
             Text = text,
@@ -28,13 +24,13 @@ namespace VokimiShared.src.models.db_classes.test_creation
             IsMultipleChoice = false,
             MultipleChoiceData = null,
             DraftTestId = testId,
-            Answers = new List<BaseAnswer>()
+            Answers = new List<BaseDraftTestAnswer>()
         };
         public void UpdateAsSingleChoice(
             string text,
             string? imagePath,
             bool shuffleAnswers,
-            ICollection<BaseAnswer> answers) {
+            ICollection<BaseDraftTestAnswer> answers) {
 
             Text = text;
             ImagePath = imagePath;
@@ -49,7 +45,7 @@ namespace VokimiShared.src.models.db_classes.test_creation
             string text,
             string? imagePath,
             bool shuffleAnswers,
-            ICollection<BaseAnswer> answers,
+            ICollection<BaseDraftTestAnswer> answers,
             MultipleChoiceAdditionalData multipleChoiceData) {
 
             Text = text;

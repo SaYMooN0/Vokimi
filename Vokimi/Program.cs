@@ -72,7 +72,7 @@ namespace Vokimi
                 options.UseNpgsql(configuration.GetConnectionString("VokimiDb")));
 
             services.AddScoped<UsersDbOperationsService>();
-            services.AddScoped<TestsDbOperationsService>();
+            services.AddScoped<TestsTakingDbOperationsService>();
             services.AddScoped<TestsCreationDbOperationsService>();
 
 

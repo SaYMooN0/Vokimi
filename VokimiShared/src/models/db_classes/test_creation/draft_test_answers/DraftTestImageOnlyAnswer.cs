@@ -1,16 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http.Headers;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace VokimiShared.src.models.db_classes.test_answers
+﻿namespace VokimiShared.src.models.db_classes.test_answers
 {
-    public class ImageOnlyAnswer : BaseAnswer
+    public class DraftTestImageOnlyAnswer : BaseDraftTestAnswer
     {
         public string ImagePath { get; init; }
-        public static ImageOnlyAnswer CreateNew(
+        public static DraftTestImageOnlyAnswer CreateNew(
             DraftTestQuestionId questionId,
             ushort order,
             string imagePath) =>

@@ -26,6 +26,8 @@
 
     <StylesEditingAreaContent ChangePageStateToStylesEditing="ChangePageStateToStylesEditing" />
 
+    <div class="publish-test-btn" @onclick="ChangePageStateToTestPublishing">Publish test</div>
+
 </div>
 @code {
     [Parameter] public DraftGenericTestDto TestDto { get; set; }
@@ -34,4 +36,6 @@
     [Parameter] public Action ChangePageStateToResultsEditing { get; set; }
     [Parameter] public Action ChangePageStateToStylesEditing { get; set; }
     [Parameter] public Action<DraftTestQuestionId> ChangePageStateToQuestionEditing { get; set; }
+    [Parameter] public Action ChangePageStateToTestPublishing { get; set; }
+
 }

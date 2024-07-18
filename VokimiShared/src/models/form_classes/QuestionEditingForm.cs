@@ -58,7 +58,7 @@ namespace VokimiShared.src.models.form_classes
             foreach (var answer in q.Answers.OrderBy(a => a.OrderInQuestion)) {
                 switch (q.AnswersType) {
                     case AnswersType.ImageOnly:
-                        var imageOnlyAnswer = answer as ImageOnlyAnswer;
+                        var imageOnlyAnswer = answer as DraftTestImageOnlyAnswer;
                         if (imageOnlyAnswer != null) {
                             answers.Add(new ImageOnlyAnswerForm {
                                 ImagePath = imageOnlyAnswer.ImagePath,
@@ -67,7 +67,7 @@ namespace VokimiShared.src.models.form_classes
                         }
                         break;
                     case AnswersType.TextAndImage:
-                        var textAndImageAnswer = answer as TextAndImageAnswer;
+                        var textAndImageAnswer = answer as DraftTestTextAndImageAnswer;
                         if (textAndImageAnswer != null) {
                             answers.Add(new TextAndImageAnswerForm {
                                 Text = textAndImageAnswer.Text,
@@ -78,7 +78,7 @@ namespace VokimiShared.src.models.form_classes
                         }
                         break;
                     case AnswersType.TextOnly:
-                        var textOnlyAnswer = answer as TextOnlyAnswer;
+                        var textOnlyAnswer = answer as DraftTestTextOnlyAnswer;
                         if (textOnlyAnswer != null) {
                             answers.Add(new TextOnlyAnswerForm {
                                 Text = textOnlyAnswer.Text,

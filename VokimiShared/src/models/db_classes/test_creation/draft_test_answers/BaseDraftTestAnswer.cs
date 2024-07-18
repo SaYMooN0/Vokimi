@@ -2,7 +2,7 @@
 
 namespace VokimiShared.src.models.db_classes.test_answers
 {
-    public abstract class BaseAnswer
+    public abstract class BaseDraftTestAnswer
     {
         public AnswerId AnswerId { get; set; }
         public DraftTestQuestionId QuestionId { get; set; }

@@ -4,6 +4,8 @@
     {
         Default,
         DefaultCircle,
-        Double
+        Double,
+        DoubleSquare,
+        Long
     }
 }

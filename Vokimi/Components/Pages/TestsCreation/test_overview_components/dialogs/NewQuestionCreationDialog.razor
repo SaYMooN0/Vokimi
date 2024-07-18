@@ -53,7 +53,11 @@
         await ParentStateHasChanged.InvokeAsync();
 
     }
-    public async Task Open() =>
+    public async Task Open() {
+        serverMessage = string.Empty;
+        questionText = string.Empty;
         await baseDialogRef.OpenAsync();
+
+    }
     private async Task Close() => await baseDialogRef.CloseAsync();
 }
