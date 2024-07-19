@@ -30,7 +30,7 @@
     margin: auto 20px 20px auto;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 6px;
+    gap: 10px;
 }
 
     .dialog-buttons div {
@@ -41,11 +41,15 @@
         font-size: 20px;
         text-align: center;
         cursor: pointer;
+        transition:all 0.08s ease-in;
     }
+        .dialog-buttons div:hover{
+            transform:scale(1.04);
+        }
 
-.cancel-btn {
-    background-color: var(--grey);
-}
+        .cancel-btn {
+            background-color: var(--grey);
+        }
 
 .confirm-btn {
     background-color: var(--primary);

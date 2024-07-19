@@ -1,4 +1,5 @@
 ﻿using VokimiShared.src.enums;
+using VokimiShared.src.models.db_classes.answers;
 using VokimiShared.src.models.db_classes.test_answers;
 using VokimiShared.src.models.db_classes.test_creation;
 using VokimiShared.src.models.form_classes.draft_tests_answers_form;
@@ -49,49 +50,39 @@ namespace VokimiShared.src.models.form_classes
 
 
         private static ushort ExtractMinAnswersCount(DraftTestQuestion q) =>
-           q.MultipleChoiceData is not null ? (ushort)q.MultipleChoiceData.MinAnswers : (ushort)1;
+           q.MultipleChoiceData is not null ? q.MultipleChoiceData.MinAnswers : (ushort)1;
         private static ushort ExtractMaxAnswersCount(DraftTestQuestion q) =>
-           q.MultipleChoiceData is not null ? (ushort)q.MultipleChoiceData.MaxAnswers : (ushort)3;
+           q.MultipleChoiceData is not null ? q.MultipleChoiceData.MaxAnswers : (ushort)3;
         private static List<BaseAnswerForm> ExtractAnswers(DraftTestQuestion q) {
-            List<BaseAnswerForm> answers = [];
+            List<BaseAnswerForm> answers =[];
 
             foreach (var answer in q.Answers.OrderBy(a => a.OrderInQuestion)) {
-                switch (q.AnswersType) {
-                    case AnswersType.ImageOnly:
-                        var imageOnlyAnswer = answer as DraftTestImageOnlyAnswer;
-                        if (imageOnlyAnswer != null) {
-                            answers.Add(new ImageOnlyAnswerForm {
-                                ImagePath = imageOnlyAnswer.ImagePath,
-                                RelatedResultIds=imageOnlyAnswer.RelatedResults.Select(r=>r.StringId).ToList()
-                            });
-                        }
-                        break;
-                    case AnswersType.TextAndImage:
-                        var textAndImageAnswer = answer as DraftTestTextAndImageAnswer;
-                        if (textAndImageAnswer != null) {
-                            answers.Add(new TextAndImageAnswerForm {
-                                Text = textAndImageAnswer.Text,
-                                ImagePath = textAndImageAnswer.ImagePath,
-                                RelatedResultIds = textAndImageAnswer.RelatedResults.Select(r => r.StringId).ToList()
+                var resultStringIds = answer.RelatedResults.Select(r => r.StringId).ToList();
 
-                            });
-                        }
-                        break;
-                    case AnswersType.TextOnly:
-                        var textOnlyAnswer = answer as DraftTestTextOnlyAnswer;
-                        if (textOnlyAnswer != null) {
-                            answers.Add(new TextOnlyAnswerForm {
-                                Text = textOnlyAnswer.Text,
-                                RelatedResultIds = textOnlyAnswer.RelatedResults.Select(r => r.StringId).ToList()
-                            });
-                        }
-                        break;
-                    default:
-                        throw new InvalidOperationException("Unknown answer type");
-                }
+                BaseAnswerForm form = q.AnswersType switch {
+                    AnswersType.ImageOnly => new ImageOnlyAnswerForm {
+                        ImagePath = (answer.AdditionalInfo as ImageOnlyAnswerAdditionalInfo)?.ImagePath,
+                        RelatedResultIds = resultStringIds
+                    },
+                    AnswersType.TextAndImage => new TextAndImageAnswerForm {
+                        Text = (answer.AdditionalInfo as TextAndImageAnswerAdditionalInfo)?.Text,
+                        ImagePath = (answer.AdditionalInfo as TextAndImageAnswerAdditionalInfo)?.ImagePath,
+                        RelatedResultIds = resultStringIds
+                    },
+                    AnswersType.TextOnly => new TextOnlyAnswerForm {
+                        Text = (answer.AdditionalInfo as TextOnlyAnswerAdditionalInfo)?.Text,
+                        RelatedResultIds = resultStringIds
+                    },
+                    _ => throw new InvalidOperationException("Unknown answer type")
+                };
+
+                answers.Add(form);
             }
+
             return answers;
         }
+
+
     }
 
 }

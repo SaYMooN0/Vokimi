@@ -1,7 +1,22 @@
-﻿
+﻿.quesitions-visibility-btn {
+    font-family: Roboto;
+    text-decoration: underline;
+    font-size: 20px;
+    color: var(--grey);
+    cursor: pointer;
+}
+
+    .quesitions-visibility-btn:hover {
+        color: var(--primary);
+    }
+
 .question-vms-container {
     display: flex;
     flex-direction: column;
+}
+
+.question-vms-container-hidden {
+    display: none;
 }
 
 .question-view-component {
@@ -69,4 +84,42 @@
 
     .delete-question-btn:hover {
         transform: scale(1.02);
+    }
+
+
+
+.new-question-btn {
+    margin: 10px 0px 0px auto;
+    gap: 2px;
+    padding: 6px 12px;
+    border-radius: 5px;
+    border: none;
+    display: flex;
+    align-items: center;
+    background: var(--primary);
+    color: white;
+    font-size: 20px;
+    font-family: Roboto;
+    transition: inherit;
+    transition: all 0.12s ease-in-out;
+    cursor: pointer;
+}
+
+
+    .new-question-btn svg {
+        height: 24px;
+        width: 24px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: inherit;
+    }
+
+
+    .new-question-btn:hover {
+        background-color: var(--primary-hov);
+    }
+
+    .new-question-btn:active {
+        transform: scale(0.92);
     }

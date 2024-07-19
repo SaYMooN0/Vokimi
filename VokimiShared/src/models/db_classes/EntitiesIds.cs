@@ -76,4 +76,10 @@
         public MultiChoiceQuestionDataId() : this(Guid.NewGuid()) { }
         public override string ToString() => Value.ToString();
     }
+    public readonly record struct AnswerTypeSpecificInfoId(Guid Value)
+    {
+        public AnswerTypeSpecificInfoId() : this(Guid.NewGuid()) { }
+        public override string ToString() => Value.ToString();
+    }
+
 }

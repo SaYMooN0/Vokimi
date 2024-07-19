@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using VokimiShared.src.models.db_classes;
+using VokimiShared.src.models.db_classes.answers;
 using VokimiShared.src.models.db_classes.test;
 using VokimiShared.src.models.db_classes.test_answers;
 using VokimiShared.src.models.db_classes.test_creation;
@@ -22,16 +23,19 @@ namespace Vokimi.src.data
         public DbSet<DraftGenericTest> DraftGenericTests { get; set; }
         public DbSet<DraftTestMainInfo> DraftTestMainInfo { get; set; }
         public DbSet<DraftTestQuestion> DraftTestQuestions { get; set; }
-        public DbSet<BaseDraftTestAnswer> DraftTestAnswers { get; set; }
+        public DbSet<DraftTestAnswer> DraftTestAnswers { get; set; }
         public DbSet<DraftTestResult> DraftTestResults { get; set; }
         //published and draft tests shared
         public DbSet<TestConclusion> TestConclusions { get; set; }
         public DbSet<TestStylesSheet> TestStyles { get; set; }
+        public DbSet<AnswerTypeSpecificInfo> AnswerTypeSpecificInfo { get; set; }
+        public DbSet<TextOnlyAnswerAdditionalInfo> AnswerAdditionalForInfoImageOnly { get; set; }
+        public DbSet<TextAndImageAnswerAdditionalInfo> AnswerAdditionalForTextAndImage { get; set; }
+        public DbSet<ImageOnlyAnswerAdditionalInfo> AnswerAdditionalForTextOnly { get; set; }
+
 
         //published tests only
-        public DbSet<DraftTestImageOnlyAnswer> ImageOnlyAnswers { get; set; }
-        public DbSet<DraftTestTextAndImageAnswer> TextAndImageAnswers { get; set; }
-        public DbSet<DraftTestTextOnlyAnswer> TextOnlyAnswers { get; set; }
+        //....
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
             optionsBuilder.UseLazyLoadingProxies();
@@ -126,7 +130,7 @@ namespace Vokimi.src.data
 
                 entity.Property(x => x.DraftTestId).IsRequired();
             });
-            modelBuilder.Entity<BaseDraftTestAnswer>(entity =>
+            modelBuilder.Entity<DraftTestAnswer>(entity =>
             {
                 entity.HasKey(e => e.AnswerId);
                 entity.Property(e => e.AnswerId).HasConversion(v => v.Value, v => new AnswerId(v));
@@ -138,13 +142,23 @@ namespace Vokimi.src.data
                       .UsingEntity<Dictionary<string, object>>(
                           "BaseAnswerDraftTestResult",
                           r => r.HasOne<DraftTestResult>().WithMany().HasForeignKey("DraftTestResultId"),
-                          l => l.HasOne<BaseDraftTestAnswer>().WithMany().HasForeignKey("BaseAnswerId")
+                          l => l.HasOne<DraftTestAnswer>().WithMany().HasForeignKey("DraftTestAnswerId")
                       );
+
+                entity.HasOne(e => e.AdditionalInfo)
+                      .WithOne()
+                      .HasForeignKey<DraftTestAnswer>(e => e.AdditionalInfoId);
             });
 
-            modelBuilder.Entity<DraftTestImageOnlyAnswer>().ToTable("DraftTestAnswersImageOnly");
-            modelBuilder.Entity<DraftTestTextAndImageAnswer>().ToTable("DraftTestAnswersTextAndImage");
-            modelBuilder.Entity<DraftTestTextOnlyAnswer>().ToTable("DraftTestAnswersTextOnly");
+            modelBuilder.Entity<AnswerTypeSpecificInfo>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id).HasConversion(v => v.Value, v => new AnswerTypeSpecificInfoId(v));
+            });
+
+            modelBuilder.Entity<ImageOnlyAnswerAdditionalInfo>().ToTable("AnswerAdditionalForInfoImageOnly");
+            modelBuilder.Entity<TextAndImageAnswerAdditionalInfo>().ToTable("AnswerAdditionalForTextAndImage");
+            modelBuilder.Entity<TextOnlyAnswerAdditionalInfo>().ToTable("AnswerAdditionalForTextOnly");
 
             modelBuilder.Entity<DraftTestResult>(entity => {
                 entity.HasKey(x => x.Id);

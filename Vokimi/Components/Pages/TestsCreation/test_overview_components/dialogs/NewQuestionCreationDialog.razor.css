@@ -32,12 +32,31 @@
     align-self: end;
     margin: auto 20px 10px 0;
     width: 250px;
-    height: 40px;
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 10px;
 }
 
     .bottom-btns-container div {
-        background-color: violet;
+        font-size: 20px;
+        padding: 6px 16px;
+        border-radius: 4px;
+        display: flex;
+        justify-content: center;
+        font-family: Roboto;
+        color: white;
+        cursor: pointer;
+        transition-duration: 0.08s;
     }
+
+        .bottom-btns-container div:hover {
+            transform: scale(1.04);
+        }
+
+.continue-btn {
+    background-color: var(--primary)
+}
+
+.cancel-btn {
+    background-color: var(--grey);
+}

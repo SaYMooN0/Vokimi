@@ -12,7 +12,7 @@ namespace VokimiShared.src.models.db_classes.test_creation
         public AnswersType AnswersType { get; init; }
         public bool IsMultipleChoice { get; private set; }
         public MultipleChoiceAdditionalData? MultipleChoiceData { get; private set; }
-        public virtual ICollection<BaseDraftTestAnswer> Answers { get; private set; } = new List<BaseDraftTestAnswer>();
+        public virtual ICollection<DraftTestAnswer> Answers { get; private set; } = new List<DraftTestAnswer>();
 
         public DraftTestId DraftTestId { get; init; }
         public static DraftTestQuestion CreateNew(string text, AnswersType answersType, DraftTestId testId) => new() {
@@ -24,13 +24,13 @@ namespace VokimiShared.src.models.db_classes.test_creation
             IsMultipleChoice = false,
             MultipleChoiceData = null,
             DraftTestId = testId,
-            Answers = new List<BaseDraftTestAnswer>()
+            Answers = new List<DraftTestAnswer>()
         };
         public void UpdateAsSingleChoice(
             string text,
             string? imagePath,
             bool shuffleAnswers,
-            ICollection<BaseDraftTestAnswer> answers) {
+            ICollection<DraftTestAnswer> answers) {
 
             Text = text;
             ImagePath = imagePath;
@@ -45,7 +45,7 @@ namespace VokimiShared.src.models.db_classes.test_creation
             string text,
             string? imagePath,
             bool shuffleAnswers,
-            ICollection<BaseDraftTestAnswer> answers,
+            ICollection<DraftTestAnswer> answers,
             MultipleChoiceAdditionalData multipleChoiceData) {
 
             Text = text;

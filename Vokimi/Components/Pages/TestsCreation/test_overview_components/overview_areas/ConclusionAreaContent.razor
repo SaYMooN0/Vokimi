@@ -4,7 +4,6 @@
 @inject VokimiStorageService vokimiStorageService
 
 <ActionConfirmationDialog @ref="confirmationDialogRef"
-                          ConfirmAction="DeleteConclusion"
                           ConfirmButtonText="Delete" />
 
 @if (AnyConclusionAdded) {
@@ -20,7 +19,7 @@
                     Edit Conclusion
                 </div>
                 <div class="remove-btn"
-                     @onclick='()=>confirmationDialogRef.Open("Do you really want to remove test conclusion?")'>
+                     @onclick='()=>confirmationDialogRef.Open("Do you really want to remove test conclusion?",DeleteConclusion)'>
                     Remove
                 </div>
             </div>

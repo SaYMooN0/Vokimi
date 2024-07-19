@@ -21,13 +21,16 @@
 
     [Parameter] public string ConfirmButtonText { get; set; } = "Confirm";
     [Parameter] public string CancelButtonText { get; set; } = "Cancel";
-    [Parameter] public Func<Task<Err>> ConfirmAction { get; set; }
+
+    public Func<Task<Err>> ConfirmAction { get; set; }
+
     protected override void OnParametersSet() {
         id = Guid.NewGuid().ToString();
     }
     public async Task Close() => await baseDialogRef.CloseAsync();
-    public async Task Open(string message) {
+    public async Task Open(string message, Func<Task<Err>> confirmAction) {
         dialogMessage = message;
+        ConfirmAction = confirmAction;
         StateHasChanged();
         await baseDialogRef.OpenAsync();
     }

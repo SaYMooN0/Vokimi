@@ -4,7 +4,6 @@
 @inject TestsCreationDbOperationsService testsCreationDbOperationsService
 
 <ActionConfirmationDialog @ref="confirmationDialogRef"
-                          ConfirmAction="DeleteQuestion"
                           ConfirmButtonText="Delete" />
 
 <NewQuestionCreationDialog @ref="@questionCreationDialogRef" ParentStateHasChanged="FetchQuestions" />
@@ -19,12 +18,12 @@
         </svg>
     </AreaIcon>
     <RightSideContent>
-        <button>
-            Hide btn
-        </button>
+        <div class="quesitions-visibility-btn" @onclick="()=>areQuestionsHidden=!areQuestionsHidden">
+            @(areQuestionsHidden ? "Show Questions" : "Hide Questions")
+        </div>
     </RightSideContent>
 </AreaHeader>
-<div class="question-vms-container">
+<div class='@(areQuestionsHidden? "question-vms-container-hidden": "question-vms-container")'>
     @for (int i = 0; i < Questions.Count(); i++) {
         var q = Questions[i];
         var localIndex = i;
@@ -52,6 +51,9 @@
 
 <div>
     <button class="new-question-btn" @onclick="()=>questionCreationDialogRef.Open()">
+        <svg viewBox="0 0 24 24" fill="none">
+            <path d="M12 4V20M20 12H4" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
         New Question
     </button>
 </div>
@@ -60,18 +62,16 @@
     private ActionConfirmationDialog confirmationDialogRef;
 
     private List<QuestionBriefInfoDto> Questions { get; set; } = [];
+    private bool areQuestionsHidden = false;
 
     [CascadingParameter(Name = "TestId")] public DraftTestId TestId { get; set; }
     [Parameter] public Action<DraftTestQuestionId> EditQuestionAction { get; set; }
 
-    private int questionToDeleteIndex;
 
-    private async Task<Err> DeleteQuestion() {
-        return Err.None;
-    }
+
     private void OnDelteQuestionPressed(int i) {
-        questionToDeleteIndex = i;
-        confirmationDialogRef.Open($"Are you sure you want to delete #{i + 1} question?");
+        Func<Task<Err>> deleteQuestionFunc = async () => { return Err.None; };
+        confirmationDialogRef.Open($"Are you sure you want to delete #{i + 1} question?", deleteQuestionFunc);
     }
 
     protected override async Task OnInitializedAsync() {

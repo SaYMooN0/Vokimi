@@ -9,7 +9,7 @@ namespace VokimiShared.src.models.db_classes.test_creation
         public string StringId { get; init; }
         public string? Text { get; private set; }
         public string? ImagePath { get; private set; }
-        public virtual ICollection<BaseDraftTestAnswer> AnswersLeadingToResult { get; set; } = [];
+        public virtual ICollection<DraftTestAnswer> AnswersLeadingToResult { get; set; } = [];
 
         public static DraftTestResult CreateNew(string stringId, DraftTestId testId) =>
             CreateNew(stringId, testId, string.Empty, null);

@@ -6,6 +6,7 @@ using Vokimi.src.data;
 using VokimiShared.src;
 using VokimiShared.src.enums;
 using VokimiShared.src.models.db_classes;
+using VokimiShared.src.models.db_classes.answers;
 using VokimiShared.src.models.db_classes.test;
 using VokimiShared.src.models.db_classes.test_answers;
 using VokimiShared.src.models.db_classes.test_creation;
@@ -128,7 +129,7 @@ namespace Vokimi.Services
             using (var transaction = await _db.Database.BeginTransactionAsync()) {
                 try {
                     await ClearAnswersForDraftTestQuestion(questionId);
-                    List<BaseDraftTestAnswer> answers = new();
+                    List<DraftTestAnswer> answers = new();
 
                     Dictionary<string, DraftTestResultId> results = _db.DraftTestResults
                        .Where(t => t.TestId == question.DraftTestId)
@@ -138,16 +139,18 @@ namespace Vokimi.Services
                         if (answerForm.Validate().NotNone())
                             continue;
 
-                        ushort orderIndex = (ushort)newData.Answers.IndexOf(answerForm);
-                        BaseDraftTestAnswer answer = answerForm switch {
-                            ImageOnlyAnswerForm imageOnlyAnswerForm => DraftTestImageOnlyAnswer
-                                .CreateNew(questionId, orderIndex, imageOnlyAnswerForm.ImagePath),
-                            TextAndImageAnswerForm textAndImageAnswerForm => DraftTestTextAndImageAnswer
-                                .CreateNew(questionId, orderIndex, textAndImageAnswerForm.Text, textAndImageAnswerForm.ImagePath),
-                            TextOnlyAnswerForm textOnlyAnswerForm => DraftTestTextOnlyAnswer
-                                .CreateNew(questionId, orderIndex, textOnlyAnswerForm.Text),
+                        AnswerTypeSpecificInfo typeSpecificInfo = answerForm switch {
+                            ImageOnlyAnswerForm imageOnlyAnswerForm =>
+                                ImageOnlyAnswerAdditionalInfo.CreateNew(imageOnlyAnswerForm.ImagePath),
+                            TextAndImageAnswerForm textAndImageAnswerForm =>
+                                TextAndImageAnswerAdditionalInfo.CreateNew(textAndImageAnswerForm.Text, textAndImageAnswerForm.ImagePath),
+                            TextOnlyAnswerForm textOnlyAnswerForm =>
+                                TextOnlyAnswerAdditionalInfo.CreateNew(textOnlyAnswerForm.Text),
                             _ => throw new InvalidOperationException("Unknown answer type")
                         };
+
+                        ushort orderIndex = (ushort)newData.Answers.IndexOf(answerForm);
+                        DraftTestAnswer answer = DraftTestAnswer.CreateNew(questionId, orderIndex, typeSpecificInfo.Id);
 
 
                         foreach (string resultStringId in answerForm.RelatedResultIds) {
@@ -162,6 +165,7 @@ namespace Vokimi.Services
                             }
                         }
 
+                        _db.AnswerTypeSpecificInfo.Add(typeSpecificInfo);
                         _db.Add(answer);
                         answers.Add(answer);
                     }
