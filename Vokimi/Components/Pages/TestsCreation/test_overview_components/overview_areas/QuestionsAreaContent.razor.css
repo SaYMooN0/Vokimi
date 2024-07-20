@@ -42,6 +42,8 @@
     gap: 10px;
 }
 
+
+
 .edit-question-btn {
     border-radius: 7px;
     cursor: pointer;
@@ -70,6 +72,10 @@
         background-color: var(--primary-hov);
     }
 
+    .edit-question-btn:active {
+        transform: scale(0.94);
+    }
+
 .delete-question-btn {
     height: 100%;
     aspect-ratio: 1/1;
@@ -84,6 +90,10 @@
 
     .delete-question-btn:hover {
         transform: scale(1.02);
+    }
+
+    .delete-question-btn:active {
+        transform: scale(0.94);
     }
 
 

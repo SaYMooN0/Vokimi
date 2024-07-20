@@ -1,0 +1,127 @@
+﻿.hor-div {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+}
+
+.ver-div {
+    display: flex;
+    flex-direction: column;
+}
+
+.text-input-part {
+    width: 100%;
+}
+
+.text-input-label {
+    margin-top: 10px;
+    margin-bottom: 2px;
+    font-size: 28px;
+    font-family: Roboto;
+    color: var(--grey);
+}
+
+.conclustion-text-input {
+    resize: vertical;
+    width: 100%;
+    min-height: 40px;
+    max-height: 240px;
+    padding: 4px 6px;
+    box-sizing: border-box;
+    border-radius: 6px;
+    font-size: 20px;
+}
+
+.hor-div .conclustion-text-input {
+    max-height: 480px;
+}
+
+
+
+.add-img-btn {
+    margin-top: 12px;
+    align-self: end;
+    width: fit-content;
+    padding: 10px 12px;
+    border-radius: 7px;
+    background-color: var(--primary);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    color: white;
+    font-family: Roboto;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+    .add-img-btn svg {
+        color: inherit;
+        height: 32px;
+    }
+
+    .add-img-btn:hover {
+        background-color: var(--primary-hov);
+    }
+
+.image-editing-part {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: fit-content;
+}
+
+.img-display {
+    height: 100%;
+    width: 100%;
+    max-width: 440px;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+}
+
+    .img-display img {
+        height: 100%;
+        width: 100%;
+        object-fit: contain;
+        border-radius: 6px;
+    }
+
+.img-uploading-error {
+    font-family: Roboto;
+    font-size: 18px;
+}
+
+.img-editing-btns {
+    width: 100%;
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+}
+
+    .img-editing-btns label {
+        height: 32px;
+        margin-top: 6px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        font-size: 20px;
+        font-family: Roboto;
+        cursor: pointer;
+        border-radius: 6px;
+        transition: all 0.16s ease-in;
+    }
+
+        .img-editing-btns label:hover {
+            border-radius: 16px;
+            letter-spacing: 2px;
+        }
+
+.change-btn {
+    background-color: var(--primary);
+}
+
+.remove-btn {
+    background-color: var(--red-del);
+}

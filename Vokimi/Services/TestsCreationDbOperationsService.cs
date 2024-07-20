@@ -128,7 +128,7 @@ namespace Vokimi.Services
 
             using (var transaction = await _db.Database.BeginTransactionAsync()) {
                 try {
-                    await ClearAnswersForDraftTestQuestion(questionId);
+                    ClearAnswersForDraftTestQuestion(question);
                     List<DraftTestAnswer> answers = new();
 
                     Dictionary<string, DraftTestResultId> results = _db.DraftTestResults
@@ -192,11 +192,14 @@ namespace Vokimi.Services
                 }
             }
         }
-        public async Task<Err> ClearAnswersForDraftTestQuestion(DraftTestQuestionId questionId) {
-            DraftTestQuestion? question = await GetDraftTestQuestionById(questionId);
-            if (question is null) { return new Err("Unknown question"); }
-            question.Answers.Clear();
-            return Err.None;
+        private void ClearAnswersForDraftTestQuestion(DraftTestQuestion question) {
+            foreach (var answer in question.Answers) {
+                foreach (var result in answer.RelatedResults) {
+                    result.AnswersLeadingToResult.Remove(answer);
+                }
+                _db.AnswerTypeSpecificInfo.Remove(answer.AdditionalInfo);
+                _db.DraftTestAnswers.Remove(answer);
+            }
         }
         public async Task<Err> CreateNewDraftTestResult(DraftTestId testId, string resultId) {
             var result = DraftTestResult.CreateNew(resultId, testId);
@@ -354,6 +357,24 @@ namespace Vokimi.Services
             _db.TestStyles.Update(test.StylesSheet);
             await _db.SaveChangesAsync();
             return Err.None;
+        }
+        public async Task<Err> DeleteDraftTestQuestion(DraftTestQuestionId questionId) {
+            using (var transaction = await _db.Database.BeginTransactionAsync()) {
+                try {
+                    DraftTestQuestion? question = await GetDraftTestQuestionById(questionId);
+                    if (question is null) {
+                        return new Err("Unknown question");
+                    }
+                    ClearAnswersForDraftTestQuestion(question);
+                    _db.DraftTestQuestions.Remove(question);
+                    await _db.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                    return Err.None;
+                } catch (Exception ex) {
+                    await transaction.RollbackAsync();
+                    return new Err("Server error. Please try again later");
+                }
+            }
         }
     }
 }

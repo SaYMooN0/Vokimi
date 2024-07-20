@@ -5,7 +5,7 @@ namespace VokimiShared.src.models.db_classes.test_answers
 {
     public class DraftTestAnswer
     {
-        public AnswerId AnswerId { get; init; }
+        public DraftTestAnswerId Id { get; init; }
         public DraftTestQuestionId QuestionId { get; init; }
         public ushort OrderInQuestion { get; set; }
         public virtual ICollection<DraftTestResult> RelatedResults { get; private set; } = [];
@@ -13,7 +13,7 @@ namespace VokimiShared.src.models.db_classes.test_answers
         public virtual AnswerTypeSpecificInfo AdditionalInfo { get; private set; }
         public static DraftTestAnswer CreateNew(
             DraftTestQuestionId questionId, ushort orderInQuestion, AnswerTypeSpecificInfoId typeSpecificInfoId) => new() {
-            AnswerId= new (),
+            Id= new (),
             QuestionId= questionId,
             OrderInQuestion= orderInQuestion,
             AdditionalInfoId= typeSpecificInfoId

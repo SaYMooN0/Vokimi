@@ -8,9 +8,9 @@
 
 .text-label {
     font-family: "Roboto";
-    font-size: 30px;
+    font-size: 23px;
     margin-top: 30px;
-    color: #413d44;
+    color: var(--grey);
 }
 
 .question-text-input {
@@ -21,12 +21,93 @@
     border: 2px solid var(--back-2);
     border-radius: 60px;
     font-size: 24px;
+    outline: none;
 }
+
+    .question-text-input::placeholder {
+        color: var(--grey);
+    }
 
     .question-text-input:focus {
         outline: 1px solid var(--primary);
         border-color: var(--primary);
     }
+
+.choose-type-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    font-family: "Roboto";
+    gap: 20px;
+}
+
+.choose-type-label {
+    font-size: 20px;
+    display: block;
+    width: 240px;
+}
+
+.select-wrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    width: 100%;
+}
+
+.type-select {
+    font-size: 20px;
+    padding: 6px 10px;
+    border: 2px solid var(--back-2);
+    color: black;
+    border-radius: 8px;
+    transition: all 0.12s ease;
+    outline: none;
+    appearance: none;
+    width: 100%;
+    background: white;
+}
+
+.select-wrapper::after {
+    content: '▼';
+    transform: translateY(-50%) rotate(-90deg);
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    pointer-events: none;
+    transition: transform 0.3s ease;
+    color: var(--grey);
+}
+
+.type-select:hover {
+    border-color: var(--primary);
+}
+
+.type-select:focus {
+    border-color: var(--primary);
+}
+
+.select-wrapper:focus-within::after {
+    transform: rotate(0) translateY(-50%);
+    color: var(--primary);
+}
+
+.select-wrapper:hover::after {
+    color: var(--primary);
+}
+
+.type-select option {
+    font-size: 18px;
+    background: white;
+    color: #111012;
+    padding: 8px;
+}
+
+.server-message {
+    font-family: Roboto;
+    font-size: 18px;
+    color: var(--red-del);
+    margin:auto 0;
+}
 
 .bottom-btns-container {
     align-self: end;

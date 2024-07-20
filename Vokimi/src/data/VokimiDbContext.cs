@@ -132,15 +132,15 @@ namespace Vokimi.src.data
             });
             modelBuilder.Entity<DraftTestAnswer>(entity =>
             {
-                entity.HasKey(e => e.AnswerId);
-                entity.Property(e => e.AnswerId).HasConversion(v => v.Value, v => new AnswerId(v));
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id).HasConversion(v => v.Value, v => new DraftTestAnswerId(v));
                 entity.Property(e => e.QuestionId).IsRequired();
                 entity.Property(e => e.OrderInQuestion).IsRequired();
 
                 entity.HasMany(e => e.RelatedResults)
                       .WithMany(r => r.AnswersLeadingToResult)
                       .UsingEntity<Dictionary<string, object>>(
-                          "BaseAnswerDraftTestResult",
+                          "DraftTestAnswerResultRelations",
                           r => r.HasOne<DraftTestResult>().WithMany().HasForeignKey("DraftTestResultId"),
                           l => l.HasOne<DraftTestAnswer>().WithMany().HasForeignKey("DraftTestAnswerId")
                       );

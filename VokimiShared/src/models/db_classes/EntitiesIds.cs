@@ -46,9 +46,9 @@
         public QuestionId() : this(Guid.NewGuid()) { }
         public override string ToString() => Value.ToString();
     }
-    public readonly record struct AnswerId(Guid Value)
+    public readonly record struct DraftTestAnswerId(Guid Value)
     {
-        public AnswerId() : this(Guid.NewGuid()) { }
+        public DraftTestAnswerId() : this(Guid.NewGuid()) { }
         public override string ToString() => Value.ToString();
     } 
     public readonly record struct DraftTestQuestionId(Guid Value)
