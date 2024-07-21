@@ -10,7 +10,7 @@
 }
 
     .create-test-button:hover {
-        background-color: var(--accent);
+        background-color: var(--primary-hov);
     }
 
 .test-vms-container {

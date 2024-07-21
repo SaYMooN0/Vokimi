@@ -1,12 +1,13 @@
-﻿@switch (publisingState) {
+﻿@using Vokimi.Components.Pages.TestsCreation.test_publishing_components
+@switch (publisingState) {
     case PublisingState.ErrorsChecking:
-        <h2>Errors checking</h2>
+        <CheckingForErrorsComponents />
         break;
     case PublisingState.TagsAdding:
-        <h2>TagsAdding</h2>
+        <AddingTagsToTestComponent />
         break;
     case PublisingState.SuccessfullyPublished:
-        <h2>Success</h2>
+        <SuccessfullyPublishedComponent />
         break;
     default:
         throw new NotImplementedException();
@@ -20,11 +21,6 @@
         TagsAdding,
         SuccessfullyPublished
     }
-    private PublisingState publisingState;
-    protected override Task OnInitializedAsync() {
+    private PublisingState publisingState = PublisingState.ErrorsChecking;
 
-        publisingState = PublisingState.ErrorsChecking;
-
-        return base.OnInitializedAsync();
-    }
 }

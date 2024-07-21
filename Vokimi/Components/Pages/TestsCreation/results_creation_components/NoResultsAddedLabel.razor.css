@@ -1,12 +1,33 @@
 ﻿.no-results-container {
-    margin-top:50px;
+    margin-top: 120px;
     display: flex;
     flex-direction: column;
     align-items: center;
+    font-family: Roboto;
 }
 
+    .no-results-container h4 {
+        color: var(--grey);
+        font-size: 26px;
+        margin-bottom: 0;
+    }
+
+    .no-results-container h2 {
+        font-size: 32px;
+    }
+
 .add-new-res-btn {
-    padding: 10px 24px;
+    padding: 8px 24px;
+    border-radius: 6px;
     background-color: var(--primary);
     cursor: pointer;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    transition: all 0.12s ease-in;
 }
+
+    .add-new-res-btn:hover {
+        background-color: var(--primary-hov);
+        padding: 8px 32px;
+    }

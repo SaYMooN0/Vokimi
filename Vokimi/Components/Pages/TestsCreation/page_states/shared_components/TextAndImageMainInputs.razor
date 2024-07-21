@@ -1,7 +1,7 @@
-﻿<div class="@(AnyImageAdded() ? "hor-div" : "ver-div")">
+﻿<div class="top-input-zone @(AnyImageAdded() ? "hor-div" : "ver-div")">
     <div class="text-input-part">
-        <p class="text-input-label">Conclusion Text:</p>
-        <textarea @bind="Text" class="conclusion-text-input default-textarea"></textarea>
+        <p class="text-input-label">@TextInputLabel</p>
+        <textarea class="text-input default-textarea" @onchange="OnTextChanged">@Text</textarea>
     </div>
     <InputFile id="img-input" class="form-control" OnChange="HandleImageChange" accept=".jpg,.png,.webp" hidden />
 
@@ -31,22 +31,24 @@
 </div>
 
 @code {
-    [Parameter]
-    public string Text { get; set; }
+    [Parameter] public string TextInputLabel{ get; set; }
+    [Parameter] public string Text { get; set; }
 
-    [Parameter]
-    public EventCallback<string> TextChanged { get; set; }
+    [Parameter] public EventCallback<string> TextChanged { get; set; }
 
-    [Parameter]
-    public string ImagePath { get; set; }
+    [Parameter] public string ImagePath { get; set; }
 
-    [Parameter]
-    public EventCallback<string> ImagePathChanged { get; set; }
+    [Parameter] public EventCallback<string> ImagePathChanged { get; set; }
 
     [Parameter]
     public Func<Stream, Task<OneOf.OneOf<string, Err>>> SaveImgFunc { get; set; }
 
     private string imageUploadingErr;
+
+    private async Task OnTextChanged(ChangeEventArgs e) {
+        Text = e.Value.ToString();
+        await TextChanged.InvokeAsync(Text);
+    }
 
     private async Task HandleImageChange(InputFileChangeEventArgs e) {
         var file = e.File;

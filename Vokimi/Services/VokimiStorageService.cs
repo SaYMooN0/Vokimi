@@ -41,6 +41,21 @@ public class VokimiStorageService
             }
         } catch (Exception ex) { return serverErr; }
     }
+    public async Task<OneOf<string, Err>> SaveDraftTestQuestionImage(Stream fileStream, DraftTestQuestionId questionId, string sessionKey) {
+        try {
+            string key = $"{ImgOperationsHelper.DraftTestQuestionsFolder}/{questionId}/{sessionKey}";
+            PutObjectResponse response = await PutObjectIntoStorage(key, fileStream);
+
+            if (response.HttpStatusCode == System.Net.HttpStatusCode.OK) {
+                return key;
+            }
+            else {
+                return fileUploadingErr;
+            }
+        } catch (Exception ex) {
+            return serverErr;
+        }
+    }
     public async Task<OneOf<string, Err>> SaveDraftTestAnswerImage(Stream fileStream, DraftTestQuestionId questionId) {
         try {
             string key = $"{ImgOperationsHelper.DraftTestAnswersFolder}/{questionId}/{Guid.NewGuid()}";
@@ -132,12 +147,17 @@ public class VokimiStorageService
         IEnumerable<string>? reservedKeys = usedKey is null ? null : [usedKey.ToString()];
         return await ClearUnusedImages(prefix, reservedKeys);
     }
-    public async Task ClearUnusedAnswerImagesForQuestion(DraftTestQuestionId questionId, IEnumerable<string> reservedKeys) {
+    public async Task ClearUnusedDraftTestAnswerImagesForQuestion(DraftTestQuestionId questionId, IEnumerable<string> reservedKeys) {
         string prefix = $"{ImgOperationsHelper.DraftTestAnswersFolder}/{questionId}/";
         await ClearUnusedImages(prefix, reservedKeys);
     }
     public async Task ClearUnusedDraftTestResultsImages(DraftTestId testId, IEnumerable<string> reservedKeys) {
         string prefix = $"{ImgOperationsHelper.DraftTestResultsFolder}/{testId}/";
+        await ClearUnusedImages(prefix, reservedKeys);
+    }
+    public async Task ClearUnusedDraftTestQuestionImages(DraftTestQuestionId questionId, string? reservedKey) {
+        string prefix = $"{ImgOperationsHelper.DraftTestQuestionsFolder}/{questionId}/";
+        IEnumerable<string>? reservedKeys = reservedKey is null ? null : [reservedKey.ToString()];
         await ClearUnusedImages(prefix, reservedKeys);
     }
 }

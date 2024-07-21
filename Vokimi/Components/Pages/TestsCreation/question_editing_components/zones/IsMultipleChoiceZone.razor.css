@@ -1,10 +1,10 @@
 ﻿.multi-choince-input-line {
     align-self: center;
-    width: 96%;
+    width: 100%;
     display: grid;
     grid-template-columns: auto 1fr;
     align-items: center;
-    justify-content: space-between;
+    justify-content: space-around;
     gap: 10px;
 }
 
@@ -21,10 +21,13 @@
     font-family: Roboto;
     font-size: 22px;
     display: flex;
-    flex-direction: row;
+    display: grid;
+    grid-template-columns: 1fr auto;
     align-items: center;
 }
-
+.is-multiple-input-label {
+    width: 240px;
+}
 .multiple-choice-only-form-block {
     width: 100%;
     display: flex;
@@ -34,14 +37,14 @@
 }
 
 .input-label input[type="number"] {
-    width: 68px;
+    width: 62px;
     box-sizing: border-box;
     background-color: var(--back-2);
     outline: none;
     height: 32px;
     border: 2px solid var(--back-2);
     border-radius: 40px;
-    padding: 0 8px;
+    padding: 0 6px;
     font-size: 19px;
     text-align: center;
 }

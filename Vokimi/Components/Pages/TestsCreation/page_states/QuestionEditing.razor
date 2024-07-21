@@ -14,23 +14,13 @@ else {
     <div class="dialog-content">
         <TestCreationPageStateTopLabel LabelText="Question Editing" BackToOverviewAction="BackToOverviewAction" />
         <form class="form-content" @onsubmit="SaveData" name="formData">
-            <div class="top-input-zone">
-                <div class="text-input-area">
-                    <label for="question-text-label" class="question-text-label">Question Text:</label>
-                    <textarea id="question-text-input" class="default-textarea" @bind="formData.Text" />
-                </div>
-                <div class="cover-input-area">
-                    @if (string.IsNullOrEmpty(formData.ImagePath)) {
-                        <div class="add-image-button">
-                            Add image
-                        </div>
-                    }
-                    else {
+            <div class="top-inputs-zone">
+                <TextAndImageMainInputs @bind-Text="formData.Text"
+                                        @bind-ImagePath="formData.ImagePath"
+                                        SaveImgFunc="ImgSavingFunc"
+                                        TextInputLabel="Text of the question:" />
 
-                    }
-                </div>
             </div>
-
             <div class="shuffle-answers-input-line">
                 Shuffle Answers:
                 <BasicTooltip Text="Shuffle Answers" />
@@ -86,10 +76,16 @@ else {
         Err err = await testsCreationDbOperationsService.UpdateDraftTestQuestion(QuestionId, formData);
         if (err.NotNone()) {
             savingError = err.Message;
+            return;
         }
-        else if (formData.AnswersType.HasImage()) {
+        await vokimiStorageService.ClearUnusedDraftTestQuestionImages(QuestionId, formData.ImagePath);
+        if (formData.AnswersType.HasImage()) {
             var imageKeys = formData.Answers.Select(x => (x as IAnswerFormWithImage).ImagePath);
-            vokimiStorageService.ClearUnusedAnswerImagesForQuestion(QuestionId, imageKeys);
+            await vokimiStorageService.ClearUnusedDraftTestAnswerImagesForQuestion(QuestionId, imageKeys);
         }
     }
+    private string imgSessionKey = Guid.NewGuid().ToString();
+
+    private async Task<OneOf.OneOf<string, Err>> ImgSavingFunc(Stream imgStream) =>
+       await vokimiStorageService.SaveDraftTestQuestionImage(imgStream, QuestionId, imgSessionKey);
 }

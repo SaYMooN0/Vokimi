@@ -32,6 +32,7 @@
 
     .add-conclustion-btn svg {
         height: 30px;
+        color: white;
     }
 
     .add-conclustion-btn:hover {

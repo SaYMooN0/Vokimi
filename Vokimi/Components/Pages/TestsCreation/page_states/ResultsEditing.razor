@@ -10,7 +10,7 @@
 }
 else {
 
-    <form class="results-editing-form" @onsubmit="HandleSubmit">
+    <form class="results-editing-form">
         <ResultsSectionHeader Text="Saved Results:" CollapseAction="CollapseAllSavedResults" />
         @foreach (var r in formData.SavedResults) {
             <ResultEditingComponent @ref="AddSavedResultWrapperRef"
@@ -31,7 +31,7 @@ else {
         }
         <div class="new-result-btn" @onclick="AddNewResult">New result</div>
         <p class="error-message">@errorMessage</p>
-        <button type="submit" class="save-results-btn">Save</button>
+        <SaveButton Onclick="HandleSubmit" Text="Save Results" />
     </form>
 }
 
@@ -77,7 +77,7 @@ else {
         }
         errorMessage = string.Empty;
         await FetchFormData();
-        
+
         StateHasChanged();
         //after fetching results all results become saved
         var usedImageKeys = formData.SavedResults

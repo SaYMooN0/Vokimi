@@ -21,10 +21,10 @@
     color: var(--grey);
 }
 
-.conclustion-text-input {
+.text-input {
     resize: vertical;
     width: 100%;
-    min-height: 40px;
+    min-height: 70px;
     max-height: 240px;
     padding: 4px 6px;
     box-sizing: border-box;
@@ -32,8 +32,9 @@
     font-size: 20px;
 }
 
-.hor-div .conclustion-text-input {
-    max-height: 480px;
+.hor-div .text-input {
+    max-height:480px;
+    height: 480px;
 }
 
 

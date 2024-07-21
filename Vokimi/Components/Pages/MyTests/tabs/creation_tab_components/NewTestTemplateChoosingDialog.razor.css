@@ -69,7 +69,7 @@
 }
 
     .continue-btn:hover {
-        background-color: var(--accent);
+        background-color: var(--primary-hov);
     }
 
     .continue-btn.continue-inactive {
