@@ -3,6 +3,10 @@
     public class TestCreationConsts
     {
         public const int
+            MinTestNameLength = 12,
+            MaxTestNameLength = 255,
+            MaxTestDescriptionLength= 255;
+        public const int
             MaxResultsCountForAnswer = 5,
             ResultIdMaxCharacters = 12,
             ResultIdMinCharacters = 5;

@@ -1,0 +1,45 @@
+﻿@using Vokimi.Components.Pages.TestsCreation.test_overview_components.test_publishing_dialog_components
+
+<BaseDialog DialogId="publishing-dialog" @ref="baseDialogRef">
+    <div class="test-publishing-contetnt">
+        @switch (publisingState) {
+            case PublisingState.ProblemsChecking:
+                <CheckingForProblemsComponents @ref="checkingForProblemsComponentsRef"
+                                               ChangeToTagsAddingAction="()=>publisingState=PublisingState.ProblemsChecking" />
+                break;
+            case PublisingState.TagsAdding:
+                <AddingTagsToTestComponent />
+                break;
+            case PublisingState.SuccessfullyPublished:
+                <SuccessfullyPublishedComponent />
+                break;
+            default:
+                throw new NotImplementedException();
+        }
+
+    </div>
+</BaseDialog>
+
+
+
+
+@code {
+    private CheckingForProblemsComponents checkingForProblemsComponentsRef;
+    private BaseDialog baseDialogRef { get; set; }
+
+    private enum PublisingState
+    {
+        ProblemsChecking,
+        TagsAdding,
+        SuccessfullyPublished
+    }
+    private PublisingState publisingState;
+
+    public async Task Open() {
+        await checkingForProblemsComponentsRef.FetchErrors();
+        publisingState = PublisingState.ProblemsChecking;
+        await baseDialogRef.OpenAsync();
+    }
+    private async Task Close() => await baseDialogRef.CloseAsync();
+
+}

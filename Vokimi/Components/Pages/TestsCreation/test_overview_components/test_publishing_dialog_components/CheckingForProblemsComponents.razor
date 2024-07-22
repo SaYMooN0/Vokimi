@@ -1,0 +1,42 @@
+﻿@using Vokimi.Components.Pages.TestsCreation.page_states.shared_components
+@inject TestsPublishingDbOperationsService testsPublishingDbOperationsService
+
+<div class="validating-container">
+    @if (problemsArr.Count == 0) {
+        <div class="no-problems-div">
+            <label>No problems were found in the test. You can move on to the next stage</label>
+            <div class="move-to-next-stage-btn" @onclick="ChangeToTagsAddingAction">
+                Continue
+            </div>
+        </div>
+    }
+    else {
+        <div class="test-problems-div">
+            <div class="problems-list">
+                @foreach (string e in problemsArr) {
+                    <p class="test-error"></p>
+                }
+            </div>
+            <div class="btns-container">
+                <div class="retry-btn">
+                    Retry
+                </div>
+                <div class="back-to-overview-btn">
+                    Go Back To Test Overview
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private List<string> problemsArr = [];
+  
+    public async Task FetchErrors() {
+      
+        problemsArr = await testsPublishingDbOperationsService.CheckDraftTestForProblems(TestId);
+        StateHasChanged();
+    }
+    [Parameter] public Action ChangeToTagsAddingAction { get; set; }
+    [CascadingParameter] public DraftTestId TestId { get; set; }
+}

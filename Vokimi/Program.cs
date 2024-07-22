@@ -74,6 +74,7 @@ namespace Vokimi
             services.AddScoped<UsersDbOperationsService>();
             services.AddScoped<TestsTakingDbOperationsService>();
             services.AddScoped<TestsCreationDbOperationsService>();
+            services.AddScoped<TestsPublishingDbOperationsService>();
 
 
             // Yandex s3 configuration

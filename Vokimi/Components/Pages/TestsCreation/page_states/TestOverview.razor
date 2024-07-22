@@ -26,16 +26,18 @@
 
     <StylesEditingAreaContent ChangePageStateToStylesEditing="ChangePageStateToStylesEditing" />
 
-    <div class="publish-test-btn" @onclick="ChangePageStateToTestPublishing">Publish test</div>
+    <TestPublishingDialog @ref="testPublishingDialogRef" />
+    <div class="publish-test-btn" @onclick="()=>testPublishingDialogRef.Open()">Publish test</div>
 
 </div>
 @code {
+    private TestPublishingDialog testPublishingDialogRef;
+
     [Parameter] public DraftGenericTestDto TestDto { get; set; }
     [Parameter] public Action ChangePageStateToMainInfoEditing { get; set; }
     [Parameter] public Action ChangePageStateToConclusionEditing { get; set; }
     [Parameter] public Action ChangePageStateToResultsEditing { get; set; }
     [Parameter] public Action ChangePageStateToStylesEditing { get; set; }
     [Parameter] public Action<DraftTestQuestionId> ChangePageStateToQuestionEditing { get; set; }
-    [Parameter] public Action ChangePageStateToTestPublishing { get; set; }
 
 }

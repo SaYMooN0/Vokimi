@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Vokimi.src.data;
 using VokimiShared.src;
+using VokimiShared.src.constants_store_classes;
 using VokimiShared.src.enums;
 using VokimiShared.src.models.db_classes;
 using VokimiShared.src.models.db_classes.test_creation;
@@ -14,13 +15,14 @@ namespace Vokimi.Services
         public TestsPublishingDbOperationsService(VokimiDbContext context) {
             _db = context;
         }
-        public async Task<List<Err>> CheckDraftTestForErrors(DraftTestId id) {
+        public async Task<List<string>> CheckDraftTestForProblems(DraftTestId id) {
             BaseDraftTest? test = await _db.DraftTestsSharedInfo.FirstOrDefaultAsync(i => i.Id == id);
             if (test is null) {
-                return [new("Unknown test")];
+                return ["Unable to find the test"];
             }
-            List<Err> errs = [];
-            //main info
+            List<string> problems = await CheckTestMainInfoForProblems(test.MainInfo);
+
+            //problems.AddRange(...);
 
             //questions
             //min questions count for test, for each question answers
@@ -29,7 +31,21 @@ namespace Vokimi.Services
             //check imgs and text
 
             //styles
-            return errs;
+            return problems;
+        }
+        private async Task<List<string>> CheckTestMainInfoForProblems(DraftTestMainInfo mainInfo) {
+            List<string> problems = [];
+            string errPrefix = "Test main info err:";
+            if (
+                string.IsNullOrWhiteSpace(mainInfo.Name) ||
+                mainInfo.Name.Length > TestCreationConsts.MaxTestNameLength ||
+                mainInfo.Name.Length < TestCreationConsts.MinTestNameLength) {
+                problems.Add($"{errPrefix} The name of the test must be from {TestCreationConsts.MinTestNameLength} to {TestCreationConsts.MaxTestNameLength} characters");
+            }
+            if (!string.IsNullOrEmpty(mainInfo.Description) && mainInfo.Description.Length > TestCreationConsts.MaxTestDescriptionLength) {
+                problems.Add($"{errPrefix} The description of the test cannot be more than {TestCreationConsts.MaxTestDescriptionLength} characters");
+            }
+            return problems;
         }
         public async Task<Err> PublishDraftTest(DraftTestId id) {
             BaseDraftTest? test = await _db.DraftTestsSharedInfo.FirstOrDefaultAsync(i => i.Id == id);

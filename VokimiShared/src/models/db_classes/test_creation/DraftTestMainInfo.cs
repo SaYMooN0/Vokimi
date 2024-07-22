@@ -1,6 +1,6 @@
 ﻿using VokimiShared.src.enums;
 
-namespace VokimiShared.src.models.db_classes.tests
+namespace VokimiShared.src.models.db_classes.test_creation
 {
     public class DraftTestMainInfo
     {

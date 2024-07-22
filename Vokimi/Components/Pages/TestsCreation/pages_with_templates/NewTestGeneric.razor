@@ -26,7 +26,7 @@
                                   ChangePageStateToConclusionEditing="()=>ChangePageState(TestCreationPageState.ConclusionEditing)"
                                   ChangePageStateToResultsEditing="()=>ChangePageState(TestCreationPageState.ResultsEditing)"
                                   ChangePageStateToStylesEditing="()=>ChangePageState(TestCreationPageState.StylesEditing)"
-                                  ChangePageStateToTestPublishing="()=>ChangePageState(TestCreationPageState.TestPublishing)" />
+                                  />
                     break;
                 case TestCreationPageState.MainInfoEditing:
                     <MainInfoEditing Test="new DraftGenericTestDto(draftTest)"
@@ -44,9 +44,6 @@
                     break;
                 case TestCreationPageState.StylesEditing:
                     <StylesEditing BackToOverviewAction="()=>ChangePageState(TestCreationPageState.Overview)" />
-                    break;
-                case TestCreationPageState.TestPublishing:
-                    <TestPublishing />
                     break;
                 default:
                     <h2>default state</h2>
@@ -74,8 +71,7 @@
         QuestionEditing,
         ResultsEditing,
         ConclusionEditing,
-        StylesEditing,
-        TestPublishing,
+        StylesEditing
 
     }
 
