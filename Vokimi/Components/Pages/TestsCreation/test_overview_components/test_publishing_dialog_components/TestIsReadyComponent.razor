@@ -1,0 +1,33 @@
+﻿@switch (componentState) {
+    case ComponentState.PrePublished:
+        <div>
+            table:
+            Main info: ready
+            Questions: ...
+        </div>
+        break;
+    case ComponentState.Success:
+        <div>
+            success
+        </div>
+        break;
+    case ComponentState.Error:
+    <div>
+        An error occurred during test publishing
+    </div>
+        break;
+
+
+}
+
+@code {
+    private enum ComponentState
+    {
+        PrePublished,
+        Success,
+        Error
+    }
+    private ComponentState componentState = ComponentState.PrePublished;
+    [Parameter] public Action ChangeToPublishedSuccessfullyAction { get; set; }
+    [Parameter] public Action ChangeToPublishinErrorAction { get; set; }
+}

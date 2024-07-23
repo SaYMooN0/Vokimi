@@ -1,2 +1,10 @@
-﻿body {
+﻿
+.publish-btn {
+    background-color: var(--primary);
+    cursor: pointer;
+}
+
+.inactive-btn {
+    background-color: var(--grey) !important;
+    cursor: not-allowed !important;
 }

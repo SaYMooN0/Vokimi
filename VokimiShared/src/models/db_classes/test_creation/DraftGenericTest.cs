@@ -1,7 +1,5 @@
 ﻿using VokimiShared.src.enums;
-using VokimiShared.src.models.db_classes.test_answers;
-using VokimiShared.src.models.db_classes.tests;
-using VokimiShared.src.models.db_classes.users;
+using VokimiShared.src.models.db_classes;
 
 namespace VokimiShared.src.models.db_classes.test_creation
 {

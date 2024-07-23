@@ -10,6 +10,11 @@
             MaxResultsCountForAnswer = 5,
             ResultIdMaxCharacters = 12,
             ResultIdMinCharacters = 5;
+        public const int
+            MaxResultsForTestCount = 30,
+            ResultMaxTextLength = 500,
+            ResultMinTextLength = 8;
+
         public const int MaxImageSizeInBytes = 3145728;
         public static int MaxImageSizeInMB => MaxImageSizeInBytes / 1048576;
 

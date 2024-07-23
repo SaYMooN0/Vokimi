@@ -1,14 +1,29 @@
 ﻿@using Vokimi.Components.Pages.TestsCreation.test_overview_components.test_publishing_dialog_components
 
+@inject TestsPublishingDbOperationsService testsPublishingDbOperationsService
+
+@rendermode InteractiveServer
+
 <BaseDialog DialogId="publishing-dialog" @ref="baseDialogRef">
     <div class="test-publishing-contetnt">
+        <svg class="close-dialog-btn" @onclick="Close" viewBox="0 0 24 24" fill="none">
+            <path d="M15 9L9 14.9996M15 15L9 9.00039" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M2.5 12C2.5 7.52166 2.5 5.28249 3.89124 3.89124C5.28249 2.5 7.52166 2.5 12 2.5C16.4783 2.5 18.7175 2.5 20.1088 3.89124C21.5 5.28249 21.5 7.52166 21.5 12C21.5 16.4783 21.5 18.7175 20.1088 20.1088C18.7175 21.5 16.4783 21.5 12 21.5C7.52166 21.5 5.28249 21.5 3.89124 20.1088C2.5 18.7175 2.5 16.4783 2.5 12Z" stroke="currentColor" stroke-width="1.5" />
+        </svg>
         @switch (publisingState) {
             case PublisingState.ProblemsChecking:
-                <CheckingForProblemsComponents @ref="checkingForProblemsComponentsRef"
-                                               ChangeToTagsAddingAction="()=>publisingState=PublisingState.ProblemsChecking" />
+                <CheckingForProblemsComponents ProblemsList="problemsList"
+                                               RetryAction="async ()=>await SetStateToProblemsChecking()"
+                                               ChangeToTagsAddingAction="()=>{
+                                                    publisingState=PublisingState.TagsAdding;
+                                                    StateHasChanged();
+                                               }" />
                 break;
             case PublisingState.TagsAdding:
-                <AddingTagsToTestComponent />
+                <AddingTagsToTestComponent PublishWithTagsAction="PublishWithTagsAction" />
+                break;
+            case PublisingState.PublishingError:
+                <PublishingErrorComponent />
                 break;
             case PublisingState.SuccessfullyPublished:
                 <SuccessfullyPublishedComponent />
@@ -24,22 +39,33 @@
 
 
 @code {
-    private CheckingForProblemsComponents checkingForProblemsComponentsRef;
+    private List<TestPublishingProblemDto> problemsList = [];
     private BaseDialog baseDialogRef { get; set; }
 
     private enum PublisingState
     {
         ProblemsChecking,
         TagsAdding,
+        PublishingError,
         SuccessfullyPublished
     }
     private PublisingState publisingState;
 
     public async Task Open() {
-        await checkingForProblemsComponentsRef.FetchErrors();
-        publisingState = PublisingState.ProblemsChecking;
+        await SetStateToProblemsChecking();
         await baseDialogRef.OpenAsync();
     }
+    public async Task SetStateToProblemsChecking() {
+        problemsList = await testsPublishingDbOperationsService.CheckDraftTestForProblems(TestId);
+        publisingState = PublisingState.ProblemsChecking;
+        StateHasChanged();
+    }
     private async Task Close() => await baseDialogRef.CloseAsync();
+
+    [Parameter] public DraftTestId TestId { get; set; }
+
+    private void PublishWithTagsAction(List<string> tags) {
+        
+    }
 
 }

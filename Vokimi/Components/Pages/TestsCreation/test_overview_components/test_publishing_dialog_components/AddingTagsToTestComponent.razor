@@ -1,5 +1,35 @@
-﻿<h3>AddingTagsToTest</h3>
+﻿<label class="add-tags-label">Add tags to your test</label>
+<input class="tag-search-input" placeholder="Search for tag..."
+       @onchange="HandleOnSearchChange" name="@Guid.NewGuid().ToString()" />
+<div class="tags-to-choose-list">
+    @foreach (string tag in tagsToChooseFrom) {
+
+    }
+</div>
+<p class="error-message">@errorMessage</p>
+<label class="chosen-count">Tags chosen: @chosenTags.Count</label>
+<div class="publish-btn @(chosenTags.Count<1? "inactive-btn": "")" @onclick="PublisButtonClicked">
+    Publish
+</div>
 
 @code {
+    private List<string> chosenTags = [];
+    private List<string> tagsToChooseFrom = [];
+    private string errorMessage = string.Empty;
+
+    [Parameter]
+    public Action<List<string>> PublishWithTagsAction { get; set; }
+
+    private void HandleOnSearchChange(ChangeEventArgs e) {
+    }
+
+    private void PublisButtonClicked() {
+        if (chosenTags.Count < 1) {
+            errorMessage = "Choose at least 1 tag";
+            StateHasChanged();
+            return;
+        }
+        PublishWithTagsAction(chosenTags);
+    }
 
 }

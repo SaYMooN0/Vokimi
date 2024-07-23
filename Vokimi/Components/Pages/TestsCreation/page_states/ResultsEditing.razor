@@ -123,8 +123,21 @@ else {
             if (form.NotSavedResults[i].ResultStringId.Length > TestCreationConsts.ResultIdMaxCharacters) {
                 return new Err(resErrorPref + $"Result id cannot be more than {TestCreationConsts.ResultIdMaxCharacters} characters");
             }
-
             usedResIds.Add(form.NotSavedResults[i].ResultStringId);
+        }
+
+        Func<string, int> lengthGettingFunc = (s) => string.IsNullOrWhiteSpace(s) ? 0 : s.Length;
+        var resultsIdTextLength = form.SavedResults
+             .Select(r => (r.StringId, lengthGettingFunc(r.Text)))
+             .Concat(
+                 form.NotSavedResults.Select(r => (r.ResultStringId, lengthGettingFunc(r.Text)))
+             );
+
+        foreach (var (resultStringId, textLength) in resultsIdTextLength) {
+            if (textLength < TestCreationConsts.ResultMinTextLength || textLength > TestCreationConsts.ResultMaxTextLength) {
+                return new Err($"Text of the result with id: '{resultStringId}' is {textLength} characters long. The length must be " +
+                    $"from {TestCreationConsts.ResultMinTextLength} to {TestCreationConsts.ResultMaxTextLength} characters");
+            }
         }
 
         return Err.None;

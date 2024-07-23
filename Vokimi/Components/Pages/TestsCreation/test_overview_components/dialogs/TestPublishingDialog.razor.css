@@ -1,3 +1,21 @@
 ﻿.test-publishing-contetnt {
-    margin-top: 40px;
+    position: relative;
+    padding: 20px;
 }
+
+.close-dialog-btn {
+    position: absolute;
+    top: 8px;
+    height: 30px;
+    right: 20px;
+    aspect-ratio: 1/1;
+    color: var(--grey);
+    cursor: pointer;
+}
+
+    .close-dialog-btn:hover {
+        transform: scale(1.02);
+        color: var(--red-del);
+    }
+
+

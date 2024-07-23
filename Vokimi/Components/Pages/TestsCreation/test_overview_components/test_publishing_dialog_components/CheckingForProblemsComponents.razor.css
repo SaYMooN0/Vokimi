@@ -1,9 +1,14 @@
 ﻿.validating-container {
-    margin-top: 60px;
-    width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+
+.problems-checking-label {
+    font-family: Roboto;
+    font-size: 24px;
+    color: var(--grey);
+    margin-bottom: 20px;
 }
 
 .no-problems-div {
@@ -14,19 +19,49 @@
 }
 
     .no-problems-div label {
-        font-size: 36px;
+        font-size: 34px;
     }
 
 .move-to-next-stage-btn {
+    width: fit-content;
+    align-self: center;
+    margin-top: 70px;
     padding: 8px 20px;
+    border-radius: 8px;
     background-color: var(--primary);
     color: white;
     font-size: 26px;
+    cursor: pointer;
 }
 
     .move-to-next-stage-btn:hover {
         background-color: var(--primary-hov);
     }
 
-.test-problems-div {
+.errors-list {
+    max-height: 600px;
+    overflow-y: auto;
 }
+
+.test-error {
+    font-family: Roboto;
+    margin: 2px 0;
+    font-size: 24px;
+}
+
+    .test-error:before {
+        content: ⬤;
+        color: var(--grey);
+    }
+
+.retry-btn {
+    padding: 8px 20px;
+    background-color: var(--primary);
+    color: white;
+    font-family: Roboto;
+    font-size: 26px;
+}
+
+    .retry-btn:hover {
+        background-color: var(--primary-hov);
+    }
