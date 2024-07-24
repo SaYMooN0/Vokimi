@@ -3,7 +3,7 @@ using VokimiShared.src.models.db_classes.test.test_questions;
 
 namespace VokimiShared.src.models.db_classes.test
 {
-    public class RegularTestQuestion
+    public class GenericTestQuestion
     {
         public QuestionId Id { get; init; }
         public string Text { get; init; }

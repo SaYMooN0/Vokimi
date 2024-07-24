@@ -1,11 +1,29 @@
 ﻿<label class="add-tags-label">Add tags to your test</label>
-<input class="tag-search-input" placeholder="Search for tag..."
-       @onchange="HandleOnSearchChange" name="@Guid.NewGuid().ToString()" />
-<div class="tags-to-choose-list">
-    @foreach (string tag in tagsToChooseFrom) {
+<div class="tags-adding-container">
+    <div class="left-part">
+        <input class="tag-search-input" placeholder="Search for tag..."
+               @onchange="HandleOnSearchChange" name="@Guid.NewGuid().ToString()" />
+        <div class="tags-to-choose-list">
+            @foreach (string tag in tagsToChooseFrom) {
+                <div class="tags-adding-vm">
+                    <label>#@tag</label>
+                    <div class="add-tag-btn" @onclick="()=>AddTag(tag)">+</div>
+                </div>
+            }
+        </div>
+    </div>
+    <div class="right-part">
+        <label class="chosen-tags-label">Tags chosen (@chosenTags.Count/@TestCreationConsts.MaxTagsForTestCount):</label>
+        @foreach (string tag in chosenTags) {
+            <div class="chosen-tag-vm">
+                <label>#@tag</label>
+                <div class="remove-tag-btn" @onclick="()=>RemoveTag(tag)">-</div>
+            </div>
+        }
 
-    }
+    </div>
 </div>
+
 <p class="error-message">@errorMessage</p>
 <label class="chosen-count">Tags chosen: @chosenTags.Count</label>
 <div class="publish-btn @(chosenTags.Count<1? "inactive-btn": "")" @onclick="PublisButtonClicked">
@@ -21,6 +39,13 @@
     public Action<List<string>> PublishWithTagsAction { get; set; }
 
     private void HandleOnSearchChange(ChangeEventArgs e) {
+    }
+
+    private void AddTag(string tag) {
+        chosenTags.Add(tag);
+    }  
+    private void RemoveTag(string tag) {
+        chosenTags.Remove(tag);
     }
 
     private void PublisButtonClicked() {

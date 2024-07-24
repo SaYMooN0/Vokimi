@@ -160,4 +160,30 @@ public class VokimiStorageService
         IEnumerable<string>? reservedKeys = reservedKey is null ? null : [reservedKey.ToString()];
         await ClearUnusedImages(prefix, reservedKeys);
     }
+    public async Task<OneOf<string, Err>> MoveConclusionImageToPublished(string imageKey, DraftTestId draftTestId, TestId testId) {
+        try {
+            string newKey = $"{ImgOperationsHelper.TestsFolder}/{testId}/{ImgOperationsHelper.TestCoverFileName}";
+
+            var copyRequest = new CopyObjectRequest {
+                SourceBucket = _bucketName,
+                SourceKey = imageKey,
+                DestinationBucket = _bucketName,
+                DestinationKey = newKey
+            };
+
+            CopyObjectResponse copyResponse = await _s3Client.CopyObjectAsync(copyRequest);
+
+            if (copyResponse.HttpStatusCode == System.Net.HttpStatusCode.OK) {
+            
+                await ClearDraftTestConclusionUnusedImages(draftTestId);
+                return newKey;
+            }
+            else {
+                return fileUploadingErr;
+            }
+        } catch {
+            return serverErr;
+        }
+    }
+
 }

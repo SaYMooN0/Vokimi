@@ -1,5 +1,4 @@
 ﻿using VokimiShared.src.enums;
-using VokimiShared.src.models.db_classes.test_creation;
 using VokimiShared.src.models.db_classes.tests;
 using VokimiShared.src.models.db_classes.users;
 
@@ -17,12 +16,14 @@ namespace VokimiShared.src.models.db_classes.test.test_types
         public TestPrivacy Privacy { get; init; }
         public DateTime CreationDate { get; init; }
         public DateTime PublicationDate { get; init; }
+
         public TestConclusionId? ConclusionId { get; protected set; }
         public virtual TestConclusion? Conclusion { get; protected set; }
 
-        public virtual ICollection<TestResult> PossibleResults { get; set; } = new List<TestResult>();
         public TestStylesSheetId StylesSheetId { get; set; }
         public virtual TestStylesSheet StylesSheet { get; set; }
+
         public abstract TestTemplate Template { get; }
+
     }
 }

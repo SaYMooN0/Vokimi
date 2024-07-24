@@ -6,6 +6,15 @@
             MinTestNameLength = 12,
             MaxTestNameLength = 255,
             MaxTestDescriptionLength= 255;
+        public const int MaxTagsForTestCount = 12;
+        public const int
+            QuestionTextMinLength = 10,
+            QuestionTextMaxLength = 255;
+
+        public const int
+            AnswerTextMinLength = 6,
+            AnswerTextMaxLength = 255;
+
         public const int
             MaxResultsCountForAnswer = 5,
             ResultIdMaxCharacters = 12,

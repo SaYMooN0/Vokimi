@@ -2,12 +2,13 @@
 {
     public static class ImgOperationsHelper
     {
+        //folders
         public const string
             GeneralFolder = "general",
             //users
             ProfilePicturesFolder = "profile_pictures",
             //tests
-            TestCoversFolder = "test_covers",
+            TestsFolder = "published_test",
             //draft tests
             DraftTestCoversFolder = "draft_tests_covers",
             DraftTestQuestionsFolder = "draft_tests_questions",
@@ -15,6 +16,8 @@
             DraftTestConclusionsFolder = "draft_tests_conclusions",
             DraftTestResultsFolder = "draft_tests_results"
             ;
+        public const string
+            TestCoverFileName="test_cover";
         public static string DefaultTestCoverImg => $"{GeneralFolder}/test_cover_default.webp";
         public static string ImgUrl(string fileKey) =>
            $"vokimiimgs/GetImage/{fileKey}";
