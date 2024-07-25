@@ -15,7 +15,7 @@ using VokimiShared.src.models.form_classes.draft_tests_answers_form;
 using VokimiShared.src.models.form_classes.result_editing;
 using VokimiShared.src.models.db_classes.answers;
 
-namespace Vokimi.Services
+namespace Vokimi.Services.db_operations
 {
     public class TestsCreationDbOperationsService
     {

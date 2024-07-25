@@ -11,12 +11,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <_ContentIncludedByDefault Remove="Components\Pages\TestsCreation\test_overview_components\test_publishing_dialog_components\TestIsReadyComponent.razor" />
     <_ContentIncludedByDefault Remove="wwwroot\app.js" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="Components\Pages\TestsCreation\test_overview_components\test_publishing_dialog_components\TestIsReadyComponent.razor" />
+    <None Include="Components\Pages\TestsCreation\test_overview_components\test_publishing_dialog_components\SuccessfullyPublishedComponent.razor" />
     <None Include="wwwroot\app.js" />
   </ItemGroup>
 
@@ -30,10 +29,6 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="8.0.6" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4" />
     <PackageReference Include="OneOf" Version="3.0.271" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <UpToDateCheckInput Remove="Components\Pages\TestsCreation\test_overview_components\test_publishing_dialog_components\TestIsReadyComponent.razor" />
   </ItemGroup>
 
 </Project>

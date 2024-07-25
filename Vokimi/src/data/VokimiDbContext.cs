@@ -1,7 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Amazon.S3.Model;
+using Microsoft.EntityFrameworkCore;
 using VokimiShared.src.models.db_classes;
 using VokimiShared.src.models.db_classes.answers;
 using VokimiShared.src.models.db_classes.test;
+using VokimiShared.src.models.db_classes.test.test_types;
 using VokimiShared.src.models.db_classes.test_answers;
 using VokimiShared.src.models.db_classes.test_creation;
 using VokimiShared.src.models.db_classes.tests;
@@ -35,8 +37,11 @@ namespace Vokimi.src.data
 
 
         //published tests only
-        //....
+        public DbSet<BaseTest> TestsSharedInfo { get; set; }
+        public DbSet<TestGenericType> TestsGenericType { get; set; }
 
+        //tags
+        public DbSet<TestTag> TestTags{ get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
             optionsBuilder.UseLazyLoadingProxies();
         }
@@ -170,6 +175,52 @@ namespace Vokimi.src.data
             modelBuilder.Entity<TestStylesSheet>(entity => {
                 entity.HasKey(x => x.Id);
                 entity.Property(x => x.Id).HasConversion(v => v.Value, v => new TestStylesSheetId(v));
+            });
+
+            modelBuilder.Entity<BaseTest>(entity =>
+            {
+                entity.HasKey(x => x.Id);
+                entity.Property(x => x.Id).HasConversion(v => v.Value, v => new TestId(v));
+                entity.Property(x => x.CreatorId).IsRequired();
+                entity.Property(x => x.Name).IsRequired();
+                entity.Property(x => x.Language).IsRequired();
+                entity.Property(x => x.Privacy).IsRequired();
+                entity.Property(x => x.CreationDate).IsRequired();
+                entity.Property(x => x.PublicationDate).IsRequired();
+                entity.Property(x => x.ConclusionId).HasConversion(
+                    v => v.HasValue ? v.Value.Value : (Guid?)null,
+                    v => v.HasValue ? new TestConclusionId(v.Value) : null);
+                entity.Property(x => x.StylesSheetId).HasConversion(v => v.Value, v => new TestStylesSheetId(v));
+
+                //entity.HasOne(x => x.Conclusion)
+                //      .WithMany()
+                //      .HasForeignKey(x => x.ConclusionId);
+
+                //entity.HasOne(x => x.StylesSheet)
+                //      .WithMany()
+                //      .HasForeignKey(x => x.StylesSheetId);
+
+
+                entity.HasMany(x => x.Tags)
+                      .WithMany(x => x.Tests)
+                      .UsingEntity<Dictionary<string, object>>(
+                          "TestWithTagRelations",
+                          j => j.HasOne<TestTag>().WithMany().HasForeignKey("TagId"),
+                          j => j.HasOne<BaseTest>().WithMany().HasForeignKey("TestId")
+                      );
+            });
+            modelBuilder.Entity<TestGenericType>(entity =>
+            {
+                entity.HasMany(x => x.Questions)
+                      .WithOne()
+                      .HasForeignKey(x => x.TestId);
+
+            });
+            modelBuilder.Entity<TestTag>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id).HasConversion(v => v.Value, v => new TestTagId(v));
+                entity.Property(e => e.Value).IsRequired();
             });
         }
     }

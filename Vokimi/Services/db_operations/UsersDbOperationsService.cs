@@ -6,7 +6,7 @@ using VokimiShared.src.models.form_classes;
 using OneOf;
 using VokimiShared.src.models.db_classes;
 
-namespace Vokimi.Services
+namespace Vokimi.Services.db_operations
 {
     public class UsersDbOperationsService
     {

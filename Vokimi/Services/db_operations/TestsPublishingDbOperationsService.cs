@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Collections;
 using System.Collections.Generic;
 using Vokimi.src.data;
 using VokimiShared.src;
@@ -14,7 +15,7 @@ using VokimiShared.src.models.db_classes.tests;
 using VokimiShared.src.models.db_classes.users;
 using VokimiShared.src.models.dtos;
 
-namespace Vokimi.Services
+namespace Vokimi.Services.db_operations
 {
     public class TestsPublishingDbOperationsService
     {
@@ -38,8 +39,8 @@ namespace Vokimi.Services
                 CheckTestMainInfoForProblems(test.MainInfo)
                 .ToList();
 
-            problems.AddRange(CheckTestResultsForProblems(test.PossibleResults));
             problems.AddRange(CheckQuestionsProblemsForGenericTest(test.Questions.ToList()));
+            problems.AddRange(CheckTestResultsForProblems(test.PossibleResults));
 
             return problems;
         }
@@ -113,39 +114,48 @@ $"from {TestCreationConsts.ResultMinTextLength} to {TestCreationConsts.ResultMax
             return problems.Select(TestPublishingProblemDto.NewQuestionsArea);
         }
         private IEnumerable<string> CheckQuestionAnswersForProblems(
-            ICollection<DraftTestAnswer> answers, Func<string, string> errPrefix) =>
-            (answers.Select(a => a.AdditionalInfo) switch {
-                IEnumerable<TextOnlyAnswerAdditionalInfo> textOnlyAnswers => CheckTextOnlyAnswersForProblems(textOnlyAnswers),
-                IEnumerable<ImageOnlyAnswerAdditionalInfo> imageOnlyAnswers => CheckImageOnlyAnswersForProblems(imageOnlyAnswers),
-                IEnumerable<TextAndImageAnswerAdditionalInfo> textAndImageAnswers => CheckTextAndImageAnswersForProblems(textAndImageAnswers),
-                _ => throw new InvalidOperationException("Unknown answer type")
-            }).Select(s => errPrefix(s));
-        private IEnumerable<string> CheckTextOnlyAnswersForProblems(IEnumerable<TextOnlyAnswerAdditionalInfo> infoList) {
-            foreach (var a in infoList) {
-                int textLen = string.IsNullOrWhiteSpace(a.Text) ? 0 : a.Text.Length;
-                if (textLen < TestCreationConsts.AnswerTextMinLength || textLen > TestCreationConsts.AnswerTextMaxLength) {
-                    yield return $"Text of the answer is {textLen} characters long. The length must be from {TestCreationConsts.AnswerTextMinLength} to {TestCreationConsts.AnswerTextMaxLength} characters";
+       ICollection<DraftTestAnswer> answers, Func<string, string> errPrefix) {
+            var problems = new List<string>();
+
+            foreach (var answer in answers) {
+                string? answerProblem = answer.AdditionalInfo switch {
+                    TextOnlyAnswerAdditionalInfo textOnlyInfo => CheckTextOnlyAnswerForProblems(textOnlyInfo),
+                    ImageOnlyAnswerAdditionalInfo imageOnlyInfo => CheckImageOnlyAnswerForProblems(imageOnlyInfo),
+                    TextAndImageAnswerAdditionalInfo textAndImageInfo => CheckTextAndImageAnswerForProblems(textAndImageInfo),
+                    _ => throw new InvalidOperationException("Unknown answer type")
+                };
+
+                if (!string.IsNullOrEmpty(answerProblem)) {
+                    problems.Add(errPrefix(answerProblem));
                 }
             }
+
+            return problems;
         }
-        private IEnumerable<string> CheckImageOnlyAnswersForProblems(IEnumerable<ImageOnlyAnswerAdditionalInfo> infoList) {
-            foreach (var a in infoList) {
-                if (string.IsNullOrWhiteSpace(a.ImagePath)) {
-                    yield return "Answer must contain image";
-                }
+
+        private string? CheckTextOnlyAnswerForProblems(TextOnlyAnswerAdditionalInfo info) {
+            int textLen = string.IsNullOrWhiteSpace(info.Text) ? 0 : info.Text.Length;
+            if (textLen < TestCreationConsts.AnswerTextMinLength || textLen > TestCreationConsts.AnswerTextMaxLength) {
+                return $"Text of the answer is {textLen} characters long. The length must be from {TestCreationConsts.AnswerTextMinLength} to {TestCreationConsts.AnswerTextMaxLength} characters";
             }
+            return null;
         }
-        private IEnumerable<string> CheckTextAndImageAnswersForProblems(IEnumerable<TextAndImageAnswerAdditionalInfo> infoList) {
-            foreach (var a in infoList) {
-                int textLen = string.IsNullOrWhiteSpace(a.Text) ? 0 : a.Text.Length;
-                if (textLen < TestCreationConsts.AnswerTextMinLength || textLen > TestCreationConsts.AnswerTextMaxLength) {
-                    yield return $"Text of the answer is {textLen} characters long. The length must be from {TestCreationConsts.AnswerTextMinLength} to {TestCreationConsts.AnswerTextMaxLength} characters";
-                }
-                if (string.IsNullOrWhiteSpace(a.ImagePath)) {
-                    yield return "Answer must contain image";
-                }
+
+        private string? CheckImageOnlyAnswerForProblems(ImageOnlyAnswerAdditionalInfo info) =>
+            string.IsNullOrWhiteSpace(info.ImagePath) ? "Answer must contain image" : null;
+
+
+        private string? CheckTextAndImageAnswerForProblems(TextAndImageAnswerAdditionalInfo info) {
+            int textLen = string.IsNullOrWhiteSpace(info.Text) ? 0 : info.Text.Length;
+            if (textLen < TestCreationConsts.AnswerTextMinLength || textLen > TestCreationConsts.AnswerTextMaxLength) {
+                return $"Text of the answer is {textLen} characters long. The length must be from {TestCreationConsts.AnswerTextMinLength} to {TestCreationConsts.AnswerTextMaxLength} characters";
             }
+            if (string.IsNullOrWhiteSpace(info.ImagePath)) {
+                return "Answer must contain image";
+            }
+            return null;
         }
+
         public async Task<Err> PublishDraftTest(DraftTestId id) {
             BaseDraftTest? test = await _db.DraftTestsSharedInfo.FirstOrDefaultAsync(i => i.Id == id);
             if (test is null) { return new("Unknown test"); }

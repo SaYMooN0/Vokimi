@@ -1,60 +1,103 @@
-﻿<label class="add-tags-label">Add tags to your test</label>
-<div class="tags-adding-container">
-    <div class="left-part">
-        <input class="tag-search-input" placeholder="Search for tag..."
-               @onchange="HandleOnSearchChange" name="@Guid.NewGuid().ToString()" />
-        <div class="tags-to-choose-list">
-            @foreach (string tag in tagsToChooseFrom) {
-                <div class="tags-adding-vm">
+﻿@inject TagsInteractionDbOperationsService tagsInteractionDbOperationsService
+
+<div class="dialog-state-container">
+    <label class="add-tags-label">
+        Add tags to your test
+    </label>
+    <div class="tags-adding-container">
+        <div class="left-part">
+            <div class="search-input-container">
+                <svg class="search-icon" viewBox="0 0 24 24" fill="none">
+                    <path d="M17.5 17.5L22 22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M20 11C20 6.02944 15.9706 2 11 2C6.02944 2 2 6.02944 2 11C2 15.9706 6.02944 20 11 20C15.9706 20 20 15.9706 20 11Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
+                </svg>
+                <input class="search-input" placeholder="Search for tag..."
+                       @oninput="HandleOnSearchChange"
+                       @bind="tagSearchInput"
+                       name="@Guid.NewGuid().ToString()" />
+                <svg class="reset-button" @onclick="ResetSearchInput" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </div>
+            <div class="tags-to-choose-list">
+                @foreach (string tag in tagsToChooseFrom) {
+                    <div class="tag-display">
+                        <label>#@tag</label>
+                        <svg class="add-btn" @onclick="()=>AddTag(tag)" viewBox="0 0 24 24" fill="none">
+                            <path d="M12 4V20M20 12H4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </div>
+                }
+                <label class="continue-typeing">If you don't find the tag you need continue to enter the name of the tag</label>
+            </div>
+        </div>
+        <div class="right-part">
+            <label class="chosen-tags-label">Tags chosen (@chosenTags.Count/@TestCreationConsts.MaxTagsForTestCount):</label>
+            @foreach (string tag in chosenTags) {
+                <div class="tag-display">
                     <label>#@tag</label>
-                    <div class="add-tag-btn" @onclick="()=>AddTag(tag)">+</div>
+                    <svg class="remove-btn" @onclick="()=>RemoveTag(tag)" viewBox="0 0 24 24" fill="none">
+                        <path d="M20 12L4 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
                 </div>
             }
         </div>
     </div>
-    <div class="right-part">
-        <label class="chosen-tags-label">Tags chosen (@chosenTags.Count/@TestCreationConsts.MaxTagsForTestCount):</label>
-        @foreach (string tag in chosenTags) {
-            <div class="chosen-tag-vm">
-                <label>#@tag</label>
-                <div class="remove-tag-btn" @onclick="()=>RemoveTag(tag)">-</div>
-            </div>
-        }
 
+    <p class="error-message">@errorMessage</p>
+    <div class="publish-btn @(chosenTags.Count<1? "inactive-btn": "")" @onclick="PublisButtonClicked">
+        Publish
     </div>
-</div>
-
-<p class="error-message">@errorMessage</p>
-<label class="chosen-count">Tags chosen: @chosenTags.Count</label>
-<div class="publish-btn @(chosenTags.Count<1? "inactive-btn": "")" @onclick="PublisButtonClicked">
-    Publish
 </div>
 
 @code {
     private List<string> chosenTags = [];
     private List<string> tagsToChooseFrom = [];
     private string errorMessage = string.Empty;
+    private string tagSearchInput = string.Empty;
 
     [Parameter]
     public Action<List<string>> PublishWithTagsAction { get; set; }
 
-    private void HandleOnSearchChange(ChangeEventArgs e) {
+    private async void HandleOnSearchChange(ChangeEventArgs e) {
+        tagSearchInput = e.Value.ToString();
+        await FetchTagsToChooseFrom();
     }
-
+    private void ResetSearchInput() {
+        tagSearchInput = string.Empty;
+    }
     private void AddTag(string tag) {
-        chosenTags.Add(tag);
-    }  
+        if (chosenTags.Count >= TestCreationConsts.MaxTagsForTestCount) {
+            errorMessage = $"You can't add more than {TestCreationConsts.MaxTagsForTestCount} tags";
+        }
+        else {
+            chosenTags.Add(tag);
+            errorMessage = string.Empty;
+        }
+    }
     private void RemoveTag(string tag) {
         chosenTags.Remove(tag);
+        errorMessage = string.Empty;
     }
 
     private void PublisButtonClicked() {
-        if (chosenTags.Count < 1) {
-            errorMessage = "Choose at least 1 tag";
+        if(chosenTags.Count<1) { return; }
+        if (chosenTags.Count > TestCreationConsts.MaxTagsForTestCount) {
+            errorMessage = $"You can't choose more than {TestCreationConsts.MaxTagsForTestCount} tags";
             StateHasChanged();
             return;
         }
         PublishWithTagsAction(chosenTags);
     }
+    private async Task FetchTagsToChooseFrom() {
+        if (string.IsNullOrWhiteSpace(tagSearchInput)) {
+            return;
+        }
 
+        var fetchingRes = await tagsInteractionDbOperationsService.GetRelevantTags(tagSearchInput);
+        fetchingRes.Switch(tags => {
+            tagsToChooseFrom = tags.Where(t => !chosenTags.Contains(t) && t != tagSearchInput).ToList();
+            tagsToChooseFrom.Insert(0, tagSearchInput);
+        }, error => errorMessage = "Unable to fetch tags");
+    }
 }

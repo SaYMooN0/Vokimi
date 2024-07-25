@@ -1,6 +1,6 @@
 ﻿using Vokimi.src.data;
 
-namespace Vokimi.Services
+namespace Vokimi.Services.db_operations
 {
     public class TestsTakingDbOperationsService
     {

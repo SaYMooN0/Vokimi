@@ -3,7 +3,7 @@
 @rendermode InteractiveServer
 
 <BaseDialog DialogId="question-editing-dialog" @ref="baseDialogRef">
-    <div class="content">
+    <div class="dialog-content">
         <label class="text-label">Enter the text of the question (it can be changed later)</label>
         <input @bind="questionText" placeholder="Question text" name="@Guid.NewGuid()" class="question-text-input" />
 

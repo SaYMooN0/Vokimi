@@ -23,6 +23,8 @@ namespace VokimiShared.src.models.db_classes.test.test_types
         public TestStylesSheetId StylesSheetId { get; set; }
         public virtual TestStylesSheet StylesSheet { get; set; }
 
+        public virtual ICollection<TestTag> Tags { get; set; } = new List<TestTag>();
+
         public abstract TestTemplate Template { get; }
 
     }

@@ -4,11 +4,12 @@
     </div>
     @if (ProblemsList.Any()) {
         <div class="errors-list">
-            @foreach (var e in ProblemsList) {
-                <p class="test-error">@e</p>
+            @foreach (var problem in ProblemsList) {
+                <label class="problem-area">@problem.Area</label>
+                <label class="problem-message">@problem.Problem</label>
             }
         </div>
-        <div class="retry-btn">
+        <div class="retry-btn" @onlick="RetryAction">
             Retry
         </div>
     }

@@ -1,11 +1,10 @@
 using Amazon.Runtime;
 using Amazon.S3;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using Vokimi.Components;
-using Vokimi.PageViewModels;
 using Vokimi.Services;
+using Vokimi.Services.db_operations;
 using Vokimi.src.data;
 
 namespace Vokimi
@@ -34,7 +33,6 @@ namespace Vokimi
 
             app.UseHttpsRedirection();
 
-            // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment()) {
                 app.UseWebAssemblyDebugging();
             }
@@ -75,6 +73,7 @@ namespace Vokimi
             services.AddScoped<TestsTakingDbOperationsService>();
             services.AddScoped<TestsCreationDbOperationsService>();
             services.AddScoped<TestsPublishingDbOperationsService>();
+            services.AddScoped<TagsInteractionDbOperationsService>();
 
 
             // Yandex s3 configuration
