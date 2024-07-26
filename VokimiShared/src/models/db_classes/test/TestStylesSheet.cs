@@ -1,5 +1,6 @@
 ﻿using VokimiShared.src.constants_store_classes;
 using VokimiShared.src.enums;
+using VokimiShared.src.models.db_entities_ids;
 
 namespace VokimiShared.src.models.db_classes.test
 {
@@ -14,7 +15,7 @@ namespace VokimiShared.src.models.db_classes.test
         }
         public static TestStylesSheet CreateNew() => new() {
             Id = new(),
-            AccentColor = TestCreationConsts.DefaultAccentColor,
+            AccentColor = BaseTestCreationConsts.DefaultAccentColor,
             ArrowsType = ArrowIconType.Default
         };
     }

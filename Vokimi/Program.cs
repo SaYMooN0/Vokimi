@@ -72,7 +72,7 @@ namespace Vokimi
             services.AddScoped<UsersDbOperationsService>();
             services.AddScoped<TestsTakingDbOperationsService>();
             services.AddScoped<TestsCreationDbOperationsService>();
-            services.AddScoped<TestsPublishingDbOperationsService>();
+            services.AddScoped<GenericTestsPublishingDbOperationsService>();
             services.AddScoped<TagsInteractionDbOperationsService>();
 
 

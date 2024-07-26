@@ -1,5 +1,6 @@
 ﻿using VokimiShared.src.models.db_classes;
 using VokimiShared.src;
+using VokimiShared.src.models.db_entities_ids;
 
 namespace Vokimi.PageViewModels
 {

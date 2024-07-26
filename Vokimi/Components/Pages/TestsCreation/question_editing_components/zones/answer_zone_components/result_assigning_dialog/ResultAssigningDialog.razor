@@ -78,8 +78,8 @@
 
         if (string.IsNullOrEmpty(newResId)) { return; }
 
-        if (currentResultsListToModifyRef.Count() >= TestCreationConsts.MaxResultsCountForAnswer) {
-            errorString = $"You can't assign more than {TestCreationConsts.MaxResultsCountForAnswer} results to one answer";
+        if (currentResultsListToModifyRef.Count() >= GenericTestCreationConsts.MaxResultsCountForAnswer) {
+            errorString = $"You can't assign more than {GenericTestCreationConsts.MaxResultsCountForAnswer} results to one answer";
             StateHasChanged();
         }
         else {

@@ -5,6 +5,7 @@ using VokimiShared.src;
 using VokimiShared.src.models.form_classes;
 using OneOf;
 using VokimiShared.src.models.db_classes;
+using VokimiShared.src.models.db_entities_ids;
 
 namespace Vokimi.Services.db_operations
 {

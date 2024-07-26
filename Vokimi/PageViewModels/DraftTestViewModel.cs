@@ -1,6 +1,6 @@
 ﻿using VokimiShared.src.enums;
-using VokimiShared.src.models.db_classes;
 using VokimiShared.src.models.db_classes.test_creation;
+using VokimiShared.src.models.db_entities_ids;
 
 namespace Vokimi.PageViewModels
 {

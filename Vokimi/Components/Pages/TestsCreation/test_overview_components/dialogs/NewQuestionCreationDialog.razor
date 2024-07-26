@@ -48,7 +48,7 @@
             serverMessage = "Question text cannot be more than 127 characters";
             return;
         }
-        DraftTestQuestion question = DraftTestQuestion.CreateNew(questionText, answersType, TestId);
+        DraftGenericTestQuestion question = DraftGenericTestQuestion.CreateNew(questionText, answersType, TestId);
         Err err = await testsCreationDbOperationsService.AddQuestionToGenericTest(TestId, question);
         if (err.NotNone()) {
             serverMessage = err.ToString();

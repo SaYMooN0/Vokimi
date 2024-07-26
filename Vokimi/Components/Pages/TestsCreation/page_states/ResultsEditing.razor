@@ -40,7 +40,7 @@ else {
 
     [Parameter] public Action BackToOverviewAction { get; set; }
 
-    [CascadingParameter(Name = "TestID")] public DraftTestId TestId { get; set; }
+    [CascadingParameter(Name = "TestId")] public DraftTestId TestId { get; set; }
 
     private TestResultsEditingForm formData = TestResultsEditingForm.Empty;
 
@@ -117,11 +117,11 @@ else {
             if (usedResIds.Contains(form.NotSavedResults[i].ResultStringId)) {
                 return new Err(resErrorPref + "There is already result with this id");
             }
-            if (form.NotSavedResults[i].ResultStringId.Length < TestCreationConsts.ResultIdMinCharacters) {
-                return new Err(resErrorPref + $"Result id cannot be less than {TestCreationConsts.ResultIdMinCharacters} characters");
+            if (form.NotSavedResults[i].ResultStringId.Length < BaseTestCreationConsts.ResultIdMinCharacters) {
+                return new Err(resErrorPref + $"Result id cannot be less than {BaseTestCreationConsts.ResultIdMinCharacters} characters");
             }
-            if (form.NotSavedResults[i].ResultStringId.Length > TestCreationConsts.ResultIdMaxCharacters) {
-                return new Err(resErrorPref + $"Result id cannot be more than {TestCreationConsts.ResultIdMaxCharacters} characters");
+            if (form.NotSavedResults[i].ResultStringId.Length > BaseTestCreationConsts.ResultIdMaxCharacters) {
+                return new Err(resErrorPref + $"Result id cannot be more than {BaseTestCreationConsts.ResultIdMaxCharacters} characters");
             }
             usedResIds.Add(form.NotSavedResults[i].ResultStringId);
         }
@@ -134,9 +134,9 @@ else {
              );
 
         foreach (var (resultStringId, textLength) in resultsIdTextLength) {
-            if (textLength < TestCreationConsts.ResultMinTextLength || textLength > TestCreationConsts.ResultMaxTextLength) {
+            if (textLength < BaseTestCreationConsts.ResultMinTextLength || textLength > BaseTestCreationConsts.ResultMaxTextLength) {
                 return new Err($"Text of the result with id: '{resultStringId}' is {textLength} characters long. The length must be " +
-                    $"from {TestCreationConsts.ResultMinTextLength} to {TestCreationConsts.ResultMaxTextLength} characters");
+                    $"from {BaseTestCreationConsts.ResultMinTextLength} to {BaseTestCreationConsts.ResultMaxTextLength} characters");
             }
         }
 

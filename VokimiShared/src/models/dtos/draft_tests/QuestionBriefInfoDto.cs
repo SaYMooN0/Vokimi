@@ -1,5 +1,6 @@
-﻿using VokimiShared.src.models.db_classes.test_creation;
-using VokimiShared.src.models.db_classes;
+﻿using VokimiShared.src.models.db_classes;
+using VokimiShared.src.models.db_classes.test_creation.generic_test_related;
+using VokimiShared.src.models.db_entities_ids;
 
 namespace VokimiShared.src.models.dtos.draft_tests
 {
@@ -9,7 +10,7 @@ namespace VokimiShared.src.models.dtos.draft_tests
         public string Text { get; init; }
         public ushort AnswersCount { get; init; }
         public bool IsMultipleChoice { get; init; }
-        public QuestionBriefInfoDto(DraftTestQuestion question) {
+        public QuestionBriefInfoDto(DraftGenericTestQuestion question) {
             Id = question.Id;
             Text = question.Text;
             AnswersCount = (ushort)question.Answers.Count;

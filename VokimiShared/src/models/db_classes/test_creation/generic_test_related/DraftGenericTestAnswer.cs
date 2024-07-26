@@ -1,9 +1,10 @@
-﻿using VokimiShared.src.models.db_classes.answers;
-using VokimiShared.src.models.db_classes.test_creation;
+﻿using VokimiShared.src.models.db_classes.generic_test_answers;
+using VokimiShared.src.models.db_classes.test_results.results_for_draft_tests;
+using VokimiShared.src.models.db_entities_ids;
 
-namespace VokimiShared.src.models.db_classes.test_answers
+namespace VokimiShared.src.models.db_classes.test_creation.generic_test_related
 {
-    public class DraftTestAnswer
+    public class DraftGenericTestAnswer
     {
         public DraftTestAnswerId Id { get; init; }
         public DraftTestQuestionId QuestionId { get; init; }
@@ -11,7 +12,7 @@ namespace VokimiShared.src.models.db_classes.test_answers
         public virtual ICollection<DraftTestResult> RelatedResults { get; private set; } = [];
         public AnswerTypeSpecificInfoId AdditionalInfoId { get; init; }
         public virtual AnswerTypeSpecificInfo AdditionalInfo { get; private set; }
-        public static DraftTestAnswer CreateNew(
+        public static DraftGenericTestAnswer CreateNew(
             DraftTestQuestionId questionId, ushort orderInQuestion, AnswerTypeSpecificInfoId typeSpecificInfoId) => new() {
             Id= new (),
             QuestionId= questionId,

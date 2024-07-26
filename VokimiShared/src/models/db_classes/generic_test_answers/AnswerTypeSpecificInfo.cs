@@ -1,4 +1,6 @@
-﻿namespace VokimiShared.src.models.db_classes.answers
+﻿using VokimiShared.src.models.db_entities_ids;
+
+namespace VokimiShared.src.models.db_classes.generic_test_answers
 {
     public abstract class AnswerTypeSpecificInfo
     {

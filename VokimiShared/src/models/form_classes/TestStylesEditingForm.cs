@@ -11,7 +11,7 @@ namespace VokimiShared.src.models.form_classes
         public ArrowIconType ArrowsType { get; set; }
         public static TestStylesEditingForm Default =>
             new() {
-                AccentColor = TestCreationConsts.DefaultAccentColor,
+                AccentColor = BaseTestCreationConsts.DefaultAccentColor,
                 ArrowsType = ArrowIconType.Default,
             };
         public static TestStylesEditingForm FromTestStylesSheet(TestStylesSheet styles) =>

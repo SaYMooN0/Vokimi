@@ -1,13 +1,15 @@
-﻿using Amazon.S3.Model;
-using Microsoft.EntityFrameworkCore;
-using VokimiShared.src.models.db_classes;
-using VokimiShared.src.models.db_classes.answers;
+﻿using Microsoft.EntityFrameworkCore;
+using Vokimi.src.data.context_configuration.db_entities_relations_classes;
+using VokimiShared.src.models.db_classes.generic_test_answers;
 using VokimiShared.src.models.db_classes.test;
+using VokimiShared.src.models.db_classes.test.test_questions;
 using VokimiShared.src.models.db_classes.test.test_types;
-using VokimiShared.src.models.db_classes.test_answers;
 using VokimiShared.src.models.db_classes.test_creation;
+using VokimiShared.src.models.db_classes.test_creation.generic_test_related;
+using VokimiShared.src.models.db_classes.test_results.results_for_draft_tests;
 using VokimiShared.src.models.db_classes.tests;
 using VokimiShared.src.models.db_classes.users;
+using VokimiShared.src.models.db_entities_ids;
 
 namespace Vokimi.src.data
 {
@@ -20,13 +22,16 @@ namespace Vokimi.src.data
         public DbSet<AppUser> AppUsers { get; set; }
         public DbSet<LoginInfo> LoginInfo { get; set; }
         public DbSet<UserAdditionalInfo> UserAdditionalInfo { get; set; }
-        //draft tests only
+        //draft tests shared
         public DbSet<BaseDraftTest> DraftTestsSharedInfo { get; set; }
-        public DbSet<DraftGenericTest> DraftGenericTests { get; set; }
         public DbSet<DraftTestMainInfo> DraftTestMainInfo { get; set; }
-        public DbSet<DraftTestQuestion> DraftTestQuestions { get; set; }
-        public DbSet<DraftTestAnswer> DraftTestAnswers { get; set; }
         public DbSet<DraftTestResult> DraftTestResults { get; set; }
+        public DbSet<DraftTestTypeSpecificResultData> DraftTestTypeSpecificResultsData { get; set; }
+        //draft generic test
+        public DbSet<DraftGenericTest> DraftGenericTests { get; set; }
+        public DbSet<DraftGenericTestResultData> DraftGenericTestResultsData { get; set; }
+        public DbSet<DraftGenericTestQuestion> DraftGenericTestQuestions { get; set; }
+        public DbSet<DraftGenericTestAnswer> DraftGenericTestAnswers { get; set; }
         //published and draft tests shared
         public DbSet<TestConclusion> TestConclusions { get; set; }
         public DbSet<TestStylesSheet> TestStyles { get; set; }
@@ -39,6 +44,8 @@ namespace Vokimi.src.data
         //published tests only
         public DbSet<BaseTest> TestsSharedInfo { get; set; }
         public DbSet<TestGenericType> TestsGenericType { get; set; }
+        public DbSet<GenericTestQuestion> GenericTestQuestions { get; set; }
+        public DbSet<MultiChoiceQuestionData> MultiChoiceQuestionsData { get; set; }
 
         //tags
         public DbSet<TestTag> TestTags{ get; set; }
@@ -49,6 +56,28 @@ namespace Vokimi.src.data
         protected override void OnModelCreating(ModelBuilder modelBuilder) {
             base.OnModelCreating(modelBuilder);
 
+            ConfigureAppUser(modelBuilder);
+            ConfigureLoginInfo(modelBuilder);
+            ConfigureUserAdditionalInfo(modelBuilder);
+            ConfigureUnconfirmedAppUser(modelBuilder);
+            ConfigureBaseDraftTest(modelBuilder);
+            ConfigureDraftGenericTest(modelBuilder);
+            ConfigureDraftTestMainInfo(modelBuilder);
+            ConfigureTestConclusion(modelBuilder);
+            ConfigureDraftGenericTestQuestion(modelBuilder);
+            ConfigureDraftGenericTestAnswer(modelBuilder);
+            ConfigureAnswerTypeSpecificInfo(modelBuilder);
+            ConfigureDraftTestResult(modelBuilder);
+            ConfigureTestStylesSheet(modelBuilder);
+            ConfigureBaseTest(modelBuilder);
+            ConfigureTestGenericType(modelBuilder);
+            ConfigureGenericTestQuestion(modelBuilder);
+            ConfigureMultiChoiceQuestionData(modelBuilder);
+            ConfigureTestTag(modelBuilder);
+            ConfigureDraftTestTypeSpecificResultData(modelBuilder);
+        }
+
+        private void ConfigureAppUser(ModelBuilder modelBuilder) {
             modelBuilder.Entity<AppUser>(entity => {
                 entity.HasKey(x => x.Id);
                 entity.Property(x => x.Id).HasConversion(v => v.Value, v => new AppUserId(v));
@@ -60,22 +89,30 @@ namespace Vokimi.src.data
                       .HasForeignKey(x => x.CreatorId)
                       .IsRequired();
             });
+        }
 
+        private void ConfigureLoginInfo(ModelBuilder modelBuilder) {
             modelBuilder.Entity<LoginInfo>(entity => {
                 entity.HasKey(x => x.Id);
                 entity.Property(x => x.Id).HasConversion(v => v.Value, v => new LoginInfoId(v));
             });
+        }
 
+        private void ConfigureUserAdditionalInfo(ModelBuilder modelBuilder) {
             modelBuilder.Entity<UserAdditionalInfo>(entity => {
                 entity.HasKey(x => x.Id);
                 entity.Property(x => x.Id).HasConversion(v => v.Value, v => new UserAdditionalInfoId(v));
             });
+        }
 
+        private void ConfigureUnconfirmedAppUser(ModelBuilder modelBuilder) {
             modelBuilder.Entity<UnconfirmedAppUser>(entity => {
                 entity.HasKey(x => x.Id);
                 entity.Property(x => x.Id).HasConversion(v => v.Value, v => new UnconfirmedAppUserId(v));
             });
+        }
 
+        private void ConfigureBaseDraftTest(ModelBuilder modelBuilder) {
             modelBuilder.Entity<BaseDraftTest>(entity => {
                 entity.HasKey(x => x.Id);
                 entity.Property(x => x.Id).HasConversion(v => v.Value, v => new DraftTestId(v));
@@ -98,29 +135,36 @@ namespace Vokimi.src.data
                       .HasForeignKey(x => x.TestId);
 
                 entity.HasOne(x => x.StylesSheet)
-                     .WithMany()
-                     .HasForeignKey(x => x.StylesSheetId);
+                      .WithMany()
+                      .HasForeignKey(x => x.StylesSheetId);
             });
+        }
 
+        private void ConfigureDraftGenericTest(ModelBuilder modelBuilder) {
             modelBuilder.Entity<DraftGenericTest>(entity => {
-
                 entity.HasMany(x => x.Questions)
                       .WithOne()
                       .HasForeignKey(x => x.DraftTestId)
                       .IsRequired();
             });
+        }
 
+        private void ConfigureDraftTestMainInfo(ModelBuilder modelBuilder) {
             modelBuilder.Entity<DraftTestMainInfo>(entity => {
                 entity.HasKey(x => x.Id);
                 entity.Property(x => x.Id).HasConversion(v => v.Value, v => new DraftTestMainInfoId(v));
-
             });
+        }
 
+        private void ConfigureTestConclusion(ModelBuilder modelBuilder) {
             modelBuilder.Entity<TestConclusion>(entity => {
                 entity.HasKey(x => x.Id);
                 entity.Property(x => x.Id).HasConversion(v => v.Value, v => new TestConclusionId(v));
             });
-            modelBuilder.Entity<DraftTestQuestion>(entity => {
+        }
+
+        private void ConfigureDraftGenericTestQuestion(ModelBuilder modelBuilder) {
+            modelBuilder.Entity<DraftGenericTestQuestion>(entity => {
                 entity.HasKey(x => x.Id);
                 entity.Property(x => x.Id).HasConversion(v => v.Value, v => new DraftTestQuestionId(v));
 
@@ -135,36 +179,28 @@ namespace Vokimi.src.data
 
                 entity.Property(x => x.DraftTestId).IsRequired();
             });
-            modelBuilder.Entity<DraftTestAnswer>(entity =>
+        }
+
+        private void ConfigureDraftGenericTestAnswer(ModelBuilder modelBuilder) {
+            modelBuilder.Entity<DraftGenericTestAnswer>(entity =>
             {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Id).HasConversion(v => v.Value, v => new DraftTestAnswerId(v));
                 entity.Property(e => e.QuestionId).IsRequired();
                 entity.Property(e => e.OrderInQuestion).IsRequired();
-
-                entity.HasMany(e => e.RelatedResults)
-                      .WithMany(r => r.AnswersLeadingToResult)
-                      .UsingEntity<Dictionary<string, object>>(
-                          "DraftTestAnswerResultRelations",
-                          r => r.HasOne<DraftTestResult>().WithMany().HasForeignKey("DraftTestResultId"),
-                          l => l.HasOne<DraftTestAnswer>().WithMany().HasForeignKey("DraftTestAnswerId")
-                      );
-
                 entity.HasOne(e => e.AdditionalInfo)
                       .WithOne()
-                      .HasForeignKey<DraftTestAnswer>(e => e.AdditionalInfoId);
+                      .HasForeignKey<DraftGenericTestAnswer>(e => e.AdditionalInfoId);
+                entity.HasMany(e => e.RelatedResults)
+                .WithMany()
+                .UsingEntity<DraftGenericTestAnswerResultDataRelations>(
+                    j => j.HasOne(x => x.DraftTestResultData).WithMany().HasForeignKey(x => x.DraftTestResultDataId),
+                    j => j.HasOne(x => x.DraftTestAnswer).WithMany().HasForeignKey(x => x.DraftTestAnswerId)
+                );
             });
+        }
 
-            modelBuilder.Entity<AnswerTypeSpecificInfo>(entity =>
-            {
-                entity.HasKey(e => e.Id);
-                entity.Property(e => e.Id).HasConversion(v => v.Value, v => new AnswerTypeSpecificInfoId(v));
-            });
-
-            modelBuilder.Entity<ImageOnlyAnswerAdditionalInfo>().ToTable("AnswerAdditionalForInfoImageOnly");
-            modelBuilder.Entity<TextAndImageAnswerAdditionalInfo>().ToTable("AnswerAdditionalForTextAndImage");
-            modelBuilder.Entity<TextOnlyAnswerAdditionalInfo>().ToTable("AnswerAdditionalForTextOnly");
-
+        private void ConfigureDraftTestResult(ModelBuilder modelBuilder) {
             modelBuilder.Entity<DraftTestResult>(entity => {
                 entity.HasKey(x => x.Id);
                 entity.Property(x => x.Id).HasConversion(v => v.Value, v => new DraftTestResultId(v));
@@ -172,11 +208,31 @@ namespace Vokimi.src.data
                 entity.Property(x => x.Text).IsRequired();
                 entity.Property(x => x.ImagePath).IsRequired(false);
             });
+        }
+        private void ConfigureAnswerTypeSpecificInfo(ModelBuilder modelBuilder) {
+            modelBuilder.Entity<AnswerTypeSpecificInfo>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id).HasConversion(v => v.Value, v => new AnswerTypeSpecificInfoId(v));
+            });
+          
+
+
+        }
+        private void ConfigureDraftTestTypeSpecificResultData(ModelBuilder modelBuilder) {
+            modelBuilder.Entity<DraftTestTypeSpecificResultData>(entity => {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id).HasConversion(v => v.Value, v => new DraftTestTypeSpecificResultDataId(v));
+            });
+        }
+        private void ConfigureTestStylesSheet(ModelBuilder modelBuilder) {
             modelBuilder.Entity<TestStylesSheet>(entity => {
                 entity.HasKey(x => x.Id);
                 entity.Property(x => x.Id).HasConversion(v => v.Value, v => new TestStylesSheetId(v));
             });
+        }
 
+        private void ConfigureBaseTest(ModelBuilder modelBuilder) {
             modelBuilder.Entity<BaseTest>(entity =>
             {
                 entity.HasKey(x => x.Id);
@@ -192,14 +248,13 @@ namespace Vokimi.src.data
                     v => v.HasValue ? new TestConclusionId(v.Value) : null);
                 entity.Property(x => x.StylesSheetId).HasConversion(v => v.Value, v => new TestStylesSheetId(v));
 
-                //entity.HasOne(x => x.Conclusion)
-                //      .WithMany()
-                //      .HasForeignKey(x => x.ConclusionId);
+                entity.HasOne(x => x.Conclusion)
+                      .WithMany()
+                      .HasForeignKey(x => x.ConclusionId);
 
-                //entity.HasOne(x => x.StylesSheet)
-                //      .WithMany()
-                //      .HasForeignKey(x => x.StylesSheetId);
-
+                entity.HasOne(x => x.StylesSheet)
+                      .WithMany()
+                      .HasForeignKey(x => x.StylesSheetId);
 
                 entity.HasMany(x => x.Tags)
                       .WithMany(x => x.Tests)
@@ -209,13 +264,33 @@ namespace Vokimi.src.data
                           j => j.HasOne<BaseTest>().WithMany().HasForeignKey("TestId")
                       );
             });
+        }
+
+        private void ConfigureTestGenericType(ModelBuilder modelBuilder) {
             modelBuilder.Entity<TestGenericType>(entity =>
             {
                 entity.HasMany(x => x.Questions)
                       .WithOne()
                       .HasForeignKey(x => x.TestId);
-
             });
+        }
+
+        private void ConfigureGenericTestQuestion(ModelBuilder modelBuilder) {
+            modelBuilder.Entity<GenericTestQuestion>(entity => {
+                entity.Property(x => x.Id).HasConversion(v => v.Value, v => new QuestionId(v));
+                entity.Property(x => x.MultiChoiceQuestionDataId).HasConversion(
+                    v => v.HasValue ? v.Value.Value : (Guid?)null,
+                    v => v.HasValue ? new MultiChoiceQuestionDataId(v.Value) : null);
+            });
+        }
+
+        private void ConfigureMultiChoiceQuestionData(ModelBuilder modelBuilder) {
+            modelBuilder.Entity<MultiChoiceQuestionData>(entity => {
+                entity.Property(x => x.Id).HasConversion(v => v.Value, v => new MultiChoiceQuestionDataId(v));
+            });
+        }
+
+        private void ConfigureTestTag(ModelBuilder modelBuilder) {
             modelBuilder.Entity<TestTag>(entity =>
             {
                 entity.HasKey(e => e.Id);
@@ -223,5 +298,6 @@ namespace Vokimi.src.data
                 entity.Property(e => e.Value).IsRequired();
             });
         }
+
     }
 }

@@ -1,16 +1,14 @@
 ﻿using VokimiShared.src.enums;
-using VokimiShared.src.models.db_classes;
+using VokimiShared.src.models.db_classes.test_results.results_for_draft_tests;
+using VokimiShared.src.models.db_entities_ids;
 
-namespace VokimiShared.src.models.db_classes.test_creation
+namespace VokimiShared.src.models.db_classes.test_creation.generic_test_related
 {
     public class DraftGenericTest : BaseDraftTest
     {
 
-        public virtual ICollection<DraftTestQuestion> Questions { get; private set; } = new List<DraftTestQuestion>();
-
-
-        //results
-        //public HashSet<TestTag> Tags { get; init; } = new();
+        public virtual ICollection<DraftGenericTestQuestion> Questions { get; private set; } = [];
+        public virtual ICollection<DraftTestResult> PossibleResults { get; set; } = [];
 
         public DraftGenericTest() {
             Template = TestTemplate.Generic;

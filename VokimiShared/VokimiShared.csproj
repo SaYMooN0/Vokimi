@@ -12,4 +12,8 @@
     <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.17" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="src\models\db_classes\test_results\results_for_published_tests\" />
+  </ItemGroup>
+
 </Project>

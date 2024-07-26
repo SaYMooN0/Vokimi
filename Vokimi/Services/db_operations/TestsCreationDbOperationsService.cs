@@ -5,15 +5,17 @@ using Vokimi.src.data;
 using VokimiShared.src;
 using VokimiShared.src.enums;
 using VokimiShared.src.models.db_classes;
+using VokimiShared.src.models.db_classes.generic_test_answers;
 using VokimiShared.src.models.db_classes.test;
-using VokimiShared.src.models.db_classes.test_answers;
 using VokimiShared.src.models.db_classes.test_creation;
+using VokimiShared.src.models.db_classes.test_creation.generic_test_related;
+using VokimiShared.src.models.db_classes.test_results.results_for_draft_tests;
 using VokimiShared.src.models.db_classes.tests;
 using VokimiShared.src.models.db_classes.users;
+using VokimiShared.src.models.db_entities_ids;
 using VokimiShared.src.models.form_classes;
 using VokimiShared.src.models.form_classes.draft_tests_answers_form;
 using VokimiShared.src.models.form_classes.result_editing;
-using VokimiShared.src.models.db_classes.answers;
 
 namespace Vokimi.Services.db_operations
 {
@@ -61,8 +63,8 @@ namespace Vokimi.Services.db_operations
             await _db.DraftTestsSharedInfo.FirstOrDefaultAsync(i => i.Id == id);
         public async Task<DraftTestMainInfo?> GetDraftTestMainInfoById(DraftTestMainInfoId id) =>
             await _db.DraftTestMainInfo.FirstOrDefaultAsync(mi => mi.Id == id);
-        public async Task<List<DraftTestQuestion>> GetDraftTestQuestionsById(DraftTestId id) =>
-            await _db.DraftTestQuestions.Where(q => q.DraftTestId == id).ToListAsync();
+        public async Task<List<DraftGenericTestQuestion>> GetDraftTestQuestionsById(DraftTestId id) =>
+            await _db.DraftGenericTestQuestions.Where(q => q.DraftTestId == id).ToListAsync();
         public async Task<Err> UpdateTestCover(DraftTestMainInfoId mainInfoId, string newPath) {
             var mainInfo = await GetDraftTestMainInfoById(mainInfoId);
             if (mainInfo is null) {
@@ -100,35 +102,40 @@ namespace Vokimi.Services.db_operations
             }
             return Err.None;
         }
-        public async Task<Err> AddQuestionToGenericTest(DraftTestId testId, DraftTestQuestion draftTestQuestion) {
-            DraftGenericTest? test = await GetDraftTestById(testId) as DraftGenericTest;
-            if (test is null) {
-                return new Err("Unknown test");
+        public async Task<Err> AddQuestionToGenericTest(DraftTestId testId, DraftGenericTestQuestion draftTestQuestion) {
+            BaseDraftTest? baseTest = await GetDraftTestById(testId);
+            if (baseTest is null) {
+                return new("Unknown test");
             }
-
-            using (var transaction = await _db.Database.BeginTransactionAsync()) {
-                try {
-                    test.Questions.Add(draftTestQuestion);
-                    await _db.SaveChangesAsync();
-                    await transaction.CommitAsync();
-                    return Err.None;
-                } catch (Exception ex) {
-                    await transaction.RollbackAsync();
-                    return new Err("Server error. Please try again later");
+            if (baseTest is DraftGenericTest test) {
+                using (var transaction = await _db.Database.BeginTransactionAsync()) {
+                    try {
+                        test.Questions.Add(draftTestQuestion);
+                        await _db.SaveChangesAsync();
+                        await transaction.CommitAsync();
+                        return Err.None;
+                    } catch (Exception ex) {
+                        await transaction.RollbackAsync();
+                        return new Err("Server error. Please try again later");
+                    }
                 }
             }
-        }
-        public Task<DraftTestQuestion?> GetDraftTestQuestionById(DraftTestQuestionId id) =>
-            _db.DraftTestQuestions.FirstOrDefaultAsync(i => i.Id == id);
+            else {
+                return new("Invalid test type");
+            }
 
-        public async Task<Err> UpdateDraftTestQuestion(DraftTestQuestionId questionId, QuestionEditingForm newData) {
-            DraftTestQuestion? question = await GetDraftTestQuestionById(questionId);
+        }
+        public Task<DraftGenericTestQuestion?> GetDraftGenericTestQuestionById(DraftTestQuestionId id) =>
+            _db.DraftGenericTestQuestions.FirstOrDefaultAsync(i => i.Id == id);
+
+        public async Task<Err> UpdateDraftTestGenericQuestion(DraftTestQuestionId questionId, QuestionEditingForm newData) {
+            DraftGenericTestQuestion? question = await GetDraftGenericTestQuestionById(questionId);
             if (question is null) { return new Err("Unknown question"); }
 
             using (var transaction = await _db.Database.BeginTransactionAsync()) {
                 try {
                     ClearAnswersForDraftTestQuestion(question);
-                    List<DraftTestAnswer> answers = new();
+                    List<DraftGenericTestAnswer> answers = new();
 
                     Dictionary<string, DraftTestResultId> results = _db.DraftTestResults
                        .Where(t => t.TestId == question.DraftTestId)
@@ -149,7 +156,7 @@ namespace Vokimi.Services.db_operations
                         };
 
                         ushort orderIndex = (ushort)newData.Answers.IndexOf(answerForm);
-                        DraftTestAnswer answer = DraftTestAnswer.CreateNew(questionId, orderIndex, typeSpecificInfo.Id);
+                        DraftGenericTestAnswer answer = DraftGenericTestAnswer.CreateNew(questionId, orderIndex, typeSpecificInfo.Id);
 
 
                         foreach (string resultStringId in answerForm.RelatedResultIds) {
@@ -181,7 +188,7 @@ namespace Vokimi.Services.db_operations
                         question.UpdateAsSingleChoice(newData.Text, newData.ImagePath, newData.ShuffleAnswers, answers);
                     }
 
-                    _db.DraftTestQuestions.Update(question);
+                    _db.DraftGenericTestQuestions.Update(question);
                     await _db.SaveChangesAsync();
                     await transaction.CommitAsync();
                     return Err.None;
@@ -191,21 +198,26 @@ namespace Vokimi.Services.db_operations
                 }
             }
         }
-        private void ClearAnswersForDraftTestQuestion(DraftTestQuestion question) {
+        private void ClearAnswersForDraftTestQuestion(DraftGenericTestQuestion question) {
             foreach (var answer in question.Answers) {
                 foreach (var result in answer.RelatedResults) {
-                    result.AnswersLeadingToResult.Remove(answer);
+                    (result.TestTypeSpecificData as DraftGenericTestResultData).AnswersLeadingToResult.Remove(answer);
                 }
                 _db.AnswerTypeSpecificInfo.Remove(answer.AdditionalInfo);
-                _db.DraftTestAnswers.Remove(answer);
+                _db.DraftGenericTestAnswers.Remove(answer);
             }
         }
         public async Task<Err> CreateNewDraftTestResult(DraftTestId testId, string resultId) {
-            var result = DraftTestResult.CreateNew(resultId, testId);
+            
             BaseDraftTest? test = await GetDraftTestById(testId);
             if (test is null) {
                 return new Err("Unknown test");
             }
+
+            var specificDataId = CreateEmptyDraftTestResultData(test.Template);
+            var result = DraftTestResult.CreateNew(resultId, testId, specificDataId);
+
+         
             using (var transaction = await _db.Database.BeginTransactionAsync()) {
                 try {
                     test.PossibleResults.Add(result);
@@ -220,6 +232,17 @@ namespace Vokimi.Services.db_operations
 
             return Err.None;
         }
+        public DraftTestTypeSpecificResultDataId CreateEmptyDraftTestResultData(TestTemplate testTemplate) {
+            switch (testTemplate) {
+                case TestTemplate.Generic:
+                    var resultData = DraftGenericTestResultData.CreateNew();
+                    _db.DraftGenericTestResultsData.Add(resultData);
+                    return resultData.Id;
+                default:
+                    throw new ArgumentException("Invalid template type");
+            }
+        }
+
         public async Task<DraftTestResult?> GetDraftTestResultById(DraftTestResultId id) =>
             await _db.DraftTestResults.FirstOrDefaultAsync(i => i.Id == id);
         public async Task<OneOf<List<string>, Err>> GetResultStringIdsForDraftTest(DraftTestId testId) {
@@ -288,7 +311,7 @@ namespace Vokimi.Services.db_operations
                         return new Err("Unknown test");
                     }
 
-                    var resultsToRemove = new List<DraftTestResult>();
+                    List<DraftTestResult> resultsToRemove = new();
 
                     ImmutableDictionary<DraftTestResultId, ResultWithSaveIdForm> savedResultsIds =
                         savedResults.ToImmutableDictionary(r => r.Id, r => r);
@@ -302,11 +325,14 @@ namespace Vokimi.Services.db_operations
                         }
                     }
                     foreach (var newRes in notSavedResults) {
+                        var resultTypeSpecificDataId = CreateEmptyDraftTestResultData(test.Template);
+
                         DraftTestResult r = DraftTestResult.CreateNew(
                             newRes.ResultStringId,
                             testId,
                             newRes.Text,
-                            newRes.ImagePath
+                            newRes.ImagePath,
+                            resultTypeSpecificDataId
                             );
                         test.PossibleResults.Add(r);
                     }
@@ -328,10 +354,7 @@ namespace Vokimi.Services.db_operations
         private async Task<Err> DeleteDraftTestResult(DraftTestResult result) {
 
             try {
-                foreach (var answer in result.AnswersLeadingToResult.ToList()) {
-                    answer.RelatedResults.Remove(result);
-                }
-
+                await DeleteDraftTestResultAdditionalData(result);
                 _db.DraftTestResults.Remove(result);
 
                 await _db.SaveChangesAsync();
@@ -339,6 +362,16 @@ namespace Vokimi.Services.db_operations
             } catch (Exception ex) {
                 return new Err("Server error. Please try again later");
             }
+        }
+        private async Task DeleteDraftTestResultAdditionalData(DraftTestResult result) {
+             switch(result.TestTypeSpecificData) {
+                case DraftGenericTestResultData genericTestData: 
+                    foreach (var answer in genericTestData.AnswersLeadingToResult.ToList()) {
+                        answer.RelatedResults.Remove(result);
+                    }
+                    break;
+               default: throw new ArgumentException("Unexpected test type");
+            };
         }
         public async Task<OneOf<TestStylesSheet, Err>> GetDraftTestStylesByDraftTestId(DraftTestId testId) {
             BaseDraftTest? test = await GetDraftTestById(testId);
@@ -360,12 +393,12 @@ namespace Vokimi.Services.db_operations
         public async Task<Err> DeleteDraftTestQuestion(DraftTestQuestionId questionId) {
             using (var transaction = await _db.Database.BeginTransactionAsync()) {
                 try {
-                    DraftTestQuestion? question = await GetDraftTestQuestionById(questionId);
+                    DraftGenericTestQuestion? question = await GetDraftGenericTestQuestionById(questionId);
                     if (question is null) {
                         return new Err("Unknown question");
                     }
                     ClearAnswersForDraftTestQuestion(question);
-                    _db.DraftTestQuestions.Remove(question);
+                    _db.DraftGenericTestQuestions.Remove(question);
                     await _db.SaveChangesAsync();
                     await transaction.CommitAsync();
                     return Err.None;

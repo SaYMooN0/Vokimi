@@ -1,4 +1,6 @@
-﻿namespace VokimiShared.src.models.db_classes.users
+﻿using VokimiShared.src.models.db_entities_ids;
+
+namespace VokimiShared.src.models.db_classes.users
 {
     public class UnconfirmedAppUser
     {

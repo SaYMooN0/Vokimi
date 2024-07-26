@@ -1,7 +1,7 @@
 ﻿using VokimiShared.src.enums;
-using VokimiShared.src.models.db_classes.answers;
-using VokimiShared.src.models.db_classes.test_answers;
+using VokimiShared.src.models.db_classes.generic_test_answers;
 using VokimiShared.src.models.db_classes.test_creation;
+using VokimiShared.src.models.db_classes.test_creation.generic_test_related;
 using VokimiShared.src.models.form_classes.draft_tests_answers_form;
 
 namespace VokimiShared.src.models.form_classes
@@ -17,7 +17,7 @@ namespace VokimiShared.src.models.form_classes
         public ushort MinAnswersCount { get; set; }
         public ushort MaxAnswersCount { get; set; }
         public List<BaseAnswerForm> Answers { get; set; } = [];
-        public static QuestionEditingForm FromDraftTestQuestion(DraftTestQuestion question) => new() {
+        public static QuestionEditingForm FromDraftTestQuestion(DraftGenericTestQuestion question) => new() {
             Text = question.Text,
             ImagePath = question.ImagePath,
             AnswersType = question.AnswersType,
@@ -49,11 +49,11 @@ namespace VokimiShared.src.models.form_classes
         }
 
 
-        private static ushort ExtractMinAnswersCount(DraftTestQuestion q) =>
+        private static ushort ExtractMinAnswersCount(DraftGenericTestQuestion q) =>
            q.MultipleChoiceData is not null ? q.MultipleChoiceData.MinAnswers : (ushort)1;
-        private static ushort ExtractMaxAnswersCount(DraftTestQuestion q) =>
+        private static ushort ExtractMaxAnswersCount(DraftGenericTestQuestion q) =>
            q.MultipleChoiceData is not null ? q.MultipleChoiceData.MaxAnswers : (ushort)3;
-        private static List<BaseAnswerForm> ExtractAnswers(DraftTestQuestion q) {
+        private static List<BaseAnswerForm> ExtractAnswers(DraftGenericTestQuestion q) {
             List<BaseAnswerForm> answers =[];
 
             foreach (var answer in q.Answers.OrderBy(a => a.OrderInQuestion)) {

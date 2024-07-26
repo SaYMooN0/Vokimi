@@ -1,5 +1,6 @@
 ﻿using VokimiShared.src.models.db_classes;
-using VokimiShared.src.models.db_classes.test_creation;
+using VokimiShared.src.models.db_classes.test_results.results_for_draft_tests;
+using VokimiShared.src.models.db_entities_ids;
 
 namespace VokimiShared.src.models.form_classes.result_editing
 {

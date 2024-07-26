@@ -1,5 +1,6 @@
 ﻿using VokimiShared.src.models.db_classes;
-using VokimiShared.src.models.db_classes.test_creation;
+using VokimiShared.src.models.db_classes.test_creation.generic_test_related;
+using VokimiShared.src.models.db_entities_ids;
 
 namespace VokimiShared.src.models.dtos.draft_tests
 {

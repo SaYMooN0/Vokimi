@@ -1,29 +1,19 @@
-﻿namespace VokimiShared.src.constants_store_classes
+﻿
+namespace VokimiShared.src.constants_store_classes
 {
-    public class TestCreationConsts
+    public static class BaseTestCreationConsts
     {
         public const int
             MinTestNameLength = 12,
             MaxTestNameLength = 255,
-            MaxTestDescriptionLength= 255;
+            MaxTestDescriptionLength = 255;
         public const int MaxTagsForTestCount = 12;
-        public const int
-            QuestionTextMinLength = 10,
-            QuestionTextMaxLength = 255;
-
-        public const int
-            AnswerTextMinLength = 6,
-            AnswerTextMaxLength = 255;
-
-        public const int
-            MaxResultsCountForAnswer = 5,
-            ResultIdMaxCharacters = 12,
-            ResultIdMinCharacters = 5;
         public const int
             MaxResultsForTestCount = 30,
             ResultMaxTextLength = 500,
-            ResultMinTextLength = 8;
-
+            ResultMinTextLength = 8,
+            ResultIdMaxCharacters = 12,
+            ResultIdMinCharacters = 5;
         public const int MaxImageSizeInBytes = 3145728;
         public static int MaxImageSizeInMB => MaxImageSizeInBytes / 1048576;
 

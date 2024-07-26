@@ -1,9 +1,9 @@
 ﻿using VokimiShared.src.enums;
-using VokimiShared.src.models.db_classes.test_answers;
+using VokimiShared.src.models.db_entities_ids;
 
-namespace VokimiShared.src.models.db_classes.test_creation
+namespace VokimiShared.src.models.db_classes.test_creation.generic_test_related
 {
-    public class DraftTestQuestion
+    public class DraftGenericTestQuestion
     {
         public DraftTestQuestionId Id { get; init; }
         public string Text { get; private set; }
@@ -12,10 +12,10 @@ namespace VokimiShared.src.models.db_classes.test_creation
         public AnswersType AnswersType { get; init; }
         public bool IsMultipleChoice { get; private set; }
         public MultipleChoiceAdditionalData? MultipleChoiceData { get; private set; }
-        public virtual ICollection<DraftTestAnswer> Answers { get; private set; } = new List<DraftTestAnswer>();
+        public virtual ICollection<DraftGenericTestAnswer> Answers { get; private set; } = new List<DraftGenericTestAnswer>();
 
         public DraftTestId DraftTestId { get; init; }
-        public static DraftTestQuestion CreateNew(string text, AnswersType answersType, DraftTestId testId) => new() {
+        public static DraftGenericTestQuestion CreateNew(string text, AnswersType answersType, DraftTestId testId) => new() {
             Id = new(),
             Text = text,
             ImagePath = null,
@@ -24,13 +24,13 @@ namespace VokimiShared.src.models.db_classes.test_creation
             IsMultipleChoice = false,
             MultipleChoiceData = null,
             DraftTestId = testId,
-            Answers = new List<DraftTestAnswer>()
+            Answers = new List<DraftGenericTestAnswer>()
         };
         public void UpdateAsSingleChoice(
             string text,
             string? imagePath,
             bool shuffleAnswers,
-            ICollection<DraftTestAnswer> answers) {
+            ICollection<DraftGenericTestAnswer> answers) {
 
             Text = text;
             ImagePath = imagePath;
@@ -45,7 +45,7 @@ namespace VokimiShared.src.models.db_classes.test_creation
             string text,
             string? imagePath,
             bool shuffleAnswers,
-            ICollection<DraftTestAnswer> answers,
+            ICollection<DraftGenericTestAnswer> answers,
             MultipleChoiceAdditionalData multipleChoiceData) {
 
             Text = text;

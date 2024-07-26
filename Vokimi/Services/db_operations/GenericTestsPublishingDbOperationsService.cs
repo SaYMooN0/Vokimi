@@ -1,95 +1,95 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Collections;
-using System.Collections.Generic;
 using Vokimi.src.data;
 using VokimiShared.src;
 using VokimiShared.src.constants_store_classes;
 using VokimiShared.src.enums;
-using VokimiShared.src.models.db_classes;
-using VokimiShared.src.models.db_classes.answers;
-using VokimiShared.src.models.db_classes.test;
-using VokimiShared.src.models.db_classes.test.test_types;
-using VokimiShared.src.models.db_classes.test_answers;
+using VokimiShared.src.models.db_classes.generic_test_answers;
 using VokimiShared.src.models.db_classes.test_creation;
-using VokimiShared.src.models.db_classes.tests;
-using VokimiShared.src.models.db_classes.users;
+using VokimiShared.src.models.db_classes.test_creation.generic_test_related;
+using VokimiShared.src.models.db_classes.test_results.results_for_draft_tests;
+using VokimiShared.src.models.db_entities_ids;
 using VokimiShared.src.models.dtos;
 
 namespace Vokimi.Services.db_operations
 {
-    public class TestsPublishingDbOperationsService
+    public class GenericTestsPublishingDbOperationsService
     {
         private readonly VokimiDbContext _db;
 
-        public TestsPublishingDbOperationsService(VokimiDbContext context) {
+        public GenericTestsPublishingDbOperationsService(VokimiDbContext context) {
             _db = context;
         }
-        public async Task<List<TestPublishingProblemDto>> CheckDraftTestForProblems(DraftTestId id) {
-            BaseDraftTest? test = await _db.DraftTestsSharedInfo.FirstOrDefaultAsync(i => i.Id == id);
-            return test switch {
-                null => [new("General", "Unable to find the test")],
-                DraftGenericTest genericTest => CheckProblemsForGenericTest(genericTest),
-                _ => throw new NotImplementedException()
-            };
+        public async Task<List<TestPublishingProblemDto>> CheckProblemsForGenericTest(DraftTestId id) {
+            BaseDraftTest? baseTest = await _db.DraftTestsSharedInfo.FirstOrDefaultAsync(i => i.Id == id);
+            if (baseTest is null) {
+                return [new("General", "Unable to find the test")];
+            }
+            if (baseTest is DraftGenericTest test) {
+                List<TestPublishingProblemDto> problems =
+                    CheckTestMainInfoForProblems(test.MainInfo)
+                    .ToList();
 
-        }
-        private List<TestPublishingProblemDto> CheckProblemsForGenericTest(DraftGenericTest test) {
+                problems.AddRange(CheckQuestionsProblemsForGenericTest(test.Questions.ToList()));
+                problems.AddRange(CheckTestResultsForProblems(test.PossibleResults));
 
-            List<TestPublishingProblemDto> problems =
-                CheckTestMainInfoForProblems(test.MainInfo)
-                .ToList();
-
-            problems.AddRange(CheckQuestionsProblemsForGenericTest(test.Questions.ToList()));
-            problems.AddRange(CheckTestResultsForProblems(test.PossibleResults));
-
-            return problems;
+                return problems;
+            }
+            else {
+                return [new("General", "Unable to check the test. Please try again later")];
+            }
         }
         private IEnumerable<TestPublishingProblemDto> CheckTestMainInfoForProblems(DraftTestMainInfo mainInfo) {
             List<string> problems = [];
             if (
                 string.IsNullOrWhiteSpace(mainInfo.Name) ||
-                mainInfo.Name.Length > TestCreationConsts.MaxTestNameLength ||
-                mainInfo.Name.Length < TestCreationConsts.MinTestNameLength) {
-                problems.Add($"Name of the test must be from {TestCreationConsts.MinTestNameLength} to {TestCreationConsts.MaxTestNameLength} characters");
+                mainInfo.Name.Length > BaseTestCreationConsts.MaxTestNameLength ||
+                mainInfo.Name.Length < BaseTestCreationConsts.MinTestNameLength) {
+                problems.Add($"Name of the test must be from {BaseTestCreationConsts.MinTestNameLength} to {BaseTestCreationConsts.MaxTestNameLength} characters");
             }
-            if (!string.IsNullOrEmpty(mainInfo.Description) && mainInfo.Description.Length > TestCreationConsts.MaxTestDescriptionLength) {
-                problems.Add($"Description of the test cannot be more than {TestCreationConsts.MaxTestDescriptionLength} characters");
+            if (!string.IsNullOrEmpty(mainInfo.Description) && mainInfo.Description.Length > BaseTestCreationConsts.MaxTestDescriptionLength) {
+                problems.Add($"Description of the test cannot be more than {BaseTestCreationConsts.MaxTestDescriptionLength} characters");
             }
             return problems.Select(TestPublishingProblemDto.NewMainInfoArea);
         }
         private IEnumerable<TestPublishingProblemDto> CheckTestResultsForProblems(ICollection<DraftTestResult> results) {
             List<string> problems = [];
             if (results.Count < 2) { problems.Add("Test cannot have less than two results"); }
-            else if (results.Count > TestCreationConsts.MaxResultsForTestCount) {
-                problems.Add($"Test cannot have more than {TestCreationConsts.MaxResultsForTestCount} results");
+            else if (results.Count > BaseTestCreationConsts.MaxResultsForTestCount) {
+                problems.Add($"Test cannot have more than {BaseTestCreationConsts.MaxResultsForTestCount} results");
             }
             foreach (var result in results) {
-                if (result.AnswersLeadingToResult.Count < 1) {
-                    problems.Add($"Result with id: '{result.StringId}' has no answers leading to it");
+                if (result.TestTypeSpecificData is DraftGenericTestResultData resultData) {
+                    if (resultData.AnswersLeadingToResult.Count < 1) {
+                        problems.Add($"Result with id: '{result.StringId}' has no answers leading to it");
+                    }
+                }
+                else {
+                    problems.Add($"Result with id: '{result.StringId}' has been saved incorrectly. Please delete it and try again");
+                    continue;
                 }
                 int textLength = string.IsNullOrWhiteSpace(result.Text) ? 0 : result.Text.Length;
 
-                if (textLength < TestCreationConsts.ResultMinTextLength ||
-                    textLength > TestCreationConsts.ResultMaxTextLength) {
+                if (textLength < BaseTestCreationConsts.ResultMinTextLength ||
+                    textLength > BaseTestCreationConsts.ResultMaxTextLength) {
 
                     problems.Add(
 $"Text of the result with id: '{result.Id}' is {textLength} characters long. The length must be " +
-$"from {TestCreationConsts.ResultMinTextLength} to {TestCreationConsts.ResultMaxTextLength} characters");
+$"from {BaseTestCreationConsts.ResultMinTextLength} to {BaseTestCreationConsts.ResultMaxTextLength} characters");
                 }
             }
 
             return problems.Select(TestPublishingProblemDto.NewResultsArea);
         }
-        private IEnumerable<TestPublishingProblemDto> CheckQuestionsProblemsForGenericTest(List<DraftTestQuestion> questions) {
+        private IEnumerable<TestPublishingProblemDto> CheckQuestionsProblemsForGenericTest(List<DraftGenericTestQuestion> questions) {
             List<string> problems = [];
             for (int i = 0; i < questions.Count; i++) {
-                DraftTestQuestion q = questions[i];
+                DraftGenericTestQuestion q = questions[i];
                 Func<string, string> withErrPrefix = (string err) => $"Question #{i + 1}: {err}";
 
                 int textLen = string.IsNullOrWhiteSpace(q.Text) ? 0 : q.Text.Length;
 
-                if (textLen < TestCreationConsts.QuestionTextMinLength || textLen > TestCreationConsts.QuestionTextMaxLength) {
-                    problems.Add(withErrPrefix($"Text of the question is {textLen} characters long. The length must be from {TestCreationConsts.QuestionTextMinLength} to {TestCreationConsts.QuestionTextMaxLength} characters"));
+                if (textLen < GenericTestCreationConsts.QuestionTextMinLength || textLen > GenericTestCreationConsts.QuestionTextMaxLength) {
+                    problems.Add(withErrPrefix($"Text of the question is {textLen} characters long. The length must be from {GenericTestCreationConsts.QuestionTextMinLength} to {GenericTestCreationConsts.QuestionTextMaxLength} characters"));
                 }
 
 
@@ -114,7 +114,7 @@ $"from {TestCreationConsts.ResultMinTextLength} to {TestCreationConsts.ResultMax
             return problems.Select(TestPublishingProblemDto.NewQuestionsArea);
         }
         private IEnumerable<string> CheckQuestionAnswersForProblems(
-       ICollection<DraftTestAnswer> answers, Func<string, string> errPrefix) {
+       ICollection<DraftGenericTestAnswer> answers, Func<string, string> errPrefix) {
             var problems = new List<string>();
 
             foreach (var answer in answers) {
@@ -135,8 +135,8 @@ $"from {TestCreationConsts.ResultMinTextLength} to {TestCreationConsts.ResultMax
 
         private string? CheckTextOnlyAnswerForProblems(TextOnlyAnswerAdditionalInfo info) {
             int textLen = string.IsNullOrWhiteSpace(info.Text) ? 0 : info.Text.Length;
-            if (textLen < TestCreationConsts.AnswerTextMinLength || textLen > TestCreationConsts.AnswerTextMaxLength) {
-                return $"Text of the answer is {textLen} characters long. The length must be from {TestCreationConsts.AnswerTextMinLength} to {TestCreationConsts.AnswerTextMaxLength} characters";
+            if (textLen < GenericTestCreationConsts.AnswerTextMinLength || textLen > GenericTestCreationConsts.AnswerTextMaxLength) {
+                return $"Text of the answer is {textLen} characters long. The length must be from {GenericTestCreationConsts.AnswerTextMinLength} to {GenericTestCreationConsts.AnswerTextMaxLength} characters";
             }
             return null;
         }
@@ -147,25 +147,17 @@ $"from {TestCreationConsts.ResultMinTextLength} to {TestCreationConsts.ResultMax
 
         private string? CheckTextAndImageAnswerForProblems(TextAndImageAnswerAdditionalInfo info) {
             int textLen = string.IsNullOrWhiteSpace(info.Text) ? 0 : info.Text.Length;
-            if (textLen < TestCreationConsts.AnswerTextMinLength || textLen > TestCreationConsts.AnswerTextMaxLength) {
-                return $"Text of the answer is {textLen} characters long. The length must be from {TestCreationConsts.AnswerTextMinLength} to {TestCreationConsts.AnswerTextMaxLength} characters";
+            if (textLen < GenericTestCreationConsts.AnswerTextMinLength || textLen > GenericTestCreationConsts.AnswerTextMaxLength) {
+                return $"Text of the answer is {textLen} characters long. The length must be from {GenericTestCreationConsts.AnswerTextMinLength} to {GenericTestCreationConsts.AnswerTextMaxLength} characters";
             }
             if (string.IsNullOrWhiteSpace(info.ImagePath)) {
                 return "Answer must contain image";
             }
             return null;
         }
-
-        public async Task<Err> PublishDraftTest(DraftTestId id) {
+        private async Task<Err> PublishGenericDraftTest(DraftTestId id) {
             BaseDraftTest? test = await _db.DraftTestsSharedInfo.FirstOrDefaultAsync(i => i.Id == id);
             if (test is null) { return new("Unknown test"); }
-
-            if (test.Template == TestTemplate.Generic && test is DraftGenericTest genericTest)
-                return await PublishGenericDraftTest(genericTest);
-            else
-                throw new NotImplementedException();
-        }
-        private async Task<Err> PublishGenericDraftTest(DraftGenericTest test) {
 
             //TestGenericType test = TestGenericType.CreateNewFromDraft(); //new conclusion and cover paths
             throw new NotImplementedException();

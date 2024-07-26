@@ -1,4 +1,5 @@
 ﻿using VokimiShared.src.models.db_classes.test.test_types;
+using VokimiShared.src.models.db_entities_ids;
 
 namespace VokimiShared.src.models.db_classes.tests
 {

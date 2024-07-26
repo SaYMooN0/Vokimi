@@ -3,6 +3,7 @@ using Amazon.S3.Model;
 using OneOf;
 using VokimiShared.src;
 using VokimiShared.src.models.db_classes;
+using VokimiShared.src.models.db_entities_ids;
 
 public class VokimiStorageService
 {

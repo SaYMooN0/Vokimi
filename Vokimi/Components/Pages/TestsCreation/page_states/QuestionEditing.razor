@@ -55,7 +55,7 @@ else {
     [Parameter] public Action OpenResultCreatingDialog { get; set; }
 
     protected override async Task OnParametersSetAsync() {
-        DraftTestQuestion? question = await testsCreationDbOperationsService.GetDraftTestQuestionById(QuestionId);
+        DraftGenericTestQuestion? question = await testsCreationDbOperationsService.GetDraftGenericTestQuestionById(QuestionId);
         if (question is null) {
             questionFetchingError = "Question not found";
             return;
@@ -73,7 +73,7 @@ else {
             return;
         }
 
-        Err err = await testsCreationDbOperationsService.UpdateDraftTestQuestion(QuestionId, formData);
+        Err err = await testsCreationDbOperationsService.UpdateDraftTestGenericQuestion(QuestionId, formData);
         if (err.NotNone()) {
             savingError = err.Message;
             return;

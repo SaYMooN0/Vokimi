@@ -1,4 +1,5 @@
-﻿using VokimiShared.src.models.form_classes;
+﻿using VokimiShared.src.models.db_entities_ids;
+using VokimiShared.src.models.form_classes;
 
 namespace VokimiShared.src.models.db_classes.tests
 {

@@ -30,12 +30,12 @@
         var file = e.File;
 
         if (file is not null) {
-            if (file.Size > TestCreationConsts.MaxImageSizeInBytes) {
-                coverUploadingError = $"File is too big. Max allowed size: {TestCreationConsts.MaxImageSizeInMB}";
+            if (file.Size > BaseTestCreationConsts.MaxImageSizeInBytes) {
+                coverUploadingError = $"File is too big. Max allowed size: {BaseTestCreationConsts.MaxImageSizeInMB}";
                 return;
             }
             try {
-                using (var stream = file.OpenReadStream(maxAllowedSize: TestCreationConsts.MaxImageSizeInBytes)) {
+                using (var stream = file.OpenReadStream(maxAllowedSize: BaseTestCreationConsts.MaxImageSizeInBytes)) {
                     var result = await vokimiStorageService.SaveDraftTestCover(Vm.TestId, stream);
                     result.Switch(
                         async path => {

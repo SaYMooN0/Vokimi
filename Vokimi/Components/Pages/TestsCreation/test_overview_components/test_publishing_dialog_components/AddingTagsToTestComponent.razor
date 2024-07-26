@@ -32,7 +32,7 @@
             </div>
         </div>
         <div class="right-part">
-            <label class="chosen-tags-label">Tags chosen (@chosenTags.Count/@TestCreationConsts.MaxTagsForTestCount):</label>
+            <label class="chosen-tags-label">Tags chosen (@chosenTags.Count/@BaseTestCreationConsts.MaxTagsForTestCount):</label>
             @foreach (string tag in chosenTags) {
                 <div class="tag-display">
                     <label>#@tag</label>
@@ -67,8 +67,8 @@
         tagSearchInput = string.Empty;
     }
     private void AddTag(string tag) {
-        if (chosenTags.Count >= TestCreationConsts.MaxTagsForTestCount) {
-            errorMessage = $"You can't add more than {TestCreationConsts.MaxTagsForTestCount} tags";
+        if (chosenTags.Count >= BaseTestCreationConsts.MaxTagsForTestCount) {
+            errorMessage = $"You can't add more than {BaseTestCreationConsts.MaxTagsForTestCount} tags";
         }
         else {
             chosenTags.Add(tag);
@@ -82,8 +82,8 @@
 
     private void PublisButtonClicked() {
         if(chosenTags.Count<1) { return; }
-        if (chosenTags.Count > TestCreationConsts.MaxTagsForTestCount) {
-            errorMessage = $"You can't choose more than {TestCreationConsts.MaxTagsForTestCount} tags";
+        if (chosenTags.Count > BaseTestCreationConsts.MaxTagsForTestCount) {
+            errorMessage = $"You can't choose more than {BaseTestCreationConsts.MaxTagsForTestCount} tags";
             StateHasChanged();
             return;
         }

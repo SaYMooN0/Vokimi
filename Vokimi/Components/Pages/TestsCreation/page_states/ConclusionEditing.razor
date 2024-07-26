@@ -27,7 +27,7 @@
             <label class="feedback-chars-count-label">
                 Maximum number of characters in feedback:
                 <input type="number" @bind="@formData.MaxCharactersForFeedback"
-                       max="@TestCreationConsts.ConclusionMaxFeedbackCharsCount" />
+                       max="@BaseTestCreationConsts.ConclusionMaxFeedbackCharsCount" />
             </label>
         </div>
 
@@ -81,17 +81,17 @@
         if (string.IsNullOrWhiteSpace(form.Text)) {
             return new Err("Text field cannot be empty");
         }
-        if (form.Text.Length > TestCreationConsts.ConclusionMaxCharsInText) {
-            return new Err($"Conclusion text cannot be longer than {TestCreationConsts.ConclusionMaxCharsInText} characters");
+        if (form.Text.Length > BaseTestCreationConsts.ConclusionMaxCharsInText) {
+            return new Err($"Conclusion text cannot be longer than {BaseTestCreationConsts.ConclusionMaxCharsInText} characters");
         }
         if (form.AddFeedback && string.IsNullOrWhiteSpace(form.FeedbackText)) {
             return new Err("Please fill Feedback 'Accompanying text' field");
         }
-        if (form.AddFeedback && form.FeedbackText.Length > TestCreationConsts.ConclusionMaxAccompanyingFeedbackTextChars) {
-            return new Err($"Feedback 'Accompanying text' cannot be more than {TestCreationConsts.ConclusionMaxAccompanyingFeedbackTextChars} long");
+        if (form.AddFeedback && form.FeedbackText.Length > BaseTestCreationConsts.ConclusionMaxAccompanyingFeedbackTextChars) {
+            return new Err($"Feedback 'Accompanying text' cannot be more than {BaseTestCreationConsts.ConclusionMaxAccompanyingFeedbackTextChars} long");
         }
-        if (form.AddFeedback && form.MaxCharactersForFeedback > TestCreationConsts.ConclusionMaxFeedbackCharsCount) {
-            return new Err($"Maximum number of characters in feedback cannot be more than {TestCreationConsts.ConclusionMaxFeedbackCharsCount}");
+        if (form.AddFeedback && form.MaxCharactersForFeedback > BaseTestCreationConsts.ConclusionMaxFeedbackCharsCount) {
+            return new Err($"Maximum number of characters in feedback cannot be more than {BaseTestCreationConsts.ConclusionMaxFeedbackCharsCount}");
         }
         return Err.None;
     }

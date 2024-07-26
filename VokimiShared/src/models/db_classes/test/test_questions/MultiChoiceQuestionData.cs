@@ -1,4 +1,6 @@
-﻿namespace VokimiShared.src.models.db_classes.test.test_questions
+﻿using VokimiShared.src.models.db_entities_ids;
+
+namespace VokimiShared.src.models.db_classes.test.test_questions
 {
     public class MultiChoiceQuestionData
     {

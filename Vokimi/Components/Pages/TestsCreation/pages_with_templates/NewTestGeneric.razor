@@ -1,4 +1,5 @@
-﻿@inject TestsCreationDbOperationsService testsCreationDbOperationsService
+﻿
+@inject TestsCreationDbOperationsService testsCreationDbOperationsService
 @inject UsersDbOperationsService usersDbOperationsService
 @inject AuthHelperService authHelperService
 @inject IHttpContextAccessor httpContextAccessor
@@ -6,6 +7,7 @@
 @rendermode InteractiveServer
 @attribute [Authorize]
 @page "/newtest/gen/{testId}"
+
 
 <PageTitle>New Test</PageTitle>
 

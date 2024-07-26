@@ -1,6 +1,6 @@
 ﻿@using Vokimi.Components.Pages.TestsCreation.test_overview_components.test_publishing_dialog_components
 
-@inject TestsPublishingDbOperationsService testsPublishingDbOperationsService
+@inject GenericTestsPublishingDbOperationsService testsPublishingDbOperationsService
 
 @rendermode InteractiveServer
 
@@ -56,7 +56,7 @@
         await baseDialogRef.OpenAsync();
     }
     public async Task SetStateToProblemsChecking() {
-        problemsList = await testsPublishingDbOperationsService.CheckDraftTestForProblems(TestId);
+        problemsList = await testsPublishingDbOperationsService.CheckProblemsForGenericTest(TestId);
         publisingState = PublisingState.ProblemsChecking;
         StateHasChanged();
     }
