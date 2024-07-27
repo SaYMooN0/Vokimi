@@ -82,7 +82,7 @@
 
     protected override async Task OnInitializedAsync() {
         await FetchQuestions();
-        base.OnParametersSet();
+        await base.OnInitializedAsync();
     }
     private async Task FetchQuestions() {
         var dbQuestions = await testsCreationDbOperationsService.GetDraftTestQuestionsById(TestId);

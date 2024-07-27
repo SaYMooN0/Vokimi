@@ -8,6 +8,6 @@ namespace VokimiShared.src.models.db_classes.tests
         public TestTagId Id { get; init; }
         public string Value { get; init; }
         public override string ToString() => Value;
-        public virtual ICollection<BaseTest> Tests { get; set; } = new List<BaseTest>();
+        public virtual ICollection<BaseTest> Tests { get; set; } = [];
     }
 }

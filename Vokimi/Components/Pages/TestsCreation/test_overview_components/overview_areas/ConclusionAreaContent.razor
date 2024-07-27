@@ -7,7 +7,7 @@
                           ConfirmButtonText="Delete" />
 
 
-<AreaHeader LabelText='@($"Test Conclusion(Optional): {(AnyConclusionAdded? "Added": "Not Added")} ")'>
+<AreaHeader LabelText='@($"Test Conclusion(Optional): {(anyConclusionAdded? "Added": "Not Added")} ")'>
     <AreaIcon>
         <svg viewBox="0 0 24 24">
             <path d="M20.5 16.9286V10C20.5 6.22876 20.5 4.34315 19.3284 3.17157C18.1569 2 16.2712 2 12.5 2H11.5C7.72876 2 5.84315 2 4.67157 3.17157C3.5 4.34315 3.5 6.22876 3.5 10V19.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
@@ -18,7 +18,7 @@
         </svg>
     </AreaIcon>
     <RightSideContent>
-        @if (AnyConclusionAdded) {
+        @if (anyConclusionAdded) {
             <div class="conclusion-actions-container">
                 <div class="edit-btn" @onclick="ChangePageStateToConclusionEditing">
                     Edit Conclusion
@@ -45,19 +45,29 @@
 
 @code {
     private ActionConfirmationDialog confirmationDialogRef;
+    private bool anyConclusionAdded;
 
     [CascadingParameter(Name = "TestId")] public DraftTestId TestId { get; set; }
-    [Parameter] public bool AnyConclusionAdded { get; set; }
     [Parameter] public Action ChangePageStateToConclusionEditing { get; set; }
 
-    private void EditConclusion() { }
+    protected override async Task OnInitializedAsync() {
+        await base.OnInitializedAsync();
+        BaseDraftTest? test = await testsCreationDbOperationsService.GetDraftTestById(TestId);
+        if (test is null) {
+            anyConclusionAdded = false;
+        }
+        else {
+            anyConclusionAdded = test.Conclusion is not null;
+        }
+
+    }
     private async Task<Err> DeleteConclusion() {
         Err dbDelitingErr = await testsCreationDbOperationsService.RemoveDraftTestConclusion(TestId);
         if (dbDelitingErr.NotNone()) {
             return dbDelitingErr;
         }
         await vokimiStorageService.ClearDraftTestConclusionUnusedImages(TestId);
-        AnyConclusionAdded = false;
+        anyConclusionAdded = false;
         StateHasChanged();
         return Err.None;
     }

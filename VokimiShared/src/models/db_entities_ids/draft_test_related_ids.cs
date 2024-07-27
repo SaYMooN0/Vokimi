@@ -24,7 +24,7 @@
     {
         public DraftTestResultId() : this(Guid.NewGuid()) { }
         public override string ToString() => Value.ToString();
-    } 
+    }
     public readonly record struct DraftTestTypeSpecificResultDataId(Guid Value)
     {
         public DraftTestTypeSpecificResultDataId() : this(Guid.NewGuid()) { }

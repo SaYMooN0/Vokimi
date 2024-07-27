@@ -34,20 +34,28 @@
     </div>
 </form>
 @code {
-    private Dictionary<Language, string> availableLanguges;
+    private Dictionary<Language, string> availableLanguges => Enum.GetValues<Language>()
+        .ToDictionary(l => l, l => l.FullName());
     private string formValidationMessage = string.Empty;
 
     [SupplyParameterFromForm]
     public TestMainInfoEditingForm formData { get; set; } = new();
 
-    [Parameter] public DraftGenericTestDto Test { get; set; }
     [Parameter] public Action BackToOverviewAction { get; set; }
+    [CascadingParameter(Name = "TestId")] public DraftTestId TestId { get; set; }
 
     protected override async Task OnParametersSetAsync() {
         await base.OnParametersSetAsync();
-        formData = TestMainInfoEditingForm.FromTestMainInfoDto(Test.MainInfo);
-        IEnumerable<Language> languages = Enum.GetValues(typeof(Language)).Cast<Language>();
-        availableLanguges = languages.ToDictionary(l => l, l => l.FullName());
+
+        BaseDraftTest? test = await testsCreationDbOperationsService.GetDraftTestById(TestId);
+        if (test is null) {
+            formData = TestMainInfoEditingForm.Empty();
+            formValidationMessage = "Unable to load test data";
+        }
+        else {
+            formData = TestMainInfoEditingForm.FromDraftTestMainInfo(test.MainInfo);
+            formValidationMessage = string.Empty;
+        }
     }
 
 
@@ -58,7 +66,7 @@
             return;
         }
         serverErr = await testsCreationDbOperationsService
-            .UpdateDraftTestMainInfo(Test.MainInfo.Id, formData.Name, formData.Description, formData.Language, formData.Privacy);
+            .UpdateDraftTestMainInfo(formData.MainInfoId, formData.Name, formData.Description, formData.Language, formData.Privacy);
         if (serverErr.NotNone()) {
             formValidationMessage = serverErr.ToString();
             return;

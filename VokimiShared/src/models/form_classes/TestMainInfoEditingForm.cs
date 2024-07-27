@@ -1,20 +1,25 @@
-﻿using VokimiShared.src.enums;
+﻿using System.Security;
+using VokimiShared.src.constants_store_classes;
+using VokimiShared.src.enums;
+using VokimiShared.src.models.db_classes.test_creation;
+using VokimiShared.src.models.db_entities_ids;
 using VokimiShared.src.models.dtos.draft_tests;
 
 namespace VokimiShared.src.models.form_classes
 {
     public class TestMainInfoEditingForm
     {
+        public DraftTestMainInfoId MainInfoId { get; init; }
         public string Name { get; set; }
         public string? Description { get; set; }
         public Language Language { get; set; }
         public TestPrivacy Privacy { get; set; }
         public static Err ValidateTestName(string name) {
-            if (name.Length > 127) {
-                return new Err("Length of the test name cannot be more than 127 characters");
+            if (name.Length > BaseTestCreationConsts.MaxTestNameLength) {
+                return new Err($"Length of the test name cannot be more than {BaseTestCreationConsts.MaxTestNameLength} characters");
             }
-            else if (name.Length < 8) {
-                return new Err("Length of the test name cannot be less than 8 characters");
+            else if (name.Length < BaseTestCreationConsts.MinTestNameLength) {
+                return new Err($"Length of the test name cannot be less than {BaseTestCreationConsts.MinTestNameLength} characters");
             }
             return Err.None;
         }
@@ -26,14 +31,24 @@ namespace VokimiShared.src.models.form_classes
             else if (string.IsNullOrEmpty(Description))
                 return Err.None;
             else
-                return Description.Length > 510 ? new Err("Length of the test description cannot be more than 510 characters") : Err.None;
+                return Description.Length > BaseTestCreationConsts.MaxTestDescriptionLength ?
+    new($"Length of the test description cannot be more than {BaseTestCreationConsts.MaxTestDescriptionLength} characters")
+                    : Err.None;
         }
-        public static TestMainInfoEditingForm FromTestMainInfoDto(DraftTestMainInfoDto dto) =>
+        public static TestMainInfoEditingForm FromDraftTestMainInfo(DraftTestMainInfo mainInfo) =>
             new() {
-                Name = dto.Name,
-                Description = dto.Description,
-                Language = dto.Language,
-                Privacy = dto.Privacy
+                MainInfoId = mainInfo.Id,
+                Name = mainInfo.Name,
+                Description = mainInfo.Description,
+                Language = mainInfo.Language,
+                Privacy = mainInfo.Privacy
             };
+        public static TestMainInfoEditingForm Empty() => new() {
+            MainInfoId = new(Guid.Empty),
+            Name = string.Empty,
+            Description = string.Empty,
+            Language = Language.Eng,
+            Privacy = TestPrivacy.Anyone
+        };
     }
 }

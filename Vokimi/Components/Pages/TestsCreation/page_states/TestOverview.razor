@@ -8,32 +8,28 @@
     <div class="main-info-and-cover-section">
         <div class="main-info-area">
             <label class="area-title">Test Main Info</label>
-            <MainInfoAreaContent MainInfoDto="TestDto.MainInfo"
-                                 GoToMainInfoEditing="ChangePageStateToMainInfoEditing" />
+            @* <MainInfoAreaContent GoToMainInfoEditing="ChangePageStateToMainInfoEditing" /> *@
         </div>
         <div class="test-cover-area">
             <label class="area-title">Test Cover</label>
-            <TestCoverAreaContent Vm="new TestCoverAreaContentViewModel(TestDto.MainInfo.CoverImagePath,TestDto.MainInfo.Id, TestDto.Id)" />
+            <TestCoverAreaContent />
         </div>
     </div>
 
-    <QuestionsAreaContent EditQuestionAction="ChangePageStateToQuestionEditing" />
+    <QuestionsAreaContent EditQuestionAction="ChangePageStateToQuestionEditing" /> 
 
-    <ResultsAreaContent ChangePageStateToResultsEditing="ChangePageStateToResultsEditing"
-                        ResultsCount="@TestDto.ResultsCount" />
-    <ConclusionAreaContent AnyConclusionAdded="!(TestDto.ConclusionId is null)"
-                           ChangePageStateToConclusionEditing="ChangePageStateToConclusionEditing" />
+    <ResultsAreaContent ChangePageStateToResultsEditing="ChangePageStateToResultsEditing" />
+    <ConclusionAreaContent ChangePageStateToConclusionEditing="ChangePageStateToConclusionEditing" />
 
     <StylesEditingAreaContent ChangePageStateToStylesEditing="ChangePageStateToStylesEditing" />
 
-    <TestPublishingDialog @ref="testPublishingDialogRef" TestId="@TestDto.Id" />
-    <div class="publish-test-btn" @onclick="()=>testPublishingDialogRef.Open()">Publish test</div>
+    @* <TestPublishingDialog @ref="testPublishingDialogRef" /> *@
+    @* <div class="publish-test-btn" @onclick="()=>testPublishingDialogRef.Open()">Publish test</div> *@
 
 </div>
 @code {
-    private TestPublishingDialog testPublishingDialogRef;
+    // private TestPublishingDialog testPublishingDialogRef;
 
-    [Parameter] public DraftGenericTestDto TestDto { get; set; }
     [Parameter] public Action ChangePageStateToMainInfoEditing { get; set; }
     [Parameter] public Action ChangePageStateToConclusionEditing { get; set; }
     [Parameter] public Action ChangePageStateToResultsEditing { get; set; }

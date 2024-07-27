@@ -1,5 +1,4 @@
-﻿
-@inject TestsCreationDbOperationsService testsCreationDbOperationsService
+﻿@inject TestsCreationDbOperationsService testsCreationDbOperationsService
 @inject UsersDbOperationsService usersDbOperationsService
 @inject AuthHelperService authHelperService
 @inject IHttpContextAccessor httpContextAccessor
@@ -18,21 +17,16 @@
     }
     else if (creator is not null && draftTest is not null) {
         <CascadingValue Value="@draftTest.Id" Name="TestId">
-
-
             @switch (pageState) {
                 case TestCreationPageState.Overview:
-                    <TestOverview TestDto="new DraftGenericTestDto(draftTest)"
-                                  ChangePageStateToMainInfoEditing="()=>ChangePageState(TestCreationPageState.MainInfoEditing)"
+                    <TestOverview ChangePageStateToMainInfoEditing="()=>ChangePageState(TestCreationPageState.MainInfoEditing)"
                                   ChangePageStateToQuestionEditing="ChangePageStateToQuestionEditing"
                                   ChangePageStateToConclusionEditing="()=>ChangePageState(TestCreationPageState.ConclusionEditing)"
                                   ChangePageStateToResultsEditing="()=>ChangePageState(TestCreationPageState.ResultsEditing)"
-                                  ChangePageStateToStylesEditing="()=>ChangePageState(TestCreationPageState.StylesEditing)"
-                                  />
+                                  ChangePageStateToStylesEditing="()=>ChangePageState(TestCreationPageState.StylesEditing)" />
                     break;
                 case TestCreationPageState.MainInfoEditing:
-                    <MainInfoEditing Test="new DraftGenericTestDto(draftTest)"
-                                     BackToOverviewAction="()=>ChangePageState(TestCreationPageState.Overview)" />
+                    <MainInfoEditing BackToOverviewAction="()=>ChangePageState(TestCreationPageState.Overview)" />
                     break;
                 case TestCreationPageState.QuestionEditing:
                     <QuestionEditing QuestionId="currentQuestionToEditId"

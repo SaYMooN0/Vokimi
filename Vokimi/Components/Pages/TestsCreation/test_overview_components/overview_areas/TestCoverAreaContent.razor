@@ -2,7 +2,7 @@
 @inject VokimiStorageService vokimiStorageService
 
 <div class="test-cover">
-    <img src="@ImgOperationsHelper.ImageUrlWithVersion(Vm.CoverPath)" alt="Test Cover" />
+    <img src="@ImgOperationsHelper.ImageUrlWithVersion(coverImagePath)" alt="Test Cover" />
 </div>
 
 <InputFile id="cover" class="form-control" OnChange="HandleFileChange" accept=".jpg,.png,.webp" hidden />
@@ -11,20 +11,36 @@
 <div class="remove-btn" @onclick="HandleCoverRemoving">Remove</div>
 
 @code {
-    [Parameter] public TestCoverAreaContentViewModel Vm { get; set; }
+
 
     private string coverUploadingError = string.Empty;
 
-    private async void HandleCoverRemoving() {
-        Err err = await testsCreationDbOperationsService.UpdateTestCover(Vm.MainInfoId, ImgOperationsHelper.DefaultTestCoverImg);
+    private string coverImagePath = string.Empty;
+    [CascadingParameter(Name = "TestId")] public DraftTestId TestId { get; set; }
+
+    protected override async Task OnInitializedAsync() {
+        await base.OnInitializedAsync();
+        BaseDraftTest? test = await testsCreationDbOperationsService.GetDraftTestById(TestId);
+        coverImagePath = test is null ? ImgOperationsHelper.DefaultTestCoverImg : test.MainInfo.CoverImagePath;
+
+
+    }
+
+    private async void HandleCoverRemoving() =>
+    await HandleCoverUpdate(ImgOperationsHelper.DefaultTestCoverImg);
+
+    private async Task HandleCoverUpdate(string path) {
+        Err err = await testsCreationDbOperationsService.UpdateTestCover(TestId, path);
         if (err.NotNone()) {
             coverUploadingError = err.ToString();
         }
         else {
-            Vm.UpdateCoverPath(ImgOperationsHelper.DefaultTestCoverImg);
+            coverImagePath = path;
             StateHasChanged();
         }
     }
+
+
 
     private async Task HandleFileChange(InputFileChangeEventArgs e) {
         var file = e.File;
@@ -36,18 +52,9 @@
             }
             try {
                 using (var stream = file.OpenReadStream(maxAllowedSize: BaseTestCreationConsts.MaxImageSizeInBytes)) {
-                    var result = await vokimiStorageService.SaveDraftTestCover(Vm.TestId, stream);
+                    var result = await vokimiStorageService.SaveDraftTestCover(TestId, stream);
                     result.Switch(
-                        async path => {
-                            Err err = await testsCreationDbOperationsService.UpdateTestCover(Vm.MainInfoId, path);
-                            if (err.NotNone()) {
-                                coverUploadingError = err.ToString();
-                            }
-                            else {
-                                Vm.UpdateCoverPath(path);
-                                StateHasChanged();
-                            }
-                        },
+                        async path => { await HandleCoverUpdate(path); },
                         err => coverUploadingError = $"Error uploading cover: {err.Message}"
                     );
 

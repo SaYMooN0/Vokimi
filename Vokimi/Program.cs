@@ -57,7 +57,7 @@ namespace Vokimi
                .AddInteractiveWebAssemblyRenderMode()
                .AddAdditionalAssemblies(typeof(Client._Imports).Assembly);
 
-        
+
             app.Run();
         }
 

@@ -59,23 +59,23 @@ namespace Vokimi.Services.db_operations
         }
         public async Task<TestTemplate?> GetTestTypeById(DraftTestId id) =>
             (await _db.DraftTestsSharedInfo.FirstOrDefaultAsync(i => i.Id == id))?.Template;
-        public async Task<BaseDraftTest> GetDraftTestById(DraftTestId id) =>
+        public async Task<BaseDraftTest?> GetDraftTestById(DraftTestId id) =>
             await _db.DraftTestsSharedInfo.FirstOrDefaultAsync(i => i.Id == id);
         public async Task<DraftTestMainInfo?> GetDraftTestMainInfoById(DraftTestMainInfoId id) =>
             await _db.DraftTestMainInfo.FirstOrDefaultAsync(mi => mi.Id == id);
         public async Task<List<DraftGenericTestQuestion>> GetDraftTestQuestionsById(DraftTestId id) =>
             await _db.DraftGenericTestQuestions.Where(q => q.DraftTestId == id).ToListAsync();
-        public async Task<Err> UpdateTestCover(DraftTestMainInfoId mainInfoId, string newPath) {
-            var mainInfo = await GetDraftTestMainInfoById(mainInfoId);
-            if (mainInfo is null) {
+        public async Task<Err> UpdateTestCover(DraftTestId testId, string newPath) {
+            BaseDraftTest? test= await GetDraftTestById(testId);
+            if (test is null) {
                 return new Err("Test cannot be found");
             }
-            if (mainInfo.CoverImagePath == newPath) {
+            if (test.MainInfo.CoverImagePath == newPath) {
                 return Err.None;
             }
-            mainInfo.UpdateCoverImage(newPath);
+            test.MainInfo.UpdateCoverImage(newPath);
             try {
-                _db.DraftTestMainInfo.Update(mainInfo);
+                _db.DraftTestMainInfo.Update(test.MainInfo);
                 await _db.SaveChangesAsync();
             } catch (Exception ex) {
                 return new Err("Server error. Please try again later");
@@ -214,7 +214,7 @@ namespace Vokimi.Services.db_operations
                 return new Err("Unknown test");
             }
 
-            var specificDataId = CreateEmptyDraftTestResultData(test.Template);
+            var specificDataId = await CreateEmptyDraftTestResultData(test.Template);
             var result = DraftTestResult.CreateNew(resultId, testId, specificDataId);
 
          
@@ -232,11 +232,12 @@ namespace Vokimi.Services.db_operations
 
             return Err.None;
         }
-        public DraftTestTypeSpecificResultDataId CreateEmptyDraftTestResultData(TestTemplate testTemplate) {
+        private async Task<DraftTestTypeSpecificResultDataId> CreateEmptyDraftTestResultData(TestTemplate testTemplate) {
             switch (testTemplate) {
                 case TestTemplate.Generic:
                     var resultData = DraftGenericTestResultData.CreateNew();
                     _db.DraftGenericTestResultsData.Add(resultData);
+                    await _db.SaveChangesAsync();
                     return resultData.Id;
                 default:
                     throw new ArgumentException("Invalid template type");
@@ -325,7 +326,7 @@ namespace Vokimi.Services.db_operations
                         }
                     }
                     foreach (var newRes in notSavedResults) {
-                        var resultTypeSpecificDataId = CreateEmptyDraftTestResultData(test.Template);
+                        var resultTypeSpecificDataId = await CreateEmptyDraftTestResultData(test.Template);
 
                         DraftTestResult r = DraftTestResult.CreateNew(
                             newRes.ResultStringId,

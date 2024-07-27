@@ -16,18 +16,10 @@
     border-radius: 10px;
     border: solid var(--primary) 4px;
 }
-
-
-.top-container {
-    position: absolute;
-    top: 2px;
-    left: 0;
-    display: grid;
-    width: 100%;
-}
-
 .template-icon-wrapper {
-    margin: 3px 6px 0 0;
+    position: absolute;
+    top: 5px;
+    left: 6px;
     justify-self: right;
     height: 32px;
     aspect-ratio: 1/1;

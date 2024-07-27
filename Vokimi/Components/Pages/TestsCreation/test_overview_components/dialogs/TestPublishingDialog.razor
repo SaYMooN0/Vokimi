@@ -41,6 +41,7 @@
 @code {
     private List<TestPublishingProblemDto> problemsList = [];
     private BaseDialog baseDialogRef { get; set; }
+    [CascadingParameter(Name = "TestId")] public DraftTestId TestId { get; set; }
 
     private enum PublisingState
     {
@@ -62,10 +63,9 @@
     }
     private async Task Close() => await baseDialogRef.CloseAsync();
 
-    [Parameter] public DraftTestId TestId { get; set; }
 
     private void PublishWithTagsAction(List<string> tags) {
-        
+
     }
 
 }

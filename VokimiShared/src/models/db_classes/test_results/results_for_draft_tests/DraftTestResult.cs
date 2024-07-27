@@ -15,7 +15,7 @@ namespace VokimiShared.src.models.db_classes.test_results.results_for_draft_test
             string stringId,
             DraftTestId testId,
             DraftTestTypeSpecificResultDataId testTypeSpecificDataId)
-            => CreateNew(stringId, testId, string.Empty, null, testTypeSpecificDataId);
+            => CreateNew(stringId, testId, string.Empty, string.Empty, testTypeSpecificDataId);
         public static DraftTestResult CreateNew(
             string stringId,
             DraftTestId testId,
@@ -27,7 +27,8 @@ namespace VokimiShared.src.models.db_classes.test_results.results_for_draft_test
                 TestId = testId,
                 StringId = stringId,
                 Text = text,
-                ImagePath = imagePath
+                ImagePath = imagePath,
+                TestTypeSpecificDataId= testTypeSpecificDataId
             };
         public void Update(string text, string? imagePath) {
             Text = text;
