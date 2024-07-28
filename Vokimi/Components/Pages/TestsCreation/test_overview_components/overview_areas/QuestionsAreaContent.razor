@@ -1,12 +1,15 @@
 ﻿@using Vokimi.Components.Pages.TestsCreation.test_overview_components.dialogs
 @using Vokimi.Components.Pages.TestsCreation.test_overview_components.areas_shared_components
 
-@inject TestsCreationDbOperationsService testsCreationDbOperationsService
+@inject IDbContextFactory<VokimiDbContext> dbContextFactory
 
 <ActionConfirmationDialog @ref="confirmationDialogRef"
                           ConfirmButtonText="Delete" />
 
-<NewQuestionCreationDialog @ref="@questionCreationDialogRef" ParentStateHasChanged="FetchQuestions" />
+<NewQuestionCreationDialog @ref="@questionCreationDialogRef"
+                           ParentStateHasChanged="()=> { using (var db = dbContextFactory.CreateDbContext())
+                                                            {FetchQuestions(db);}
+                                                       }" />
 
 
 <AreaHeader LabelText=@($"Test Questions ({Questions.Count})")>
@@ -69,24 +72,36 @@
 
 
 
-    private void OnDelteQuestionPressed(int i, DraftTestQuestionId questionId) {
-        Func<Task<Err>> deleteQuestionFunc = async () => {
-            Err deletionErr = await testsCreationDbOperationsService.DeleteDraftTestQuestion(questionId);
-            if (!deletionErr.NotNone()) {
-                await FetchQuestions();
-            }
-            return deletionErr;
-        };
-        confirmationDialogRef.Open($"Are you sure you want to delete #{i + 1} question?", deleteQuestionFunc);
-    }
+    private void OnDelteQuestionPressed(int i, DraftTestQuestionId questionId) =>
+        confirmationDialogRef.Open(
+            $"Are you sure you want to delete #{i + 1} question?",
+            () => DeleteQuestionFunc(questionId)
+        );
+
 
     protected override async Task OnInitializedAsync() {
-        await FetchQuestions();
+        using (var dbContext = await dbContextFactory.CreateDbContextAsync()) {
+            FetchQuestions(dbContext);
+        }
         await base.OnInitializedAsync();
     }
-    private async Task FetchQuestions() {
-        var dbQuestions = await testsCreationDbOperationsService.GetDraftTestQuestionsById(TestId);
-        Questions = dbQuestions.Select(q => new QuestionBriefInfoDto(q)).ToList();
+    private void FetchQuestions(VokimiDbContext db) {
+        Questions = db.DraftGenericTestQuestions
+            .Where(q => q.DraftTestId == TestId)
+            .Select(QuestionBriefInfoDto.FromDraftGenericTestQuestion)
+            .ToList();
+
         StateHasChanged();
+    }
+    private async Task<Err> DeleteQuestionFunc(DraftTestQuestionId questionId) {
+        using (var dbContext = await dbContextFactory.CreateDbContextAsync()) {
+
+            Err deletionErr = await GenericTestsCreationDbOperations.DeleteDraftTestQuestion(dbContext, questionId);
+
+            if (!deletionErr.NotNone()) {
+                FetchQuestions(dbContext);
+            }
+            return deletionErr;
+        }
     }
 }

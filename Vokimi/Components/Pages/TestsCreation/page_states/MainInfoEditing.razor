@@ -1,4 +1,4 @@
-﻿@inject TestsCreationDbOperationsService testsCreationDbOperationsService
+﻿@inject IDbContextFactory<VokimiDbContext> dbContextFactory
 
 @rendermode InteractiveServer
 
@@ -46,17 +46,20 @@
 
     protected override async Task OnParametersSetAsync() {
         await base.OnParametersSetAsync();
+        using (VokimiDbContext dbContext = dbContextFactory.CreateDbContext()) {
 
-        BaseDraftTest? test = await testsCreationDbOperationsService.GetDraftTestById(TestId);
-        if (test is null) {
-            formData = TestMainInfoEditingForm.Empty();
-            formValidationMessage = "Unable to load test data";
-        }
-        else {
-            formData = TestMainInfoEditingForm.FromDraftTestMainInfo(test.MainInfo);
-            formValidationMessage = string.Empty;
+            BaseDraftTest? test = await dbContext.DraftTestsSharedInfo.FirstOrDefaultAsync(x => x.Id == TestId);
+            if (test is null) {
+                formData = TestMainInfoEditingForm.Empty();
+                formValidationMessage = "Unable to load test data";
+            }
+            else {
+                formData = TestMainInfoEditingForm.FromDraftTestMainInfo(test.MainInfo);
+                formValidationMessage = string.Empty;
+            }
         }
     }
+
 
 
     private async void HandleSubmit() {
@@ -65,12 +68,15 @@
             formValidationMessage = serverErr.ToString();
             return;
         }
-        serverErr = await testsCreationDbOperationsService
-            .UpdateDraftTestMainInfo(formData.MainInfoId, formData.Name, formData.Description, formData.Language, formData.Privacy);
-        if (serverErr.NotNone()) {
-            formValidationMessage = serverErr.ToString();
-            return;
+        using (var dbContext = dbContextFactory.CreateDbContext()) {
+            serverErr = await BaseTestsCreationDbOperations.UpdateDraftTestMainInfo(
+                dbContext, formData.MainInfoId, formData.Name, formData.Description, formData.Language, formData.Privacy);
+            if (serverErr.NotNone()) {
+                formValidationMessage = serverErr.ToString();
+                return;
+            }
+            BackToOverviewAction();
         }
-        BackToOverviewAction();
+
     }
 }

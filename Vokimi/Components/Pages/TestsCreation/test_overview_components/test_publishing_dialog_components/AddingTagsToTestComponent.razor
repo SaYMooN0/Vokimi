@@ -1,6 +1,4 @@
-﻿@inject TagsInteractionDbOperationsService tagsInteractionDbOperationsService
-
-<div class="dialog-state-container">
+﻿<div class="dialog-state-container">
     <label class="add-tags-label">
         Add tags to your test
     </label>
@@ -94,10 +92,10 @@
             return;
         }
 
-        var fetchingRes = await tagsInteractionDbOperationsService.GetRelevantTags(tagSearchInput);
-        fetchingRes.Switch(tags => {
-            tagsToChooseFrom = tags.Where(t => !chosenTags.Contains(t) && t != tagSearchInput).ToList();
-            tagsToChooseFrom.Insert(0, tagSearchInput);
-        }, error => errorMessage = "Unable to fetch tags");
+        // var fetchingRes = await tagsInteractionDbOperationsService.GetRelevantTags(tagSearchInput);
+        // fetchingRes.Switch(tags => {
+        //     tagsToChooseFrom = tags.Where(t => !chosenTags.Contains(t) && t != tagSearchInput).ToList();
+        //     tagsToChooseFrom.Insert(0, tagSearchInput);
+        // }, error => errorMessage = "Unable to fetch tags");
     }
 }

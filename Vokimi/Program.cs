@@ -4,8 +4,8 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Vokimi.Components;
 using Vokimi.Services;
-using Vokimi.Services.db_operations;
 using Vokimi.src.data;
+using Vokimi.src.data.db_operations;
 
 namespace Vokimi
 {
@@ -66,14 +66,10 @@ namespace Vokimi
             services.AddAntiforgery();
 
             // Database context configuration
-            services.AddDbContext<VokimiDbContext>(options =>
+            services.AddDbContextFactory<VokimiDbContext>(options =>
                 options.UseNpgsql(configuration.GetConnectionString("VokimiDb")));
 
-            services.AddScoped<UsersDbOperationsService>();
-            services.AddScoped<TestsTakingDbOperationsService>();
-            services.AddScoped<TestsCreationDbOperationsService>();
             services.AddScoped<GenericTestsPublishingDbOperationsService>();
-            services.AddScoped<TagsInteractionDbOperationsService>();
 
 
             // Yandex s3 configuration

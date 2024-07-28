@@ -1,7 +1,6 @@
-﻿@inject TestsCreationDbOperationsService testsCreationDbOperationsService
-@inject UsersDbOperationsService usersDbOperationsService
-@inject AuthHelperService authHelperService
+﻿@inject AuthHelperService authHelperService
 @inject IHttpContextAccessor httpContextAccessor
+@inject IDbContextFactory<VokimiDbContext> dbContextFactory
 
 @rendermode InteractiveServer
 @attribute [Authorize]
@@ -100,22 +99,24 @@
             pageInitializationError = "An error has occurred. Try to log out of your account and log in again.";
             return;
         }
+        using (var db = dbContextFactory.CreateDbContext()) {
+            creator = await db.AppUsers.FirstOrDefaultAsync(u => u.Id == userId.Value);
+            if (creator is null) {
+                pageInitializationError = "An error has occurred. Try to log out of your account and log in again.";
+                return;
+            }
 
-        creator = await usersDbOperationsService.GetUserById(userId.Value);
-        if (creator is null) {
-            pageInitializationError = "An error has occurred. Try to log out of your account and log in again.";
-            return;
-        }
+            DraftGenericTest? genericTest = await db.DraftGenericTests.FirstOrDefaultAsync(t => t.Id == parsedTestId.Value);
+            if (genericTest is null) {
+                pageInitializationError = "Test not found";
+            }
+            else {
+                draftTest = genericTest;
+                if (!creator.DraftTests.Contains(draftTest)) {
+                    pageInitializationError = "You don't have access to this test";
+                }
+            }
 
-        draftTest = await testsCreationDbOperationsService.GetDraftTestById(parsedTestId.Value) as DraftGenericTest;
-        if (draftTest is null) {
-            pageInitializationError = "Unknown test";
-            return;
         }
-        if (!creator.DraftTests.Contains(draftTest)) {
-            pageInitializationError = "You don't have access to this test";
-            return;
-        }
-
     }
 }

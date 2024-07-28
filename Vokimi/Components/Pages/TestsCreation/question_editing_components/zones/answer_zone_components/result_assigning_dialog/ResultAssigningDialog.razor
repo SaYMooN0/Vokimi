@@ -1,4 +1,4 @@
-﻿@inject TestsCreationDbOperationsService testsCreationDbOperationsService
+﻿@inject IDbContextFactory<VokimiDbContext> dbContextFactory
 
 
 
@@ -39,15 +39,19 @@
     [CascadingParameter(Name = "TestId")] public DraftTestId TestId { get; set; }
 
     private List<string> currentResultsListToModifyRef = [];
-    private async Task<List<string>> AllResultStringIdsForTest() =>
-        (await testsCreationDbOperationsService.GetResultStringIdsForDraftTest(TestId)).Match(
-           list => list,
-           err => {
-               errorString = err.ToString();
-               StateHasChanged();
-               return [];
-           }
-       );
+
+    private async Task<List<string>> AllResultStringIdsForTest() {
+        using (VokimiDbContext db = dbContextFactory.CreateDbContext()) {
+            BaseDraftTest? test = await db.DraftTestsSharedInfo.FirstOrDefaultAsync(i => i.Id == TestId);
+            if (test is null) {
+                errorString = "Test not found";
+                StateHasChanged();
+                return [];
+            }
+            return test.PossibleResults.Select(r => r.StringId).ToList();
+        }
+    }
+   
 
     private Action RerenderResutsViewComponents;
 

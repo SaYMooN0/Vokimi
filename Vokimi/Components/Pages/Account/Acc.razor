@@ -1,15 +1,13 @@
 ﻿@inject NavigationManager navigationManager
 @inject AuthHelperService authHelperService
-@inject UsersDbOperationsService usersDbOperationsService
+@inject IDbContextFactory<VokimiDbContext> dbContextFactory
 
 @page "/acc/{userId}"
 @page "/acc"
 
 <PageTitle>Account</PageTitle> @* or user name if its someone's *@
 
-@switch (pageState)
-
-{
+@switch (pageState) {
     @case PageState.MyAcc:
         <MyAcc />
         break;
@@ -51,33 +49,29 @@
     [Parameter]
     public string userId { get; set; }
 
-    protected override async Task OnParametersSetAsync()
-    {
+    protected override async Task OnParametersSetAsync() {
 
-        if (string.IsNullOrEmpty(userId))
-        {
+        if (string.IsNullOrEmpty(userId)) {
             AuthenticationState? authState = await authenticationStateTask;
 
-            if (authHelperService.IsSignedIn(authState))
-            {
+            if (authHelperService.IsSignedIn(authState)) {
                 pageState = PageState.MyAcc;
             }
-            else
-            {
+            else {
                 await InvokeAsync(() => navigationManager.NavigateTo("/login", true, true));
             }
         }
-        else if (Guid.TryParse(userId, out Guid guid))
-        {
+        else if (Guid.TryParse(userId, out Guid guid)) {
             ownerId = new(guid);
-            AppUser? appUser = await usersDbOperationsService.GetUserById(ownerId.Value);
+            using (var db = dbContextFactory.CreateDbContext()) {
+                AppUser? appUser = await db.AppUsers.FirstOrDefaultAsync(u => u.Id == ownerId.Value);
 
-            pageState = appUser switch
-            {
-                null => PageState.UserNotFound,
-                { IsAccountPrivate: false } => PageState.UserPublicAcc, //check if friends
-                _ => PageState.PrivateAcc
-            };
+                pageState = appUser switch {
+                    null => PageState.UserNotFound,
+                    { IsAccountPrivate: false } => PageState.UserPublicAcc, //check if friends
+                    _ => PageState.PrivateAcc
+                };
+            }
 
         }
         else { pageState = PageState.UserNotFound; }

@@ -1,6 +1,6 @@
 ﻿@using Vokimi.Components.Pages.TestsCreation.test_overview_components.areas_shared_components
 
-@inject TestsCreationDbOperationsService testsCreationDbOperationsService
+@inject IDbContextFactory<VokimiDbContext> dbContextFactory
 @inject VokimiStorageService vokimiStorageService
 
 <ActionConfirmationDialog @ref="confirmationDialogRef"
@@ -52,23 +52,23 @@
 
     protected override async Task OnInitializedAsync() {
         await base.OnInitializedAsync();
-        BaseDraftTest? test = await testsCreationDbOperationsService.GetDraftTestById(TestId);
-        if (test is null) {
-            anyConclusionAdded = false;
-        }
-        else {
-            anyConclusionAdded = test.Conclusion is not null;
+        using (var dbContext = dbContextFactory.CreateDbContext()) {
+            BaseDraftTest? test = await dbContext.DraftTestsSharedInfo.FirstOrDefaultAsync(t => t.Id == TestId);
+            anyConclusionAdded = test is null ? false : test.Conclusion is not null;
         }
 
     }
     private async Task<Err> DeleteConclusion() {
-        Err dbDelitingErr = await testsCreationDbOperationsService.RemoveDraftTestConclusion(TestId);
-        if (dbDelitingErr.NotNone()) {
-            return dbDelitingErr;
+        using (var dbContext = dbContextFactory.CreateDbContext()) {
+            Err dbDelitingErr = await BaseTestsCreationDbOperations.RemoveDraftTestConclusion(dbContext, TestId);
+            if (dbDelitingErr.NotNone()) {
+                return dbDelitingErr;
+            }
+            await vokimiStorageService.ClearDraftTestConclusionUnusedImages(TestId);
+            anyConclusionAdded = false;
+            StateHasChanged();
+            return Err.None;
         }
-        await vokimiStorageService.ClearDraftTestConclusionUnusedImages(TestId);
-        anyConclusionAdded = false;
-        StateHasChanged();
-        return Err.None;
+
     }
 }

@@ -1,7 +1,7 @@
 ﻿@using Vokimi.Components.Pages.TestsCreation.page_states.shared_components
 @using Vokimi.Components.Pages.TestsCreation.styles_editing_components
 
-@inject TestsCreationDbOperationsService testsCreationDbOperationsService
+@inject IDbContextFactory<VokimiDbContext> dbContextFactory
 
 <TestCreationPageStateTopLabel LabelText="Styles Editing" BackToOverviewAction="BackToOverviewAction" />
 <form class="styles-editing-form" name="formData" @onsubmit="HandleSubmit">
@@ -20,23 +20,31 @@
     private string errorMessage { get; set; }
 
     protected override async Task OnInitializedAsync() {
-        errorMessage = string.Empty;
-        formData = TestStylesEditingForm.Default;
-        (await testsCreationDbOperationsService.GetDraftTestStylesByDraftTestId(TestId)).Switch(
-            styles => formData = TestStylesEditingForm.FromTestStylesSheet(styles),
-            err => errorMessage = err.Message
+        using (VokimiDbContext dbContext = dbContextFactory.CreateDbContext()) {
+            BaseDraftTest? test = await dbContext.DraftTestsSharedInfo.FirstOrDefaultAsync(x => x.Id == TestId);
+            if (test is null) {
+                formData = TestStylesEditingForm.Default;
+                errorMessage = "Unable to find styles for test";
+            }
+            else {
+                formData = TestStylesEditingForm.FromTestStylesSheet(test.StylesSheet);
+                errorMessage = string.Empty;
+            }
+        }
 
-        );
     }
 
     private async void HandleSubmit() {
         errorMessage = string.Empty;
-        Err serverErr = await testsCreationDbOperationsService.UpdateStylesForDraftTest(TestId, formData);
-        if (serverErr.NotNone()) {
-            errorMessage = serverErr.Message;
-            StateHasChanged();
-            return;
+        using (VokimiDbContext dbContext = dbContextFactory.CreateDbContext()) {
+            Err serverErr = await BaseTestsCreationDbOperations.UpdateStylesForDraftTest(dbContext, TestId, formData);
+            if (serverErr.NotNone()) {
+                errorMessage = serverErr.Message;
+                StateHasChanged();
+                return;
+            }
         }
+
 
     }
 }

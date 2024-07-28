@@ -1,6 +1,6 @@
 ﻿@using Vokimi.Components.Pages.TestsCreation.test_overview_components.areas_shared_components
 
-@inject TestsCreationDbOperationsService testsCreationDbOperationsService
+@inject IDbContextFactory<VokimiDbContext> dbContextFactory
 
 <AreaHeader LabelText=@($"Test Results ({resultsCount})")>
     <AreaIcon>
@@ -22,8 +22,12 @@
     [CascadingParameter(Name = "TestId")] public DraftTestId TestId { get; set; }
 
     protected override async Task OnInitializedAsync() {
-        BaseDraftTest? test = await testsCreationDbOperationsService.GetDraftTestById(TestId);
-        resultsCount = test is not null ? test.PossibleResults.Count() : 0;
+
+        using (var dbContext = dbContextFactory.CreateDbContext()) {
+            BaseDraftTest? test = await dbContext.DraftTestsSharedInfo.FirstOrDefaultAsync(t => t.Id == TestId);
+            resultsCount = test is not null ? test.PossibleResults.Count() : 0;
+        }
+     
         await base.OnInitializedAsync();
     }
 }

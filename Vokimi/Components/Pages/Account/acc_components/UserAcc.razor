@@ -1,6 +1,6 @@
-﻿@inject UsersDbOperationsService usersDbOperationsService
-@inject NavigationManager navigationManager
+﻿@inject NavigationManager navigationManager
 @inject AuthHelperService authHelperService
+@inject IDbContextFactory<VokimiDbContext> dbContextFactory
 
 <h3>User Acc</h3>
 <h4>
@@ -14,17 +14,17 @@
     [CascadingParameter]
     public HttpContext httpContext { get; set; }
 
-    protected override async Task OnParametersSetAsync()
-    {
-        AppUser? pageOwner = await usersDbOperationsService.GetUserById(PageOwnerId);
-        if (pageOwner is null)
-            navigationManager.NavigateTo("/acc/notfound", true);
-        else if (pageOwner.IsAccountPrivate)
-            navigationManager.NavigateTo("/acc/" + pageOwner.Id.ToString(), true);
-        else
-        {
-            AppUserId? viewerId = authHelperService.GetUserIdFromClaims(httpContext.User);
-            vm = UserAccountPageViewModel.FromUser(pageOwner, viewerId);
+    protected override async Task OnParametersSetAsync() {
+        using (var db = dbContextFactory.CreateDbContext()) {
+            AppUser? pageOwner = await db.AppUsers.FirstOrDefaultAsync(u => u.Id == PageOwnerId);
+            if (pageOwner is null)
+                navigationManager.NavigateTo("/acc/notfound", true);
+            else if (pageOwner.IsAccountPrivate)
+                navigationManager.NavigateTo("/acc/" + pageOwner.Id.ToString(), true);
+            else {
+                AppUserId? viewerId = authHelperService.GetUserIdFromClaims(httpContext.User);
+                vm = UserAccountPageViewModel.FromUser(pageOwner, viewerId);
+            }
         }
     }
 }

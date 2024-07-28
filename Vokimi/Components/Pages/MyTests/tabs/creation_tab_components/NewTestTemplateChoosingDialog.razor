@@ -1,5 +1,4 @@
-﻿@inject TestsCreationDbOperationsService testsCreationDbOperationsService
-@inject UsersDbOperationsService usersDbOperationsService
+﻿@inject IDbContextFactory<VokimiDbContext> dbContextFactory
 @inject NavigationManager navigationManager
 @inject AuthHelperService authHelperService
 @inject IHttpContextAccessor httpContextAccessor
@@ -89,23 +88,24 @@
             StateHasChanged();
             return;
         }
-
-        AppUser? user = await usersDbOperationsService.GetUserById(userId.Value);
-        if (user is null) {
-            serverMessage = "Failed to create test. Try logging out and logging in again";
-            StateHasChanged();
-            return;
-        }
-
-        var createResult = await testsCreationDbOperationsService.CreateNewDraftTest(testNameInput, chosenTemplate.Value, user);
-        createResult.Switch(
-            testId => {
-                navigationManager.NavigateTo($"/newtest/{testId}");
-            },
-            err => {
-                serverMessage = "Failed to create test. Please try again later";
+        using (var db = dbContextFactory.CreateDbContext()) {
+            AppUser? user = await db.AppUsers.FirstOrDefaultAsync(u => u.Id == userId.Value);
+            if (user is null) {
+                serverMessage = "Failed to create test. Try logging out and logging in again";
                 StateHasChanged();
+                return;
             }
-        );
+
+            var createResult = await BaseTestsCreationDbOperations.CreateNewDraftTest(db, testNameInput, chosenTemplate.Value, user);
+            createResult.Switch(
+                testId => {
+                    navigationManager.NavigateTo($"/newtest/{testId}");
+                },
+                err => {
+                    serverMessage = "Failed to create test. Please try again later";
+                    StateHasChanged();
+                }
+            );
+        }
     }
 }

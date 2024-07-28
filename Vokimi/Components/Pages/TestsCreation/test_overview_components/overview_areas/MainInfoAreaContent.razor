@@ -1,11 +1,11 @@
 ﻿<div class="test-main-info-overview">
-    <label class="test-name">@MainInfoDto.Name</label>
+    <label class="test-name">@testName</label>
     <p>
-        Description:<br /> <label class="test-description">@MainInfoDto.Description</label>
+        Description:<br /> <label class="test-description">@testDescription</label>
     </p>
     <div class="lang-priv-container">
-        <label>Language: @MainInfoDto.Language.FullName()</label>
-        <label>Privacy: @MainInfoDto.Privacy</label>
+        <label>Language: @testLanguage</label>
+        <label>Privacy: @testPrivacy</label>
     </div>
 </div>
 <div class="edit-main-info-btn" @onclick="GoToMainInfoEditing">
@@ -18,6 +18,19 @@
 
 
 @code {
-    [Parameter] public DraftTestMainInfoDto MainInfoDto { get; set; }
     [Parameter] public Action GoToMainInfoEditing { get; set; }
+
+    private string
+            testName,
+            testDescription,
+            testLanguage,
+            testPrivacy;
+    protected override async Task OnInitializedAsync() {
+        await base.OnInitializedAsync();
+        //from db
+        testName = string.Empty;
+        testDescription = string.Empty;
+        testLanguage = string.Empty; //.FullName()
+        testPrivacy = string.Empty;
+    }
 }

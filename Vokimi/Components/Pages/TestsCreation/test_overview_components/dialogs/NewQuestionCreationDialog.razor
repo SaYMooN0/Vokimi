@@ -1,4 +1,6 @@
-﻿@inject TestsCreationDbOperationsService testsCreationDbOperationsService
+﻿@using VokimiShared.src.models.dtos.draft_generic_tests
+
+@inject IDbContextFactory<VokimiDbContext> dbContextFactory
 
 @rendermode InteractiveServer
 
@@ -17,7 +19,7 @@
                 </select>
             </div>
         </div>
-      
+
 
         <label class="server-message">@serverMessage</label>
         <div class="bottom-btns-container">
@@ -48,15 +50,28 @@
             serverMessage = "Question text cannot be more than 127 characters";
             return;
         }
-        DraftGenericTestQuestion question = DraftGenericTestQuestion.CreateNew(questionText, answersType, TestId);
-        Err err = await testsCreationDbOperationsService.AddQuestionToGenericTest(TestId, question);
-        if (err.NotNone()) {
-            serverMessage = err.ToString();
-            return;
-        }
-        await Close();
-        await ParentStateHasChanged.InvokeAsync();
+        using (var dbContext = dbContextFactory.CreateDbContext()) {
+            BaseDraftTest? test = await dbContext.DraftTestsSharedInfo.FirstOrDefaultAsync(t => t.Id == TestId);
+            if (test is null) {
+                serverMessage = "Test not found";
+                return;
+            }
 
+            if (test is  DraftGenericTest genericTest) {
+                var question = DraftGenericTestQuestionDbDataDto.Minimal(questionText, answersType);
+                Err err = await GenericTestsCreationDbOperations.CreateNewQuestion(dbContext, genericTest, question);
+                if (err.NotNone()) {
+                    serverMessage = err.ToString();
+                }
+                else {
+                    await Close();
+                    await ParentStateHasChanged.InvokeAsync();
+                }
+            }
+            else {
+                serverMessage = "Unable to create new question. Please try to refresh the page";
+            }
+        }
     }
     public async Task Open() {
         serverMessage = string.Empty;

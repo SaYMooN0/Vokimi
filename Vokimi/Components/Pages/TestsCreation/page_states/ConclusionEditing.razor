@@ -2,7 +2,7 @@
 
 
 @inject VokimiStorageService vokimiStorageService
-@inject TestsCreationDbOperationsService testsCreationDbOperationsService
+@inject IDbContextFactory<VokimiDbContext> dbContextFactory
 
 <form class="form-container" name="formData" @onsubmit="HandleSubmit">
     <TestCreationPageStateTopLabel LabelText="Test Conclusion Editing" BackToOverviewAction="BackToOverviewAction" />
@@ -10,7 +10,7 @@
         <TextAndImageMainInputs @bind-Text="formData.Text"
                                 @bind-ImagePath="formData.ImagePath"
                                 SaveImgFunc="ImgSavingFunc"
-                                TextInputLabel="Conclusion Text:"/>
+                                TextInputLabel="Conclusion Text:" />
 
     </div>
     <div class="add-feedback-zone">
@@ -48,12 +48,18 @@
     private string serverError = string.Empty;
 
     protected override async Task OnInitializedAsync() {
-        TestConclusion? conclusion = await testsCreationDbOperationsService.GetDraftTestConclusionById(TestId);
-        if (conclusion is not null) {
-            formData = ConclusionCreationForm.FromConclusion(conclusion);
-        }
-        else {
-            formData = new();
+        using (VokimiDbContext dbContext = dbContextFactory.CreateDbContext()) {
+            BaseDraftTest? test = await dbContext.DraftTestsSharedInfo.FirstOrDefaultAsync(i => i.Id == TestId);
+            if (test is null) {
+                formData = new();
+                serverError = "Test does not exist";
+            }
+            else if (test.Conclusion is null) {
+                formData = new();
+            }
+            else {
+                formData = ConclusionCreationForm.FromConclusion(test.Conclusion);
+            }
         }
         await base.OnInitializedAsync();
     }
@@ -64,13 +70,18 @@
             StateHasChanged();
             return;
         }
-        Err savingError = await testsCreationDbOperationsService.UpdateDraftTestConclusion(TestId, formData);
-        if (savingError.NotNone()) {
-            serverError = savingError.Message;
-            StateHasChanged();
-            return;
+        using (VokimiDbContext dbContext = dbContextFactory.CreateDbContext()) {
+
+            Err savingError = await BaseTestsCreationDbOperations.UpdateDraftTestConclusion(dbContext, TestId, formData);
+            if (savingError.NotNone()) {
+                serverError = savingError.Message;
+                StateHasChanged();
+            }
+            else {
+                await vokimiStorageService.ClearDraftTestConclusionUnusedImages(TestId, formData.ImagePath);
+            }
         }
-        await vokimiStorageService.ClearDraftTestConclusionUnusedImages(TestId, formData.ImagePath);
+
     }
     private string imgSessionKey = Guid.NewGuid().ToString();
 

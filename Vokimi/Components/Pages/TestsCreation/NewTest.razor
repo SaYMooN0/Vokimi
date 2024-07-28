@@ -1,7 +1,7 @@
-﻿@inject TestsCreationDbOperationsService testsCreationDbOperationsService
-@inject UsersDbOperationsService usersDbOperationsService
+﻿@inject IDbContextFactory<VokimiDbContext> dbContextFactory
 @inject AuthHelperService authHelperService
 @inject NavigationManager navigationManager
+
 
 @page "/newtest"
 @page "/newtest/{testId}"
@@ -37,18 +37,22 @@
             pageInitializationError = "An error has occurred. Try to log out of your account and log in again.";
             return;
         }
+        using (var db = dbContextFactory.CreateDbContext()) {
+            AppUser? user = await db.AppUsers.FirstOrDefaultAsync(u => u.Id == userId.Value);
+            if (user is null) {
+                pageInitializationError = "An error has occurred. Try to log out of your account and log in again.";
+                return;
+            }
+            var test = await db.DraftTestsSharedInfo.FirstOrDefaultAsync(t => t.Id == parsedTestId.Value);
+            if (test is null) {
+                pageInitializationError = "Unknown test";
+                return;
+            }
+            navigationManager.NavigateTo($"/newtest/{test.Template.ShortId()}/{parsedTestId.Value}");
 
-        AppUser? user = await usersDbOperationsService.GetUserById(userId.Value);
-        if (user is null) {
-            pageInitializationError = "An error has occurred. Try to log out of your account and log in again.";
-            return;
         }
-        var test = await testsCreationDbOperationsService.GetDraftTestById(parsedTestId.Value);
-        if (test is null) {
-            pageInitializationError = "Unknown test";
-            return;
-        }
-        navigationManager.NavigateTo($"/newtest/{test.Template.ShortId()}/{parsedTestId.Value}");
+
+
 
     }
 }

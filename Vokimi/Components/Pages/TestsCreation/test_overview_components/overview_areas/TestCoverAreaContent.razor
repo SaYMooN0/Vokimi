@@ -1,4 +1,4 @@
-﻿@inject TestsCreationDbOperationsService testsCreationDbOperationsService
+﻿@inject IDbContextFactory<VokimiDbContext> dbContextFactory
 @inject VokimiStorageService vokimiStorageService
 
 <div class="test-cover">
@@ -20,8 +20,11 @@
 
     protected override async Task OnInitializedAsync() {
         await base.OnInitializedAsync();
-        BaseDraftTest? test = await testsCreationDbOperationsService.GetDraftTestById(TestId);
-        coverImagePath = test is null ? ImgOperationsHelper.DefaultTestCoverImg : test.MainInfo.CoverImagePath;
+        using (var dbContext = dbContextFactory.CreateDbContext()) {
+            BaseDraftTest? test = await dbContext.DraftTestsSharedInfo.FirstOrDefaultAsync(t => t.Id == TestId);
+            coverImagePath = test is null ? ImgOperationsHelper.DefaultTestCoverImg : test.MainInfo.CoverImagePath;
+        }
+
 
 
     }
@@ -30,14 +33,18 @@
     await HandleCoverUpdate(ImgOperationsHelper.DefaultTestCoverImg);
 
     private async Task HandleCoverUpdate(string path) {
-        Err err = await testsCreationDbOperationsService.UpdateTestCover(TestId, path);
-        if (err.NotNone()) {
-            coverUploadingError = err.ToString();
+        using (var dbContext = dbContextFactory.CreateDbContext()) {
+            Err err = await testsCreationDbOperationsService.UpdateTestCover(TestId, path);
+            if (err.NotNone()) {
+                coverUploadingError = err.ToString();
+            }
+            else {
+                coverImagePath = path;
+                StateHasChanged();
+            }
         }
-        else {
-            coverImagePath = path;
-            StateHasChanged();
-        }
+
+     
     }
 
 

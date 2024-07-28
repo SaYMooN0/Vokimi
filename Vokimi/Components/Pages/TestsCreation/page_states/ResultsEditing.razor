@@ -1,7 +1,7 @@
 ﻿@using Vokimi.Components.Pages.TestsCreation.page_states.shared_components
 @using Vokimi.Components.Pages.TestsCreation.results_creation_components
 
-@inject TestsCreationDbOperationsService testsCreationDbOperationsService
+@inject IDbContextFactory<VokimiDbContext> dbContextFactory
 @inject VokimiStorageService vokimiStorageService
 
 <TestCreationPageStateTopLabel LabelText="Results Editing" BackToOverviewAction="BackToOverviewAction" />
@@ -66,15 +66,18 @@ else {
             StateHasChanged();
             return;
         }
+        using (var dbContext = dbContextFactory.CreateDbContext()) {
+            Err savingErr = await BaseTestsCreationDbOperations
+                    .UpdateDraftTestResults(dbContext, TestId, formData.SavedResults, formData.NotSavedResults);
 
-        Err savingErr = await testsCreationDbOperationsService
-            .UpdateDraftTestResults(TestId, formData.SavedResults, formData.NotSavedResults);
-
-        if (savingErr.NotNone()) {
-            errorMessage = savingErr.Message;
-            StateHasChanged();
-            return;
+            if (savingErr.NotNone()) {
+                errorMessage = savingErr.Message;
+                StateHasChanged();
+                return;
+            }
         }
+
+
         errorMessage = string.Empty;
         await FetchFormData();
 
@@ -89,13 +92,18 @@ else {
 
     }
     private async Task<Err> FetchFormData() {
-        BaseDraftTest? test = await testsCreationDbOperationsService.GetDraftTestById(TestId);
-        if (test is null) {
-            formData = TestResultsEditingForm.Empty;
-            return new Err("Error fetching results data");
+        using (var dbContext = dbContextFactory.CreateDbContext()) {
+            BaseDraftTest? test = await dbContext.DraftTestsSharedInfo.FirstOrDefaultAsync(t => t.Id == TestId);
+            if (test is null) {
+                formData = TestResultsEditingForm.Empty;
+                return new Err("Error fetching results data");
+            }
+            else {
+                formData = TestResultsEditingForm.FromDraftTest(test);
+                return Err.None;
+            }
+
         }
-        formData = TestResultsEditingForm.FromDraftTest(test);
-        return Err.None;
     }
     public void CollapseAllSavedResults() {
         foreach (var wrapperRef in savedResultsWrapperRefs) {

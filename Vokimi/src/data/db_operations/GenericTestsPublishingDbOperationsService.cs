@@ -10,7 +10,7 @@ using VokimiShared.src.models.db_classes.test_results.results_for_draft_tests;
 using VokimiShared.src.models.db_entities_ids;
 using VokimiShared.src.models.dtos;
 
-namespace Vokimi.Services.db_operations
+namespace Vokimi.src.data.db_operations
 {
     public class GenericTestsPublishingDbOperationsService
     {

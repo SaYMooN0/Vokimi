@@ -1,7 +1,6 @@
-﻿@inject UsersDbOperationsService usersDbOperationsService
-@inject NavigationManager navigationManager
+﻿@inject NavigationManager navigationManager
 @inject AuthHelperService authHelperService
-
+@inject IDbContextFactory<VokimiDbContext> dbContextFactory
 
 @page "/login"
 <PageTitle>Authorization</PageTitle>
@@ -13,8 +12,7 @@
     <InputText placeholder="Password" class="input-text" @bind-Value="form.Password" type="password" />
     <ValidationMessage For="@(() => form.Password)" class="err-message" />
 
-    @if (!string.IsNullOrEmpty(serverErrorMessage))
-    {
+    @if (!string.IsNullOrEmpty(serverErrorMessage)) {
         <label class="err-message">@serverErrorMessage</label>
     }
 
@@ -33,26 +31,23 @@
     [SupplyParameterFromForm]
     private AuthorizationForm form { get; set; } = new();
 
-    private async Task HandleLogin()
-    {
-        AppUser? user = await usersDbOperationsService.GetUserByEmail(form.Email);
-        if (user is null)
-            serverErrorMessage = "There is no account with this email";
+    private async Task HandleLogin() {
+        using (var db = dbContextFactory.CreateDbContext()) {
+            AppUser? user = await db.AppUsers.FirstOrDefaultAsync(u => u.LoginInfo.Email == form.Email);
+            if (user is null)
+                serverErrorMessage = "There is no account with this email";
 
-        else if (!BCrypt.Net.BCrypt.Verify(form.Password, user.LoginInfo.PasswordHash))
-            serverErrorMessage = "Invalid password";
-        else
-        {
-            var principal = authHelperService.CreateUserPrincipal(form.Email, user.Id);
-            await httpContext.SignInAsync(AuthHelperService.AuthScheme, principal);
-            navigationManager.NavigateTo("/acc", true);
+            else if (!BCrypt.Net.BCrypt.Verify(form.Password, user.LoginInfo.PasswordHash))
+                serverErrorMessage = "Invalid password";
+            else {
+                var principal = authHelperService.CreateUserPrincipal(form.Email, user.Id);
+                await httpContext.SignInAsync(AuthHelperService.AuthScheme, principal);
+                navigationManager.NavigateTo("/acc", true);
+            }
         }
-
     }
-    protected override async Task OnParametersSetAsync()
-    {
-        if (authHelperService.IsSignedIn(await authenticationStateTask))
-        {
+    protected override async Task OnParametersSetAsync() {
+        if (authHelperService.IsSignedIn(await authenticationStateTask)) {
             navigationManager.NavigateTo("/acc", true, true);
         }
     }

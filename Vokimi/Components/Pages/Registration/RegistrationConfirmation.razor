@@ -1,23 +1,23 @@
 ﻿@using Microsoft.AspNetCore.WebUtilities
 
+@inject IDbContextFactory<VokimiDbContext> dbContextFactory
+
 @page "/registration-confirmation"
 <PageTitle>Confirm Registration</PageTitle>
 
 @inject NavigationManager navigationManager
-@inject UsersDbOperationsService usersDbOperationsService
+
 @inject AuthHelperService authHelperService
 
 <div class="confirmation-container">
 
     <h3>Registration Confirmation</h3>
-    @if (registrationConfirmed)
-    {
+    @if (registrationConfirmed) {
         <label>
             Registration successfully confirmed
         </label>
     }
-    else
-    {
+    else {
         <label class="error-message">@serverMessage</label>
     }
 
@@ -34,22 +34,34 @@
     private string email { get; set; } = null;
     private string code { get; set; } = null;
 
-    protected override async Task OnInitializedAsync()
-    {
+    protected override async Task OnInitializedAsync() {
         registrationConfirmed = false;
         var uri = navigationManager.ToAbsoluteUri(navigationManager.Uri);
 
-        if (!TryGetEmailAndCode(uri))
-            serverMessage = "Try to reload the page. If that doesn't help, try registering again";
+        using (var db = dbContextFactory.CreateDbContext()) {
+            if (!TryGetEmailAndCode(uri))
+                serverMessage = "Try to reload the page. If that doesn't help, try registering again";
 
-        else if (await usersDbOperationsService.IsEmailTaken(email))
-            serverMessage = "Email is already confirmed. Please use authorization form to log in";
+            else if (await UsersDbOperations.IsEmailTaken(db, email))
+                serverMessage = "Email is already confirmed. Please use authorization form to log in";
 
-        else await SignInUser(email, code);
+            else {
+                (await UsersDbOperations.TryToConfirmUser(db, email, code)).Switch(
+                    async user => {
+                        var principal = authHelperService.CreateUserPrincipal(email, user.Id);
+                        await httpContext.SignInAsync(AuthHelperService.AuthScheme, principal);
+                        registrationConfirmed = true;
+                    },
+                    err => { serverMessage = err.Message; }
+                );
+            }
+        }
+
+
+
 
     }
-    private bool TryGetEmailAndCode(Uri uri)
-    {
+    private bool TryGetEmailAndCode(Uri uri) {
         email = null;
         code = null;
 
@@ -61,18 +73,5 @@
             code = c;
 
         return !string.IsNullOrEmpty(email) && !string.IsNullOrEmpty(code);
-    }
-
-    private async Task SignInUser(string email, string code)
-    {
-        (await usersDbOperationsService.TryToConfirmUser(email, code)).Switch(
-            async user =>
-            {
-                var principal = authHelperService.CreateUserPrincipal(email, user.Id);
-                await httpContext.SignInAsync(AuthHelperService.AuthScheme, principal);
-                registrationConfirmed = true;
-            },
-            err => { serverMessage = err.Message; }
-        );
     }
 }

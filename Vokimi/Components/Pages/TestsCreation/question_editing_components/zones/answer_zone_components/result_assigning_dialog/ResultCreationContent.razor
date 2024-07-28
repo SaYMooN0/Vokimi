@@ -1,7 +1,7 @@
 ﻿@using System.Text.RegularExpressions
 
 
-@inject TestsCreationDbOperationsService testsCreationDbOperationsService
+@inject IDbContextFactory<VokimiDbContext> dbContextFactory
 
 <input @bind="resultId" placeholder="Type new result id" name="@Guid.NewGuid()" class="result-id-input" />
 <p class="error-string">@errorMessage</p>
@@ -36,8 +36,7 @@
         }
 
         if (!ResultStringIdValidatingRegex.IsMatch(resultId)) {
-            return
-            ShowErrorAndReturnNull("Result id can only contain letters, numbers, underscores, and hyphens");
+            return ShowErrorAndReturnNull("Result id can only contain letters, numbers, underscores, and hyphens");
 
         }
 
@@ -45,11 +44,14 @@
             return ShowErrorAndReturnNull("Result with such id already exists");
 
         }
-        Err err = await testsCreationDbOperationsService.CreateNewDraftTestResult(TestId, resultId);
-        if (err.NotNone()) {
-            return ShowErrorAndReturnNull(err.ToString());
+        using (VokimiDbContext dbContext = dbContextFactory.CreateDbContext()) {
+            Err err = await BaseTestsCreationDbOperations.CreateNewDraftTestResult(dbContext, TestId, resultId);
+            if (err.NotNone()) {
+                return ShowErrorAndReturnNull(err.ToString());
+            }
+            return resultId;
         }
-        return resultId;
+
 
     }
     private string? ShowErrorAndReturnNull(string error) {

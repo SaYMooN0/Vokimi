@@ -1,7 +1,7 @@
 ﻿@inject IHttpContextAccessor httpContextAccessor
 @inject AuthHelperService authHelperService
 @inject NavigationManager navigationManager
-@inject UsersDbOperationsService usersDbOperationsService
+@inject IDbContextFactory<VokimiDbContext> dbContextFactory
 
 <TestsViewSection SectionLabel=@($"Draft Tests ({draftTestsCount})")>
     <div class="test-vms-container">
@@ -53,17 +53,20 @@
             navigationManager.NavigateTo("/login");
             return;
         }
-        AppUser? user = await usersDbOperationsService.GetUserById(appUserId.Value);
-        if (user is null) {
-            navigationManager.NavigateTo("/login");
-            return;
+        using (var db = dbContextFactory.CreateDbContext()) {
+            AppUser? user = await db.AppUsers.FirstOrDefaultAsync(u => u.Id == appUserId.Value);
+            if (user is null) {
+                navigationManager.NavigateTo("/login");
+                return;
+            }
+            draftTestsCount = user.DraftTests.Count();
+            draftTests = user.DraftTests
+                .Take(testPackageCount)
+                .Select(t => DraftTestViewModel.FromTest(t))
+                .ToArray();
+            // userTests=
         }
-        draftTestsCount = user.DraftTests.Count();
-        draftTests = user.DraftTests
-            .Take(testPackageCount)
-            .Select(t => DraftTestViewModel.FromTest(t))
-            .ToArray();
-        // userTests=
+
     }
     public async void OpenTemplateChoosingDialog() {
         if (newTestTemplateChoosingDialogRef is not null)

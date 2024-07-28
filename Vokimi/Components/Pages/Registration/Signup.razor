@@ -3,24 +3,22 @@
 
 @inject NavigationManager navigationManager
 @inject EmailService emailService
-@inject UsersDbOperationsService usersDbOperationsService
 @inject AuthHelperService authHelperService
+@inject IDbContextFactory<VokimiDbContext> dbContextFactory
 
 @page "/signup"
 <PageTitle>Registration</PageTitle>
 
 @rendermode RenderMode.InteractiveServer
 
-@if (emailAlreadySent)
-{
+@if (emailAlreadySent) {
     <h3>@form.Username, thank you for registration</h3>
     <label>
         Link to complete the registration has been sent to <span>@form.Email</span>.
         Click on the link in your email client to complete the registration
     </label>
 }
-else
-{
+else {
     <FormContainer Model="form" OnValidSubmit="HandleValidSubmit" FormName="RegistrationForm">
         <label class="form-title">Create an account</label>
 
@@ -36,8 +34,7 @@ else
         <InputText placeholder="Confirm Password" class="input-text" @bind-Value="form.ConfirmPassword" type="password" />
         <ValidationMessage For="@(() => form.ConfirmPassword)" class="err-message" />
 
-        @if (!string.IsNullOrEmpty(serverErrorMessage))
-        {
+        @if (!string.IsNullOrEmpty(serverErrorMessage)) {
             <label class="err-message">@serverErrorMessage</label>
         }
 
@@ -56,45 +53,44 @@ else
 
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
-    protected override async Task OnParametersSetAsync()
-    {
-        if (authHelperService.IsSignedIn(await authenticationStateTask))
-        {
+    protected override async Task OnParametersSetAsync() {
+        if (authHelperService.IsSignedIn(await authenticationStateTask)) {
             navigationManager.NavigateTo("/acc", true, true);
         }
     }
 
-    private async void HandleValidSubmit()
-    {
-        var valEr = ValidateForm();
-        if (valEr.NotNone())
-            serverErrorMessage = valEr.Message;
-        else if (await usersDbOperationsService.IsEmailTaken(form.Email))
-            serverErrorMessage = "Account with this email already exists";
-        else
-        {
-            string confirmationCode = GenerateConfirmationCode();
-            (await usersDbOperationsService.CreateUnconfirmedUser(form, confirmationCode)).Switch(
-                async user =>
-                {
-                    string confirmationLink = GenerateConfirmationLink(confirmationCode);
-                    await emailService.SendConfirmationLink(form.Email, confirmationLink);
-                    emailAlreadySent = true;
-                },
-                err => { serverErrorMessage = "An error occurred while registering, please try again later"; }
-            );
+    private async void HandleValidSubmit() {
+        using (var db = dbContextFactory.CreateDbContext()) {
+
+            var valEr = ValidateForm();
+            if (valEr.NotNone())
+                serverErrorMessage = valEr.Message;
+            else if (await UsersDbOperations.IsEmailTaken(db, form.Email))
+                serverErrorMessage = "Account with this email already exists";
+            else {
+
+                string confirmationCode = GenerateConfirmationCode();
+                (await UsersDbOperations.CreateUnconfirmedUser(db,form, confirmationCode)).Switch(
+                    async user => {
+                        string confirmationLink = GenerateConfirmationLink(confirmationCode);
+                        await emailService.SendConfirmationLink(form.Email, confirmationLink);
+                        emailAlreadySent = true;
+                    },
+                    err => { serverErrorMessage = "An error occurred while registering, please try again later"; }
+                );
+            }
         }
         StateHasChanged();
 
     }
-    private Err ValidateForm()
-    {
+    private Err ValidateForm() {
         serverErrorMessage = string.Empty;
         Regex nameRegex = new(@"^[a-zA-Z0-9_.,><~^А-Яа-яЁё]*$");
         if (form.Username.Length < 5 ||
             form.Username.Length > 30 ||
             !nameRegex.IsMatch(form.Username)
-        ) return new("Invalid username");
+        )
+            return new("Invalid username");
 
 
         Regex emailRegex = new(@"^[^@\s]+@[^@\s]+\.[^@\s]+$");
@@ -113,5 +109,5 @@ else
     private string GenerateConfirmationLink(string confirmationCode) =>
         $"{navigationManager.BaseUri}registration-confirmation?email={form.Email}&code={Uri.EscapeDataString(confirmationCode)}";
 
-  
+
 }

@@ -10,7 +10,6 @@
 @using Vokimi.Client
 @using Vokimi.Components
 @using Vokimi.Services
-@using Vokimi.Services.db_operations
 
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Authentication
@@ -18,9 +17,13 @@
 @using Vokimi.PageViewModels
 @using Vokimi.Controllers
 @using static Vokimi.Components.Pages.TestsCreation.pages_with_templates.NewTestGeneric
+@using Microsoft.EntityFrameworkCore
 
 
 @* src models *@
+@using Vokimi.src.data
+@using Vokimi.src.data.db_operations
+
 @using VokimiShared.src
 @using VokimiShared.src.enums
 @using VokimiShared.src.models.dtos

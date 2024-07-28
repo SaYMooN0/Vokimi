@@ -2,7 +2,7 @@
 @using Vokimi.Components.Pages.TestsCreation.page_states.shared_components
 
 
-@inject TestsCreationDbOperationsService testsCreationDbOperationsService
+@inject IDbContextFactory<VokimiDbContext> dbContextFactory
 @inject VokimiStorageService vokimiStorageService
 
 @if (!string.IsNullOrEmpty(questionFetchingError)) {
@@ -55,13 +55,18 @@ else {
     [Parameter] public Action OpenResultCreatingDialog { get; set; }
 
     protected override async Task OnParametersSetAsync() {
-        DraftGenericTestQuestion? question = await testsCreationDbOperationsService.GetDraftGenericTestQuestionById(QuestionId);
-        if (question is null) {
-            questionFetchingError = "Question not found";
-            return;
+        using (var db = dbContextFactory.CreateDbContext()) {
+
+            DraftGenericTestQuestion? question = await db.DraftGenericTestQuestions.FirstOrDefaultAsync(x => x.Id == QuestionId);
+            if (question is null) {
+                questionFetchingError = "Question not found";
+            }
+            else {
+                formData = QuestionEditingForm.FromDraftTestQuestion(question);
+                questionFetchingError = "";
+            }
+
         }
-        formData = QuestionEditingForm.FromDraftTestQuestion(question);
-        questionFetchingError = "";
     }
 
     private async void SaveData() {
@@ -72,12 +77,14 @@ else {
             savingError = formErr.Message;
             return;
         }
-
-        Err err = await testsCreationDbOperationsService.UpdateDraftTestGenericQuestion(QuestionId, formData);
-        if (err.NotNone()) {
-            savingError = err.Message;
-            return;
+        using (var dbContext = dbContextFactory.CreateDbContext()) {
+            Err err = await GenericTestsCreationDbOperations.UpdateDraftTestGenericQuestion(dbContext, QuestionId, formData);
+            if (err.NotNone()) {
+                savingError = err.Message;
+                return;
+            }
         }
+
         await vokimiStorageService.ClearUnusedDraftTestQuestionImages(QuestionId, formData.ImagePath);
         if (formData.AnswersType.HasImage()) {
             var imageKeys = formData.Answers.Select(x => (x as IAnswerFormWithImage).ImagePath);
