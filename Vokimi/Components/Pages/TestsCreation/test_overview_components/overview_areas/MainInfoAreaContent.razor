@@ -1,4 +1,6 @@
-﻿<div class="test-main-info-overview">
+﻿@inject IDbContextFactory<VokimiDbContext> dbContextFactory
+
+<div class="test-main-info-overview">
     <label class="test-name">@testName</label>
     <p>
         Description:<br /> <label class="test-description">@testDescription</label>
@@ -19,18 +21,31 @@
 
 @code {
     [Parameter] public Action GoToMainInfoEditing { get; set; }
+    [CascadingParameter(Name = "TestId")] public DraftTestId TestId { get; set; }
 
     private string
-            testName,
-            testDescription,
-            testLanguage,
-            testPrivacy;
+        testName,
+        testDescription,
+        testLanguage,
+        testPrivacy;
     protected override async Task OnInitializedAsync() {
         await base.OnInitializedAsync();
-        //from db
-        testName = string.Empty;
-        testDescription = string.Empty;
-        testLanguage = string.Empty; //.FullName()
-        testPrivacy = string.Empty;
+        using (var dbContext = dbContextFactory.CreateDbContext()) {
+            BaseDraftTest? draftTest = await dbContext.DraftTestsSharedInfo.FirstOrDefaultAsync(t => t.Id == TestId);
+            if (draftTest is null) {
+                testName = string.Empty;
+                testDescription = string.Empty;
+                testLanguage = string.Empty; 
+                testPrivacy = string.Empty;
+            }
+            else {
+                testName = draftTest.MainInfo.Name;
+                testDescription = draftTest.MainInfo.Description ?? string.Empty;
+                testLanguage = draftTest.MainInfo.Language.FullName();
+                testPrivacy = draftTest.MainInfo.Privacy.ToString();
+            }
+
+        }
+
     }
 }

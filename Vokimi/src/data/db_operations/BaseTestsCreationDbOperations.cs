@@ -51,10 +51,7 @@ namespace Vokimi.src.data.db_operations
             return test.Id;
         }
 
-        static async Task<List<DraftGenericTestQuestion>> GetDraftTestQuestionsById(VokimiDbContext db, DraftTestId id) =>
-            await db.DraftGenericTestQuestions.Where(q => q.DraftTestId == id).ToListAsync();
-
-        static async Task<Err> UpdateTestCover(VokimiDbContext db, DraftTestId testId, string newPath) {
+        internal static async Task<Err> UpdateTestCover(VokimiDbContext db, DraftTestId testId, string newPath) {
             BaseDraftTest? test = await db.DraftTestsSharedInfo.FirstOrDefaultAsync(i => i.Id == testId);
             if (test is null) {
                 return new Err("Test cannot be found");

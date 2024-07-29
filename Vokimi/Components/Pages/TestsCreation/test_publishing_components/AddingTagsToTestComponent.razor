@@ -43,9 +43,11 @@
     </div>
 
     <p class="error-message">@errorMessage</p>
-    <div class="publish-btn @(chosenTags.Count<1? "inactive-btn": "")" @onclick="PublisButtonClicked">
-        Publish
-    </div>
+    <PublishingStageNavigationButtons GoBackAction="BackToErrorsCheckingAction">
+        <div class="publish-btn @(chosenTags.Count<1? "inactive-btn": "")" @onclick="PublisButtonClicked">
+            Publish
+        </div>
+    </PublishingStageNavigationButtons>
 </div>
 
 @code {
@@ -56,6 +58,8 @@
 
     [Parameter]
     public Action<List<string>> PublishWithTagsAction { get; set; }
+    [Parameter]
+    public Action BackToErrorsCheckingAction { get; set; }
 
     private async void HandleOnSearchChange(ChangeEventArgs e) {
         tagSearchInput = e.Value.ToString();
@@ -79,7 +83,7 @@
     }
 
     private void PublisButtonClicked() {
-        if(chosenTags.Count<1) { return; }
+        if (chosenTags.Count < 1) { return; }
         if (chosenTags.Count > BaseTestCreationConsts.MaxTagsForTestCount) {
             errorMessage = $"You can't choose more than {BaseTestCreationConsts.MaxTagsForTestCount} tags";
             StateHasChanged();

@@ -5,35 +5,32 @@
 @inject VokimiStorageService vokimiStorageService
 
 <TestCreationPageStateTopLabel LabelText="Results Editing" BackToOverviewAction="BackToOverviewAction" />
-@if (formData.SavedResults.Count == 0 && formData.NotSavedResults.Count == 0) {
-    <NoResultsAddedLabel CreateNewResultAction="AddNewResult" />
-}
-else {
 
-    <form class="results-editing-form">
-        <ResultsSectionHeader Text="Saved Results:" CollapseAction="CollapseAllSavedResults" />
-        @foreach (var r in formData.SavedResults) {
-            <ResultEditingComponent @ref="AddSavedResultWrapperRef"
-                                    ResultForm="r"
-                                    RemoveResultAction="()=>{formData.SavedResults.Remove(r); StateHasChanged();}">
-                <label class="result-id-label">@r.StringId</label>
-            </ResultEditingComponent>
-        }
-        <ResultsSectionHeader Text="New Results:" CollapseAction="CollapseAllNotSavedResults" />
-        @foreach (var r in formData.NotSavedResults) {
-            <ResultEditingComponent @ref="AddNotSavedResultWrapperRef"
-                                    ResultForm="r"
-                                    RemoveResultAction="()=>{formData.NotSavedResults.Remove(r); StateHasChanged();}">
-                <label class="result-id-input-label">
-                    Result id: <input @bind="r.ResultStringId" type="text" />
-                </label>
-            </ResultEditingComponent>
-        }
-        <div class="new-result-btn" @onclick="AddNewResult">New result</div>
-        <p class="error-message">@errorMessage</p>
-        <SaveButton Onclick="HandleSubmit" Text="Save Results" />
-    </form>
-}
+
+<form class="results-editing-form">
+    <ResultsSectionHeader Text="Saved Results:" CollapseAction="CollapseAllSavedResults" />
+    @foreach (var r in formData.SavedResults) {
+        <ResultEditingComponent @ref="AddSavedResultWrapperRef"
+                                ResultForm="r"
+                                RemoveResultAction="()=>{formData.SavedResults.Remove(r); StateHasChanged();}">
+            <label class="result-id-label">@r.StringId</label>
+        </ResultEditingComponent>
+    }
+    <ResultsSectionHeader Text="New Results:" CollapseAction="CollapseAllNotSavedResults" />
+    @foreach (var r in formData.NotSavedResults) {
+        <ResultEditingComponent @ref="AddNotSavedResultWrapperRef"
+                                ResultForm="r"
+                                RemoveResultAction="()=>{formData.NotSavedResults.Remove(r); StateHasChanged();}">
+            <label class="result-id-input-label">
+                Result id: <input @bind="r.ResultStringId" type="text" />
+            </label>
+        </ResultEditingComponent>
+    }
+    <div class="new-result-btn" @onclick="AddNewResult">New result</div>
+    <p class="error-message">@errorMessage</p>
+    <SaveButton Onclick="HandleSubmit" Text="Save Results" />
+</form>
+
 
 @code {
     private string errorMessage = string.Empty;

@@ -34,7 +34,7 @@
 
     private async Task HandleCoverUpdate(string path) {
         using (var dbContext = dbContextFactory.CreateDbContext()) {
-            Err err = await testsCreationDbOperationsService.UpdateTestCover(TestId, path);
+            Err err = await BaseTestsCreationDbOperations.UpdateTestCover(dbContext, TestId, path);
             if (err.NotNone()) {
                 coverUploadingError = err.ToString();
             }
@@ -43,11 +43,7 @@
                 StateHasChanged();
             }
         }
-
-     
     }
-
-
 
     private async Task HandleFileChange(InputFileChangeEventArgs e) {
         var file = e.File;

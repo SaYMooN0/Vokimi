@@ -1,0 +1,47 @@
+﻿@using Vokimi.Components.Pages.TestsCreation.test_publishing_components
+
+
+@rendermode InteractiveServer
+
+@switch (publisingState) {
+    case PublisingState.ProblemsChecking:
+        <CheckingForProblemsComponents BackToOverviewAction="BackToOverviewAction"
+                                       ChangeToTagsAddingAction="()=> publisingState=PublisingState.TagsAdding" />
+        break;
+    case PublisingState.TagsAdding:
+        <AddingTagsToTestComponent PublishWithTagsAction="PublishWithTagsAction"
+                                   BackToErrorsCheckingAction="()=> publisingState=PublisingState.ProblemsChecking" />
+        break;
+    case PublisingState.PublishingError:
+        <PublishingErrorComponent />
+        break;
+    case PublisingState.SuccessfullyPublished:
+        <SuccessfullyPublishedComponent />
+        break;
+    default:
+        throw new NotImplementedException();
+}
+
+
+
+
+
+@code {
+
+    [CascadingParameter(Name = "TestId")] public DraftTestId TestId { get; set; }
+    [Parameter] public Action BackToOverviewAction { get; set; }
+
+    private enum PublisingState
+    {
+        ProblemsChecking,
+        TagsAdding,
+        PublishingError,
+        SuccessfullyPublished
+    }
+    private PublisingState publisingState;
+
+    private void PublishWithTagsAction(List<string> tags) {
+
+    }
+
+}

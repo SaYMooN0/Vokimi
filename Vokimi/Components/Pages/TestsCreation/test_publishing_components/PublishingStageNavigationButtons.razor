@@ -1,0 +1,11 @@
+﻿<div class="stage-changing-btns">
+    <div class="back-btn" @onclick="GoBackAction">Back</div>
+    @ChildContent
+</div>
+
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+    [Parameter]
+    public Action GoBackAction { get; set; }
+}

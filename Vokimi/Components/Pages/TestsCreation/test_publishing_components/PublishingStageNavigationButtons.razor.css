@@ -1,0 +1,11 @@
+﻿.stage-changing-btns {
+    display: flex;
+    flex-direction: row;
+    align-self: center;
+    gap:20px;
+}
+.back-btn{
+    padding:8px 20px;
+    background-color:var(--grey);
+    cursor:pointer;
+}

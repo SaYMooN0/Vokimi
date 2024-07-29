@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="Components\Pages\TestsCreation\test_overview_components\test_publishing_dialog_components\SuccessfullyPublishedComponent.razor" />
+    <None Include="Components\Pages\TestsCreation\test_publishing_components\SuccessfullyPublishedComponent.razor" />
     <None Include="wwwroot\app.js" />
   </ItemGroup>
 

@@ -1,6 +1,4 @@
-﻿@using VokimiShared.src.models.dtos.draft_generic_tests
-
-@inject IDbContextFactory<VokimiDbContext> dbContextFactory
+﻿@inject IDbContextFactory<VokimiDbContext> dbContextFactory
 
 @rendermode InteractiveServer
 
@@ -39,15 +37,15 @@
     private AnswersType answersType { get; set; } = AnswersType.TextOnly;
 
     [CascadingParameter(Name = "TestId")] public DraftTestId TestId { get; set; }
-    [Parameter] public EventCallback ParentStateHasChanged { get; set; }
+    [Parameter] public Action ParentStateHasChanged { get; set; }
 
     private async void SaveNewQuestion() {
-        if (string.IsNullOrEmpty(questionText) || questionText.Length < 10) {
-            serverMessage = "Question text cannot be less than 10 characters";
+        if (string.IsNullOrEmpty(questionText) || questionText.Length < GenericTestCreationConsts.QuestionTextMinLength) {
+            serverMessage = $"Question text cannot be less than {GenericTestCreationConsts.QuestionTextMinLength} characters";
             return;
         }
-        else if (questionText.Length > 127) {
-            serverMessage = "Question text cannot be more than 127 characters";
+        else if (questionText.Length > GenericTestCreationConsts.QuestionTextMaxLength) {
+            serverMessage = $"Question text cannot be more than {GenericTestCreationConsts.QuestionTextMaxLength} characters";
             return;
         }
         using (var dbContext = dbContextFactory.CreateDbContext()) {
@@ -58,14 +56,13 @@
             }
 
             if (test is  DraftGenericTest genericTest) {
-                var question = DraftGenericTestQuestionDbDataDto.Minimal(questionText, answersType);
-                Err err = await GenericTestsCreationDbOperations.CreateNewQuestion(dbContext, genericTest, question);
+                Err err = await GenericTestsCreationDbOperations.CreateNewQuestion(dbContext, genericTest, questionText, answersType);
                 if (err.NotNone()) {
                     serverMessage = err.ToString();
                 }
                 else {
+                    ParentStateHasChanged();
                     await Close();
-                    await ParentStateHasChanged.InvokeAsync();
                 }
             }
             else {

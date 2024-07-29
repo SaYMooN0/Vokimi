@@ -69,9 +69,6 @@ namespace Vokimi
             services.AddDbContextFactory<VokimiDbContext>(options =>
                 options.UseNpgsql(configuration.GetConnectionString("VokimiDb")));
 
-            services.AddScoped<GenericTestsPublishingDbOperationsService>();
-
-
             // Yandex s3 configuration
             var creds = new BasicAWSCredentials(configuration["AWS:AccessKey"], configuration["AWS:SecretKey"]);
             var config = new AmazonS3Config { ServiceURL = "https://s3.yandexcloud.net" };

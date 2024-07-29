@@ -1,4 +1,5 @@
 ﻿.validating-container {
+    margin-top: 200px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -8,7 +9,7 @@
     font-family: Roboto;
     font-size: 24px;
     color: var(--grey);
-    margin-bottom: 20px;
+    margin-bottom: 12px;
 }
 
 .no-problems-div {
@@ -20,12 +21,12 @@
 
     .no-problems-div label {
         font-size: 30px;
+        margin-bottom: 20px;
     }
 
 .move-to-next-stage-btn {
     width: fit-content;
     align-self: center;
-    margin-top: 70px;
     padding: 8px 20px;
     border-radius: 8px;
     background-color: var(--primary);
@@ -40,28 +41,45 @@
 
 .errors-list {
     max-height: 600px;
+    min-width: 700px;
+    max-width: 1200px;
+    padding: 20px;
+    border-radius: 10px 20px;
+    background-color: var(--back-2);
     overflow-y: auto;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-row-gap: 12px;
 }
 
-.test-error {
-    font-family: Roboto;
-    margin: 2px 0;
-    font-size: 24px;
-}
-
-    .test-error:before {
-        content: ⬤;
-        color: var(--grey);
+    .errors-list label {
+        font-family: Roboto;
+        font-size: 22px;
     }
 
-.retry-btn {
-    padding: 8px 20px;
-    background-color: var(--primary);
-    color: white;
-    font-family: Roboto;
-    font-size: 26px;
+.errors-list-column-label {
+    text-align: center;
+    font-size: 27px;
+    font-weight: bold;
+    margin-bottom: 10px;
 }
 
-    .retry-btn:hover {
-        background-color: var(--primary-hov);
+.problem-area {
+    padding-right: 20px;
+}
+
+.back-btn {
+    padding: 8px 20px;
+    background-color: var(--grey);
+    border-radius: 6px;
+    color: white;
+    font-family: Roboto;
+    font-size: 22px;
+    cursor: pointer;
+    transition: all 0.08s ease-in;
+}
+
+    .back-btn:hover {
+        padding: 8px 24px;
+        background-color: var(--primary);
     }

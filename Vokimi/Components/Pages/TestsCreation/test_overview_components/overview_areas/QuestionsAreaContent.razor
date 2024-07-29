@@ -7,9 +7,7 @@
                           ConfirmButtonText="Delete" />
 
 <NewQuestionCreationDialog @ref="@questionCreationDialogRef"
-                           ParentStateHasChanged="()=> { using (var db = dbContextFactory.CreateDbContext())
-                                                            {FetchQuestions(db);}
-                                                       }" />
+                           ParentStateHasChanged="()=>{using (var dbContext = dbContextFactory.CreateDbContext()) {FetchQuestions(dbContext);}}" />
 
 
 <AreaHeader LabelText=@($"Test Questions ({Questions.Count})")>
@@ -79,29 +77,33 @@
         );
 
 
-    protected override async Task OnInitializedAsync() {
-        using (var dbContext = await dbContextFactory.CreateDbContextAsync()) {
+    protected override void OnInitialized() {
+        base.OnInitialized();
+        using (var dbContext = dbContextFactory.CreateDbContext()) {
             FetchQuestions(dbContext);
         }
-        await base.OnInitializedAsync();
-    }
-    private void FetchQuestions(VokimiDbContext db) {
-        Questions = db.DraftGenericTestQuestions
-            .Where(q => q.DraftTestId == TestId)
-            .Select(QuestionBriefInfoDto.FromDraftGenericTestQuestion)
-            .ToList();
 
+    }
+    private void FetchQuestions(VokimiDbContext dbContext) {
+        DraftGenericTest? test = dbContext.DraftGenericTests.FirstOrDefault(t => t.Id == TestId);
+        if (test is null) {
+            Questions = [];
+        }
+        else {
+            Questions = test.Questions
+                .Select(QuestionBriefInfoDto.FromDraftGenericTestQuestion)
+                .ToList();
+        }
         StateHasChanged();
     }
     private async Task<Err> DeleteQuestionFunc(DraftTestQuestionId questionId) {
+        Err deletionErr = Err.None;
         using (var dbContext = await dbContextFactory.CreateDbContextAsync()) {
-
-            Err deletionErr = await GenericTestsCreationDbOperations.DeleteDraftTestQuestion(dbContext, questionId);
-
+            deletionErr = await GenericTestsCreationDbOperations.DeleteDraftTestQuestion(dbContext, questionId);
             if (!deletionErr.NotNone()) {
                 FetchQuestions(dbContext);
             }
-            return deletionErr;
         }
+        return deletionErr;
     }
 }

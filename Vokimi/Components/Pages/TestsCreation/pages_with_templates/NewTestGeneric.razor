@@ -22,7 +22,8 @@
                                   ChangePageStateToQuestionEditing="ChangePageStateToQuestionEditing"
                                   ChangePageStateToConclusionEditing="()=>ChangePageState(TestCreationPageState.ConclusionEditing)"
                                   ChangePageStateToResultsEditing="()=>ChangePageState(TestCreationPageState.ResultsEditing)"
-                                  ChangePageStateToStylesEditing="()=>ChangePageState(TestCreationPageState.StylesEditing)" />
+                                  ChangePageStateToStylesEditing="()=>ChangePageState(TestCreationPageState.StylesEditing)"
+                                  ChangePageStateToPublishing="()=>ChangePageState(TestCreationPageState.TestPublishing)" />
                     break;
                 case TestCreationPageState.MainInfoEditing:
                     <MainInfoEditing BackToOverviewAction="()=>ChangePageState(TestCreationPageState.Overview)" />
@@ -40,8 +41,11 @@
                 case TestCreationPageState.StylesEditing:
                     <StylesEditing BackToOverviewAction="()=>ChangePageState(TestCreationPageState.Overview)" />
                     break;
+                case TestCreationPageState.TestPublishing:
+                    <TestPublishing BackToOverviewAction="()=>ChangePageState(TestCreationPageState.Overview)" />
+                    break;
                 default:
-                    <h2>default state</h2>
+                    <h2>An error has occurred, please refresh the page</h2>
                     break;
             }
         </CascadingValue>
@@ -66,7 +70,8 @@
         QuestionEditing,
         ResultsEditing,
         ConclusionEditing,
-        StylesEditing
+        StylesEditing,
+        TestPublishing
 
     }
 

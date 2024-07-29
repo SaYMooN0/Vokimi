@@ -53,11 +53,15 @@ namespace Vokimi.src.data.db_operations
                             if (results.TryGetValue(resultStringId, out DraftTestResultId resultId)) {
                                 DraftTestResult? result = await db.DraftTestResults.FirstOrDefaultAsync(i => i.Id == resultId);
 
-                                if (result is null) {
-                                    continue;
+                                
+                                if (result is not null && 
+                                    result.TestTypeSpecificData is DraftGenericTestResultData resultData) {
+
+                                    answer.RelatedResults.Add(result);
+                                    resultData.AnswersLeadingToResult.Add(answer);
                                 }
 
-                                answer.RelatedResults.Add(result);
+                                
                             }
                         }
 

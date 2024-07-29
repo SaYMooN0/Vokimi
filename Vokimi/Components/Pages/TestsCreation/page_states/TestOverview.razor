@@ -8,7 +8,7 @@
     <div class="main-info-and-cover-section">
         <div class="main-info-area">
             <label class="area-title">Test Main Info</label>
-            @* <MainInfoAreaContent GoToMainInfoEditing="ChangePageStateToMainInfoEditing" /> *@
+            <MainInfoAreaContent GoToMainInfoEditing="ChangePageStateToMainInfoEditing" />
         </div>
         <div class="test-cover-area">
             <label class="area-title">Test Cover</label>
@@ -16,24 +16,23 @@
         </div>
     </div>
 
-    <QuestionsAreaContent EditQuestionAction="ChangePageStateToQuestionEditing" /> 
+    <QuestionsAreaContent EditQuestionAction="ChangePageStateToQuestionEditing" />
 
     <ResultsAreaContent ChangePageStateToResultsEditing="ChangePageStateToResultsEditing" />
     <ConclusionAreaContent ChangePageStateToConclusionEditing="ChangePageStateToConclusionEditing" />
 
     <StylesEditingAreaContent ChangePageStateToStylesEditing="ChangePageStateToStylesEditing" />
 
-    @* <TestPublishingDialog @ref="testPublishingDialogRef" /> *@
-    @* <div class="publish-test-btn" @onclick="()=>testPublishingDialogRef.Open()">Publish test</div> *@
+    <div class="publish-test-btn" @onclick="ChangePageStateToPublishing">Publish test</div>
 
 </div>
 @code {
-    // private TestPublishingDialog testPublishingDialogRef;
 
     [Parameter] public Action ChangePageStateToMainInfoEditing { get; set; }
     [Parameter] public Action ChangePageStateToConclusionEditing { get; set; }
     [Parameter] public Action ChangePageStateToResultsEditing { get; set; }
     [Parameter] public Action ChangePageStateToStylesEditing { get; set; }
+    [Parameter] public Action ChangePageStateToPublishing { get; set; }
     [Parameter] public Action<DraftTestQuestionId> ChangePageStateToQuestionEditing { get; set; }
 
 }
