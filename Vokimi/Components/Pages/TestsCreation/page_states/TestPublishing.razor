@@ -1,5 +1,6 @@
 ﻿@using Vokimi.Components.Pages.TestsCreation.test_publishing_components
 
+@inject IDbContextFactory<VokimiDbContext> dbContextFactory
 
 @rendermode InteractiveServer
 
@@ -40,8 +41,21 @@
     }
     private PublisingState publisingState;
 
-    private void PublishWithTagsAction(List<string> tags) {
+    private async Task<Err> PublishWithTagsAction(List<string> tags) {
+        using (var dbContext = dbContextFactory.CreateDbContext()) {
 
+            DraftGenericTest? test = await dbContext.DraftGenericTests.FirstOrDefaultAsync(i => i.Id == TestId);
+            if (test is null) {
+                return new Err("Unknown test");
+            }
+            string testCover = test.MainInfo.CoverImagePath;
+            return (await GenericTestsPublishingDbOperations.PublishGenericDraftTest(dbContext, test)).Match(
+                publishedTest => {
+                    //update testCover
+                    //assign tags
+                    return Err.None;
+                }, err => err);
+        }
     }
 
 }

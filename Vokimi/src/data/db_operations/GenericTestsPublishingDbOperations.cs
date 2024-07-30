@@ -1,9 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using OneOf;
 using Vokimi.src.data;
 using VokimiShared.src;
 using VokimiShared.src.constants_store_classes;
 using VokimiShared.src.enums;
 using VokimiShared.src.models.db_classes.generic_test_answers;
+using VokimiShared.src.models.db_classes.test.test_types;
 using VokimiShared.src.models.db_classes.test_creation;
 using VokimiShared.src.models.db_classes.test_creation.generic_test_related;
 using VokimiShared.src.models.db_classes.test_results.results_for_draft_tests;
@@ -50,7 +52,7 @@ namespace Vokimi.src.data.db_operations
             }
             foreach (var result in results) {
                 if (result.TestTypeSpecificData is DraftGenericTestResultData resultData) {
-                    if (resultData.AnswersLeadingToResult.Count ==0) {
+                    if (resultData.AnswersLeadingToResult.Count == 0) {
                         problems.Add($"Result with id: '{result.StringId}' has no answers leading to it");
                     }
                 }
@@ -64,7 +66,7 @@ namespace Vokimi.src.data.db_operations
                     textLength > BaseTestCreationConsts.ResultMaxTextLength) {
 
                     problems.Add(
-$"Text of the result with id: '{result.Id}' is {textLength} characters long. The length must be " +
+$"Text of the result with id: '{result.StringId}' is {textLength} characters long. The length must be " +
 $"from {BaseTestCreationConsts.ResultMinTextLength} to {BaseTestCreationConsts.ResultMaxTextLength} characters");
                 }
             }
@@ -146,11 +148,9 @@ $"from {BaseTestCreationConsts.ResultMinTextLength} to {BaseTestCreationConsts.R
             }
             return null;
         }
-        private static async Task<Err> PublishGenericDraftTest(VokimiDbContext db, DraftTestId id) {
-            BaseDraftTest? test = await db.DraftTestsSharedInfo.FirstOrDefaultAsync(i => i.Id == id);
-            if (test is null) { return new("Unknown test"); }
+        internal static async Task<OneOf<TestGenericType, Err>> PublishGenericDraftTest(VokimiDbContext db, DraftGenericTest test) {
+       
 
-            //TestGenericType test = TestGenericType.CreateNewFromDraft(); //new conclusion and cover paths
             throw new NotImplementedException();
         }
     }

@@ -217,7 +217,7 @@ namespace Vokimi.src.data.db_operations
             switch (result.TestTypeSpecificData) {
                 case DraftGenericTestResultData genericTestData:
                     foreach (var answer in genericTestData.AnswersLeadingToResult.ToList()) {
-                        answer.RelatedResults.Remove(result);
+                        answer.RelatedResultsData.Remove(result.TestTypeSpecificData as DraftGenericTestResultData);
                     }
                     break;
                 default:

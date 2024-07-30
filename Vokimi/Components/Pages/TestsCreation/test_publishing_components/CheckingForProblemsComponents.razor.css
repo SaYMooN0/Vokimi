@@ -1,5 +1,5 @@
 ﻿.validating-container {
-    margin-top: 200px;
+    margin-top: 10vh;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -21,17 +21,20 @@
 
     .no-problems-div label {
         font-size: 30px;
-        margin-bottom: 20px;
+        margin-bottom: 60px;
     }
 
 .move-to-next-stage-btn {
     width: fit-content;
     align-self: center;
-    padding: 8px 20px;
-    border-radius: 8px;
+    height: 100%;
+    padding: 0 20px;
+    border-radius: inherit;
     background-color: var(--primary);
     color: white;
-    font-size: 26px;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
     cursor: pointer;
 }
 

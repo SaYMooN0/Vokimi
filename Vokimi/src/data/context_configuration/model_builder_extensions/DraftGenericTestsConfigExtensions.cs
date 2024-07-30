@@ -43,12 +43,17 @@ namespace Vokimi.src.data.context_configuration.model_builder_extensions
                 entity.HasOne(e => e.AdditionalInfo)
                       .WithOne()
                       .HasForeignKey<DraftGenericTestAnswer>(e => e.AdditionalInfoId);
-                entity
-                    .HasMany(e => e.RelatedResults)
-                    .WithMany()
+
+
+                entity.HasMany(e => e.RelatedResultsData)
+                    .WithMany(e => e.AnswersLeadingToResult)
                     .UsingEntity<DraftGenericTestAnswerResultDataRelations>(
-                        j => j.HasOne(x => x.DraftTestResultData).WithMany().HasForeignKey(x => x.DraftTestResultDataId),
-                        j => j.HasOne(x => x.DraftTestAnswer).WithMany().HasForeignKey(x => x.DraftTestAnswerId)
+                        j => j.HasOne(x => x.DraftTestResultData)
+                              .WithMany()
+                              .HasForeignKey(x => x.DraftTestResultDataId),
+                        j => j.HasOne(x => x.DraftTestAnswer)
+                              .WithMany()
+                              .HasForeignKey(x => x.DraftTestAnswerId)
                     );
             });
         }

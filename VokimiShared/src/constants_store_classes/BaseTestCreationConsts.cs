@@ -7,7 +7,6 @@ namespace VokimiShared.src.constants_store_classes
             MinTestNameLength = 12,
             MaxTestNameLength = 255,
             MaxTestDescriptionLength = 255;
-        public const int MaxTagsForTestCount = 12;
         public const int
             MaxResultsForTestCount = 30,
             ResultMaxTextLength = 500,

@@ -9,7 +9,7 @@ namespace VokimiShared.src.models.db_classes.test_creation.generic_test_related
         public DraftTestAnswerId Id { get; init; }
         public DraftTestQuestionId QuestionId { get; init; }
         public ushort OrderInQuestion { get; set; }
-        public virtual ICollection<DraftTestResult> RelatedResults { get; private set; } = [];
+        public virtual ICollection<DraftGenericTestResultData> RelatedResultsData { get; private set; } = [];
         public AnswerTypeSpecificInfoId AdditionalInfoId { get; init; }
         public virtual AnswerTypeSpecificInfo AdditionalInfo { get; private set; }
         public static DraftGenericTestAnswer CreateNew(

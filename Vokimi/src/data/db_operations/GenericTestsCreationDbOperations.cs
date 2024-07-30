@@ -14,7 +14,7 @@ namespace Vokimi.src.data.db_operations
     {
         internal static async Task<Err> CreateNewQuestion(VokimiDbContext db, DraftGenericTest test, string questionText, AnswersType answersType) {
             try {
-                var draftTestQuestion= DraftGenericTestQuestion.CreateNew(questionText, answersType, test.Id);
+                var draftTestQuestion = DraftGenericTestQuestion.CreateNew(questionText, answersType, test.Id);
                 test.Questions.Add(draftTestQuestion);
                 await db.SaveChangesAsync();
                 return Err.None;
@@ -39,12 +39,7 @@ namespace Vokimi.src.data.db_operations
                         if (answerForm.Validate().NotNone())
                             continue;
 
-                        AnswerTypeSpecificInfo typeSpecificInfo = answerForm switch {
-                            ImageOnlyAnswerForm imageOnlyAnswerForm => ImageOnlyAnswerAdditionalInfo.CreateNew(imageOnlyAnswerForm.ImagePath),
-                            TextAndImageAnswerForm textAndImageAnswerForm => TextAndImageAnswerAdditionalInfo.CreateNew(textAndImageAnswerForm.Text, textAndImageAnswerForm.ImagePath),
-                            TextOnlyAnswerForm textOnlyAnswerForm => TextOnlyAnswerAdditionalInfo.CreateNew(textOnlyAnswerForm.Text),
-                            _ => throw new InvalidOperationException("Unknown answer type")
-                        };
+                        AnswerTypeSpecificInfo typeSpecificInfo = CreateAnswerTypeSpecificInfo(answerForm);
 
                         ushort orderIndex = (ushort)newData.Answers.IndexOf(answerForm);
                         DraftGenericTestAnswer answer = DraftGenericTestAnswer.CreateNew(questionId, orderIndex, typeSpecificInfo.Id);
@@ -53,15 +48,15 @@ namespace Vokimi.src.data.db_operations
                             if (results.TryGetValue(resultStringId, out DraftTestResultId resultId)) {
                                 DraftTestResult? result = await db.DraftTestResults.FirstOrDefaultAsync(i => i.Id == resultId);
 
-                                
-                                if (result is not null && 
+
+                                if (result is not null &&
                                     result.TestTypeSpecificData is DraftGenericTestResultData resultData) {
 
-                                    answer.RelatedResults.Add(result);
+                                    answer.RelatedResultsData.Add(resultData);
                                     resultData.AnswersLeadingToResult.Add(answer);
                                 }
 
-                                
+
                             }
                         }
 
@@ -92,14 +87,23 @@ namespace Vokimi.src.data.db_operations
                 }
             }
         }
+        private static AnswerTypeSpecificInfo CreateAnswerTypeSpecificInfo(BaseAnswerForm answerForm) {
+            return answerForm switch {
+                ImageOnlyAnswerForm imageOnlyAnswerForm => ImageOnlyAnswerAdditionalInfo.CreateNew(imageOnlyAnswerForm.ImagePath),
+                TextAndImageAnswerForm textAndImageAnswerForm => TextAndImageAnswerAdditionalInfo.CreateNew(textAndImageAnswerForm.Text, textAndImageAnswerForm.ImagePath),
+                TextOnlyAnswerForm textOnlyAnswerForm => TextOnlyAnswerAdditionalInfo.CreateNew(textOnlyAnswerForm.Text),
+                _ => throw new InvalidOperationException("Unknown answer type")
+            };
+        }
         private static void ClearAnswersForDraftTestQuestion(VokimiDbContext db, DraftGenericTestQuestion question) {
             foreach (var answer in question.Answers) {
-                foreach (var result in answer.RelatedResults) {
-                    (result.TestTypeSpecificData as DraftGenericTestResultData).AnswersLeadingToResult.Remove(answer);
+                foreach (var resultData in answer.RelatedResultsData) {
+                    resultData.AnswersLeadingToResult.Remove(answer);
                 }
                 db.AnswerTypeSpecificInfo.Remove(answer.AdditionalInfo);
                 db.DraftGenericTestAnswers.Remove(answer);
             }
+            db.SaveChanges();
         }
         internal static async Task<Err> DeleteDraftTestQuestion(VokimiDbContext db, DraftTestQuestionId questionId) {
             using (var transaction = await db.Database.BeginTransactionAsync()) {

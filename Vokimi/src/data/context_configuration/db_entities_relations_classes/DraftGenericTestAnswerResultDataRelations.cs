@@ -6,10 +6,10 @@ namespace Vokimi.src.data.context_configuration.db_entities_relations_classes
 {
     public class DraftGenericTestAnswerResultDataRelations
     {
-        public DraftTestResultId DraftTestResultDataId { get; init; }
+        public DraftTestTypeSpecificResultDataId DraftTestResultDataId { get; init; }
         public DraftTestAnswerId DraftTestAnswerId { get; init; }
 
-        public virtual DraftTestResult DraftTestResultData { get; init; }
+        public virtual DraftGenericTestResultData DraftTestResultData { get; init; }
         public virtual DraftGenericTestAnswer DraftTestAnswer { get; init; }
     }
 }

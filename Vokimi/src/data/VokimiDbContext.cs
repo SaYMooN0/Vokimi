@@ -66,8 +66,8 @@ namespace Vokimi.src.data
             //draft tests shared
             modelBuilder.ConfigureBaseDraftTest();
             modelBuilder.ConfigureDraftTestMainInfo();
-            modelBuilder.ConfigureDraftTestTypeSpecificResultData();
             modelBuilder.ConfigureDraftTestResult();
+            modelBuilder.ConfigureDraftTestTypeSpecificResultData();
 
 
             //published and draft tests shared
