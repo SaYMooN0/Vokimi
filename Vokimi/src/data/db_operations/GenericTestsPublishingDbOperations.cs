@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OneOf;
 using Vokimi.src.data;
+using Vokimi.src.data.test_publishing_dtos;
 using VokimiShared.src;
 using VokimiShared.src.constants_store_classes;
 using VokimiShared.src.enums;
@@ -149,9 +150,14 @@ $"from {BaseTestCreationConsts.ResultMinTextLength} to {BaseTestCreationConsts.R
             return null;
         }
         internal static async Task<OneOf<TestGenericType, Err>> PublishGenericDraftTest(VokimiDbContext db, DraftGenericTest test) {
-       
 
+            //publish results
+            //publish answers
+            //publish questions
+
+            //GenericTestPublishingDto dto= GenericTestPublishingDto.Create(test);
             throw new NotImplementedException();
         }
+
     }
 }

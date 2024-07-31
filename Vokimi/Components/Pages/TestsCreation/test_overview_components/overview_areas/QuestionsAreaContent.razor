@@ -106,4 +106,18 @@
         }
         return deletionErr;
     }
+    private record class QuestionBriefInfoDto(
+        DraftTestQuestionId Id,
+        string Text,
+        ushort AnswersCount,
+        bool IsMultipleChoice)
+    {
+        internal static QuestionBriefInfoDto FromDraftGenericTestQuestion(DraftGenericTestQuestion question) =>
+            new(
+                question.Id,
+                question.Text,
+                (ushort)question.Answers.Count,
+                question.IsMultipleChoice
+            );
+    }
 }

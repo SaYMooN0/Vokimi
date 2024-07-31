@@ -86,7 +86,7 @@
     private string imgSessionKey = Guid.NewGuid().ToString();
 
     private async Task<OneOf.OneOf<string, Err>> ImgSavingFunc(Stream imgStream) =>
-        await vokimiStorageService.SaveDraftTestConclusionImage(imgStream, TestId, imgSessionKey);
+        await vokimiStorageService.SaveTestConclusionImage(imgStream, TestId, imgSessionKey);
 
     private Err Validate(ConclusionCreationForm form) {
         if (string.IsNullOrWhiteSpace(form.Text)) {

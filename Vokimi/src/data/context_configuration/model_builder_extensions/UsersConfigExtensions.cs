@@ -14,9 +14,8 @@ namespace Vokimi.src.data.context_configuration.model_builder_extensions
                 entity.Property(x => x.UserAdditionalInfoId).HasConversion(v => v.Value, v => new UserAdditionalInfoId(v));
 
                 entity.HasMany(x => x.DraftTests)
-                      .WithOne(x => x.Creator)
-                      .HasForeignKey(x => x.CreatorId)
-                      .IsRequired();
+                      .WithOne()
+                      .HasForeignKey(x => x.CreatorId);
             });
         }
 

@@ -19,10 +19,6 @@ namespace Vokimi.src.data.context_configuration.model_builder_extensions
                       .WithOne()
                       .HasForeignKey<BaseDraftTest>(x => x.MainInfoId);
 
-                entity.HasOne(x => x.Creator)
-                      .WithMany(x => x.DraftTests)
-                      .HasForeignKey(x => x.CreatorId);
-
                 entity.HasOne(x => x.Conclusion)
                       .WithMany()
                       .HasForeignKey(x => x.ConclusionId);

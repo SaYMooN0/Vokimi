@@ -72,9 +72,9 @@ public class VokimiStorageService
             return serverErr;
         }
     }
-    public async Task<OneOf<string, Err>> SaveDraftTestConclusionImage(Stream fileStream, DraftTestId testId, string imgSessionKey) {
+    public async Task<OneOf<string, Err>> SaveTestConclusionImage(Stream fileStream, DraftTestId testId, string imgSessionKey) {
         try {
-            string key = $"{ImgOperationsHelper.DraftTestConclusionsFolder}/{testId}/{imgSessionKey}";
+            string key = $"{ImgOperationsHelper.TestConclusionsFolder}/{testId}/{imgSessionKey}";
             PutObjectResponse response = await PutObjectIntoStorage(key, fileStream);
 
             if (response.HttpStatusCode == System.Net.HttpStatusCode.OK) {
@@ -144,7 +144,7 @@ public class VokimiStorageService
         return Err.None;
     }
     public async Task<Err> ClearDraftTestConclusionUnusedImages(DraftTestId testId, string? usedKey = null) {
-        string prefix = $"{ImgOperationsHelper.DraftTestConclusionsFolder}/{testId}/";
+        string prefix = $"{ImgOperationsHelper.TestConclusionsFolder}/{testId}/";
         IEnumerable<string>? reservedKeys = usedKey is null ? null : [usedKey.ToString()];
         return await ClearUnusedImages(prefix, reservedKeys);
     }

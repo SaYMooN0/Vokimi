@@ -9,11 +9,11 @@
             ProfilePicturesFolder = "profile_pictures",
             //tests
             TestsFolder = "published_test",
+            TestConclusionsFolder = "test_conclusions",
             //draft tests
             DraftTestCoversFolder = "draft_tests_covers",
             DraftTestQuestionsFolder = "draft_tests_questions",
             DraftTestAnswersFolder = "draft_tests_answers",
-            DraftTestConclusionsFolder = "draft_tests_conclusions",
             DraftTestResultsFolder = "draft_tests_results"
             ;
         public const string

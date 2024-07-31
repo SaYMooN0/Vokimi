@@ -8,6 +8,7 @@ using VokimiShared.src.models.db_classes.test.test_types;
 using VokimiShared.src.models.db_classes.test_creation;
 using VokimiShared.src.models.db_classes.test_creation.generic_test_related;
 using VokimiShared.src.models.db_classes.test_results.results_for_draft_tests;
+using VokimiShared.src.models.db_classes.test_results.results_for_published_tests;
 using VokimiShared.src.models.db_classes.tests;
 using VokimiShared.src.models.db_classes.users;
 using VokimiShared.src.models.db_entities_ids;
@@ -47,6 +48,8 @@ namespace Vokimi.src.data
         public DbSet<TestGenericType> TestsGenericType { get; set; }
         public DbSet<GenericTestQuestion> GenericTestQuestions { get; set; }
         public DbSet<MultiChoiceQuestionData> MultiChoiceQuestionsData { get; set; }
+        public DbSet<GenericTestAnswer> GenericTestAnswers { get; set; }
+        public DbSet<GenericTestResult> GenericTestResults { get; set; }
 
         //tags
         public DbSet<TestTag> TestTags{ get; set; }
@@ -88,8 +91,9 @@ namespace Vokimi.src.data
 
             //published generic test
             modelBuilder.ConfigureTestGenericType();
-            modelBuilder.ConfigureGenericTestQuestion();
-
+            modelBuilder.ConfigureGenericTestQuestions();
+            modelBuilder.ConfigureGenericTestAnswers();
+            modelBuilder.ConfigureGenericTestResults();
         }
 
 

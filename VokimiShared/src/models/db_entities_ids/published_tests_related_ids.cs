@@ -6,14 +6,24 @@ namespace VokimiShared.src.models.db_entities_ids
         public TestId() : this(Guid.NewGuid()) { }
         public override string ToString() => Value.ToString();
     }
-    public readonly record struct QuestionId(Guid Value)
+    public readonly record struct GenericTestQuestionId(Guid Value)
     {
-        public QuestionId() : this(Guid.NewGuid()) { }
+        public GenericTestQuestionId() : this(Guid.NewGuid()) { }
         public override string ToString() => Value.ToString();
     }
     public readonly record struct MultiChoiceQuestionDataId(Guid Value)
     {
         public MultiChoiceQuestionDataId() : this(Guid.NewGuid()) { }
+        public override string ToString() => Value.ToString();
+    }
+    public readonly record struct GenericTestResultId(Guid Value)
+    {
+        public GenericTestResultId() : this(Guid.NewGuid()) { }
+        public override string ToString() => Value.ToString();
+    }
+    public readonly record struct GenericTestAnswerId(Guid Value)
+    {
+        public GenericTestAnswerId() : this(Guid.NewGuid()) { }
         public override string ToString() => Value.ToString();
     }
     public readonly record struct TestTagId(Guid Value)

@@ -11,7 +11,6 @@ namespace VokimiShared.src.models.db_classes.test_creation
     {
         public DraftTestId Id { get; init; }
         public AppUserId CreatorId { get; init; }
-        public virtual AppUser Creator { get; protected set; }
         public DraftTestMainInfoId MainInfoId { get; init; }
         public virtual DraftTestMainInfo MainInfo { get; protected set; }
         public DateTime CreationDate { get; init; }
