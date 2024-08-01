@@ -97,9 +97,6 @@ namespace Vokimi.src.data.db_operations
         }
         private static void ClearAnswersForDraftTestQuestion(VokimiDbContext db, DraftGenericTestQuestion question) {
             foreach (var answer in question.Answers) {
-                foreach (var resultData in answer.RelatedResultsData) {
-                    resultData.AnswersLeadingToResult.Remove(answer);
-                }
                 db.AnswerTypeSpecificInfo.Remove(answer.AdditionalInfo);
                 db.DraftGenericTestAnswers.Remove(answer);
             }

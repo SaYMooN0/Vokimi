@@ -9,5 +9,10 @@ namespace VokimiShared.src.models.db_classes.tests
         public string Value { get; init; }
         public override string ToString() => Value;
         public virtual ICollection<BaseTest> Tests { get; set; } = [];
+        public static TestTag CreateNew(string value) => new() {
+            Id = new(),
+            Value = value
+        };
+        public void AddTest(BaseTest test) => Tests.Add(test);
     }
 }

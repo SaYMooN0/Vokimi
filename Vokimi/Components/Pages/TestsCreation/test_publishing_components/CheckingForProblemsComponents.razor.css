@@ -72,6 +72,7 @@
 }
 
 .back-btn {
+    margin-top:40px;
     padding: 8px 20px;
     background-color: var(--grey);
     border-radius: 6px;

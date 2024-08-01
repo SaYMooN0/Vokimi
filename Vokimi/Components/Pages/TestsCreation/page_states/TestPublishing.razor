@@ -51,7 +51,8 @@
             string testCover = test.MainInfo.CoverImagePath;
             return (await GenericTestsPublishingDbOperations.PublishGenericDraftTest(dbContext, test)).Match(
                 publishedTest => {
-                    //update testCover
+                    //update testCover, question and results 
+                    //RemoveDraftTestEntries
                     //assign tags
                     return Err.None;
                 }, err => err);

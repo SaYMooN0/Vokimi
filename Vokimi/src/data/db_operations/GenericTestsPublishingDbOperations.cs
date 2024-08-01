@@ -1,15 +1,16 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OneOf;
-using Vokimi.src.data;
-using Vokimi.src.data.test_publishing_dtos;
 using VokimiShared.src;
 using VokimiShared.src.constants_store_classes;
 using VokimiShared.src.enums;
 using VokimiShared.src.models.db_classes.generic_test_answers;
+using VokimiShared.src.models.db_classes.test;
+using VokimiShared.src.models.db_classes.test.test_questions;
 using VokimiShared.src.models.db_classes.test.test_types;
 using VokimiShared.src.models.db_classes.test_creation;
 using VokimiShared.src.models.db_classes.test_creation.generic_test_related;
 using VokimiShared.src.models.db_classes.test_results.results_for_draft_tests;
+using VokimiShared.src.models.db_classes.test_results.results_for_published_tests;
 using VokimiShared.src.models.db_entities_ids;
 using VokimiShared.src.models.dtos;
 
@@ -22,8 +23,7 @@ namespace Vokimi.src.data.db_operations
             if (test is null) {
                 return [new("General", "Unable to find the test")];
             }
-            List<TestPublishingProblemDto> problems =
-                CheckTestMainInfoForProblems(test.MainInfo)
+            List<TestPublishingProblemDto> problems =BaseTestPublishingDbOperations.CheckTestMainInfoForProblems(test.MainInfo)
                 .ToList();
 
             problems.AddRange(CheckQuestionsForProblems(test.Questions.ToList()));
@@ -32,24 +32,12 @@ namespace Vokimi.src.data.db_operations
             return problems;
 
         }
-        private static IEnumerable<TestPublishingProblemDto> CheckTestMainInfoForProblems(DraftTestMainInfo mainInfo) {
-            List<string> problems = [];
-            if (
-                string.IsNullOrWhiteSpace(mainInfo.Name) ||
-                mainInfo.Name.Length > BaseTestCreationConsts.MaxTestNameLength ||
-                mainInfo.Name.Length < BaseTestCreationConsts.MinTestNameLength) {
-                problems.Add($"Name of the test must be from {BaseTestCreationConsts.MinTestNameLength} to {BaseTestCreationConsts.MaxTestNameLength} characters");
-            }
-            if (!string.IsNullOrEmpty(mainInfo.Description) && mainInfo.Description.Length > BaseTestCreationConsts.MaxTestDescriptionLength) {
-                problems.Add($"Description of the test cannot be more than {BaseTestCreationConsts.MaxTestDescriptionLength} characters");
-            }
-            return problems.Select(TestPublishingProblemDto.NewMainInfoArea);
-        }
+       
         private static IEnumerable<TestPublishingProblemDto> CheckResultsForProblems(ICollection<DraftTestResult> results) {
             List<string> problems = [];
-            if (results.Count < 2) { problems.Add("Test cannot have less than two results"); }
-            else if (results.Count > BaseTestCreationConsts.MaxResultsForTestCount) {
-                problems.Add($"Test cannot have more than {BaseTestCreationConsts.MaxResultsForTestCount} results");
+            string? resCountProblem = BaseTestPublishingDbOperations.CheckTestForResultsCount(results);
+            if (resCountProblem is not null) {
+                problems.Add(resCountProblem);
             }
             foreach (var result in results) {
                 if (result.TestTypeSpecificData is DraftGenericTestResultData resultData) {
@@ -58,20 +46,15 @@ namespace Vokimi.src.data.db_operations
                     }
                 }
                 else {
-                    problems.Add($"Result with id: '{result.StringId}' has been saved incorrectly. Please delete it and try again");
+                    problems.Add($"Result with id: '{result.StringId}' has been saved incorrectly. Please recreate it");
                     continue;
                 }
-                int textLength = string.IsNullOrWhiteSpace(result.Text) ? 0 : result.Text.Length;
 
-                if (textLength < BaseTestCreationConsts.ResultMinTextLength ||
-                    textLength > BaseTestCreationConsts.ResultMaxTextLength) {
-
-                    problems.Add(
-$"Text of the result with id: '{result.StringId}' is {textLength} characters long. The length must be " +
-$"from {BaseTestCreationConsts.ResultMinTextLength} to {BaseTestCreationConsts.ResultMaxTextLength} characters");
+                string? lengthProblem = BaseTestPublishingDbOperations.CheckDraftTestResultForTextLength(result);
+                if (lengthProblem is not null) {
+                    problems.Add(lengthProblem);
                 }
             }
-
             return problems.Select(TestPublishingProblemDto.NewResultsArea);
         }
         private static IEnumerable<TestPublishingProblemDto> CheckQuestionsForProblems(List<DraftGenericTestQuestion> questions) {
@@ -149,14 +132,92 @@ $"from {BaseTestCreationConsts.ResultMinTextLength} to {BaseTestCreationConsts.R
             }
             return null;
         }
-        internal static async Task<OneOf<TestGenericType, Err>> PublishGenericDraftTest(VokimiDbContext db, DraftGenericTest test) {
 
-            //publish results
-            //publish answers
-            //publish questions
+        internal static async Task<OneOf<TestGenericType, Err>> PublishGenericDraftTest(VokimiDbContext db, DraftGenericTest draftTest) {
+            if ((await CheckProblemsForGenericTest(db, draftTest.Id)).Any()) {
+                return new Err("Some problems with the test. Please try again later");
+            }
 
-            //GenericTestPublishingDto dto= GenericTestPublishingDto.Create(test);
-            throw new NotImplementedException();
+            using var transaction = await db.Database.BeginTransactionAsync();
+            try {
+                var publishingDto = TestPublishingDto.FromBaseDraftTest(draftTest);
+
+                var publishedResults = await PublishTestResults(db, draftTest, publishingDto.Id);
+
+                var publishedQuestions = await PublishTestQuestions(db, draftTest, publishingDto.Id, publishedResults);
+
+                var testToPublish = TestGenericType.CreateNew(publishingDto, publishedQuestions, publishedResults.Values);
+                db.TestsGenericType.Add(testToPublish);
+
+                //await RemoveDraftTestEntries(db, draftTest);
+
+                await db.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                return testToPublish;
+            } catch (Exception ex) {
+                await transaction.RollbackAsync();
+                return new Err("Error publishing the test. Please try again later.");
+            }
+        }
+
+
+        private static async Task<Dictionary<string, GenericTestResult>> PublishTestResults(VokimiDbContext db, DraftGenericTest draftTest, TestId testId) {
+            var publishedResults = new Dictionary<string, GenericTestResult>(draftTest.PossibleResults.Count);
+
+            foreach (var draftResult in draftTest.PossibleResults) {
+                var resultToPublish = GenericTestResult.CreateNew(testId, draftResult.Text, draftResult.ImagePath);
+                db.GenericTestResults.Add(resultToPublish);
+                publishedResults.Add(draftResult.StringId, resultToPublish);
+            }
+
+            return publishedResults;
+        }
+
+        private static async Task<List<GenericTestQuestion>> PublishTestQuestions(VokimiDbContext db, DraftGenericTest draftTest, TestId testId, Dictionary<string, GenericTestResult> publishedResults) {
+            var publishedQuestions = new List<GenericTestQuestion>();
+
+            foreach (var draftQuestion in draftTest.Questions) {
+                MultiChoiceQuestionDataId? multiChoiceDataId = null;
+
+                if (draftQuestion.IsMultipleChoice) {
+                    var multiChoiceData = MultiChoiceQuestionData.CreateNew(draftQuestion.MultipleChoiceData.MinAnswers, draftQuestion.MultipleChoiceData.MaxAnswers);
+                    db.MultiChoiceQuestionsData.Add(multiChoiceData);
+                    multiChoiceDataId = multiChoiceData.Id;
+                }
+
+                var questionToPublish = GenericTestQuestion.CreateNew(testId, draftQuestion.Text, draftQuestion.ImagePath, draftQuestion.AnswersType, multiChoiceDataId);
+                db.GenericTestQuestions.Add(questionToPublish);
+
+                foreach (var draftAnswer in draftQuestion.Answers) {
+                    ushort order = draftQuestion.ShuffleAnswers ? (ushort)0 : draftAnswer.OrderInQuestion;
+                    var relatedResultIds = draftAnswer.RelatedResultsData.Select(r => r.DraftTestResult.StringId);
+                    var relatedResults = publishedResults.Where(p => relatedResultIds.Contains(p.Key)).Select(p => p.Value).ToList();
+                    var answerToPublish = GenericTestAnswer.CreateNew(questionToPublish.Id, order, draftAnswer.AdditionalInfoId, relatedResults);
+
+                    db.GenericTestAnswers.Add(answerToPublish);
+                    db.DraftGenericTestAnswers.Remove(draftAnswer);
+                }
+                db.DraftGenericTestQuestions.Remove(draftQuestion);
+
+                publishedQuestions.Add(questionToPublish);
+            }
+
+            return publishedQuestions;
+        }
+
+        internal static async Task RemoveDraftTestEntries(VokimiDbContext db, DraftGenericTest draftTest) {
+            foreach (var draftQuestion in draftTest.Questions) {
+                foreach (var draftAnswer in draftQuestion.Answers) {
+                    db.DraftGenericTestAnswers.Remove(draftAnswer);
+                }
+                db.DraftGenericTestQuestions.Remove(draftQuestion);
+            }
+
+            foreach (var draftResult in draftTest.PossibleResults) {
+                db.DraftTestTypeSpecificResultsData.Remove(draftResult.TestTypeSpecificData);
+                db.DraftTestResults.Remove(draftResult);
+            }
         }
 
     }

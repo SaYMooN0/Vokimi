@@ -2,9 +2,10 @@
 using VokimiShared.src.models.db_classes.test_creation;
 using VokimiShared.src.models.db_entities_ids;
 
-namespace Vokimi.src.data.test_publishing_dtos
+namespace VokimiShared.src.models.dtos
 {
-    public record BaseTestInfoPublishingDto(
+    public record TestPublishingDto(
+        TestId Id,
         AppUserId CreatorId,
         string Name,
         string Cover,
@@ -15,7 +16,8 @@ namespace Vokimi.src.data.test_publishing_dtos
         TestConclusionId? ConclusionId,
         TestStylesSheetId StylesSheetId)
     {
-        public static BaseTestInfoPublishingDto FromDraftTest(BaseDraftTest test) => new(
+        public static TestPublishingDto FromBaseDraftTest(BaseDraftTest test) => new(
+            new TestId(),
             test.CreatorId,
             test.MainInfo.Name,
             test.MainInfo.CoverImagePath,
@@ -25,6 +27,7 @@ namespace Vokimi.src.data.test_publishing_dtos
             test.CreationDate,
             test.ConclusionId,
             test.StylesSheetId
-            );
+        );
     }
+
 }

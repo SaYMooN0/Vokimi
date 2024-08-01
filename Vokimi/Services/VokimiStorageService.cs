@@ -59,7 +59,7 @@ public class VokimiStorageService
     }
     public async Task<OneOf<string, Err>> SaveDraftTestAnswerImage(Stream fileStream, DraftTestQuestionId questionId) {
         try {
-            string key = $"{ImgOperationsHelper.DraftTestAnswersFolder}/{questionId}/{Guid.NewGuid()}";
+            string key = $"{ImgOperationsHelper.TestAnswersFolder}/{questionId}/{Guid.NewGuid()}";
             PutObjectResponse response = await PutObjectIntoStorage(key, fileStream);
 
             if (response.HttpStatusCode == System.Net.HttpStatusCode.OK) {
@@ -149,7 +149,7 @@ public class VokimiStorageService
         return await ClearUnusedImages(prefix, reservedKeys);
     }
     public async Task ClearUnusedDraftTestAnswerImagesForQuestion(DraftTestQuestionId questionId, IEnumerable<string> reservedKeys) {
-        string prefix = $"{ImgOperationsHelper.DraftTestAnswersFolder}/{questionId}/";
+        string prefix = $"{ImgOperationsHelper.TestAnswersFolder}/{questionId}/";
         await ClearUnusedImages(prefix, reservedKeys);
     }
     public async Task ClearUnusedDraftTestResultsImages(DraftTestId testId, IEnumerable<string> reservedKeys) {

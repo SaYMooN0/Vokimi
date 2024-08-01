@@ -19,5 +19,20 @@ namespace VokimiShared.src.models.db_classes.test
 
 
         public virtual ICollection<GenericTestAnswer> Answers { get; protected set; } = [];
+
+        public static GenericTestQuestion CreateNew(TestId testId,
+                                                    string text,
+                                                    string? imagePath,
+                                                    AnswersType answersType,
+                                                    MultiChoiceQuestionDataId? multiChoiceQuestionDataId) =>
+            new() {
+                Id = new(),
+                TestId = testId,
+                Text = text,
+                ImagePath = imagePath,
+                AnswersType = answersType,
+                MultiChoiceQuestionDataId = multiChoiceQuestionDataId
+            };
+
     }
 }

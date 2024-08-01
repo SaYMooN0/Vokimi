@@ -1,6 +1,6 @@
-﻿using Vokimi.src.data.test_publishing_dtos;
-using VokimiShared.src.enums;
+﻿using VokimiShared.src.enums;
 using VokimiShared.src.models.db_classes.test_results.results_for_published_tests;
+using VokimiShared.src.models.dtos;
 
 namespace VokimiShared.src.models.db_classes.test.test_types
 {
@@ -10,22 +10,24 @@ namespace VokimiShared.src.models.db_classes.test.test_types
 
         public virtual ICollection<GenericTestQuestion> Questions { get; init; } = [];
         public virtual ICollection<GenericTestResult> PossibleResults { get; init; } = [];
-
-        public static TestGenericType CreateNewFromPublishingDto(GenericTestPublishingDto dto) => new() {
-            Id=new(),
-            CreatorId=dto.MainInfo.CreatorId,
-            Name=dto.MainInfo.Name,
-            Cover=dto.MainInfo.Cover,
-            Description=dto.MainInfo.Description,
-            Language=dto.MainInfo.Language,
-            Privacy=dto.MainInfo.Privacy,
-            CreationDate=dto.MainInfo.CreationDate,
-            PublicationDate=DateTime.UtcNow,
-            ConclusionId=dto.MainInfo.ConclusionId,
-            StylesSheetId=dto.MainInfo.StylesSheetId,
-            Questions= dto.Questions,
-            PossibleResults= dto.PossibleResults
-        };
+        public static TestGenericType CreateNew(TestPublishingDto dto,
+            ICollection<GenericTestQuestion> questions,
+            ICollection<GenericTestResult> possibleResults) =>
+            new() {
+                Id = dto.Id,
+                CreatorId = dto.CreatorId,
+                Name = dto.Name,
+                Cover = ImgOperationsHelper.SetNewTestCover(dto.Cover, dto.Id),
+                Description = dto.Description,
+                Language = dto.Language,
+                Privacy = dto.Privacy,
+                CreationDate = dto.CreationDate,
+                PublicationDate = DateTime.UtcNow,
+                ConclusionId = dto.ConclusionId,
+                StylesSheetId = dto.StylesSheetId,
+                Questions = questions,
+                PossibleResults = possibleResults
+            };
 
     }
 }
