@@ -1,4 +1,5 @@
-﻿using VokimiShared.src.enums;
+﻿using System.Runtime.InteropServices;
+using VokimiShared.src.enums;
 using VokimiShared.src.models.db_classes.test_creation;
 using VokimiShared.src.models.db_entities_ids;
 
@@ -8,7 +9,7 @@ namespace VokimiShared.src.models.dtos
         TestId Id,
         AppUserId CreatorId,
         string Name,
-        string Cover,
+        string DraftTestCover,
         string? Description,
         Language Language,
         TestPrivacy Privacy,
@@ -16,6 +17,9 @@ namespace VokimiShared.src.models.dtos
         TestConclusionId? ConclusionId,
         TestStylesSheetId StylesSheetId)
     {
+        public string NewCover { get; set; }
+        public bool CoverRelocationNeeded => DraftTestCover != ImgOperationsHelper.DefaultTestCoverImg;
+
         public static TestPublishingDto FromBaseDraftTest(BaseDraftTest test) => new(
             new TestId(),
             test.CreatorId,
@@ -27,7 +31,9 @@ namespace VokimiShared.src.models.dtos
             test.CreationDate,
             test.ConclusionId,
             test.StylesSheetId
-        );
+        ) {
+            NewCover = ImgOperationsHelper.DefaultTestCoverImg
+        };
     }
 
 }

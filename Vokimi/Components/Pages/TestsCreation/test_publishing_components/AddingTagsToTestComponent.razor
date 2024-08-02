@@ -66,7 +66,7 @@
     private string errorMessage = string.Empty;
     private string tagSearchInput = string.Empty;
 
-    [Parameter] public Func<List<string>, Task<Err>> PublishWithTagsAction { get; set; }
+    [Parameter] public Func<List<string>, Task> PublishWithTagsAction { get; set; }
     [Parameter] public Action BackToErrorsCheckingAction { get; set; }
 
     private const int MaxTagsCount = TestTagsConsts.MaxTagsForTestCount;
@@ -108,11 +108,7 @@
             StateHasChanged();
             return;
         }
-        Err publishingErr=await PublishWithTagsAction(chosenTags);
-        if(publishingErr.NotNone()) {
-            errorMessage=publishingErr.ToString();
-            StateHasChanged();
-        }
+        await PublishWithTagsAction(chosenTags);
     }
     private void FetchTagsToChooseFrom() {
         if (string.IsNullOrWhiteSpace(tagSearchInput)) {

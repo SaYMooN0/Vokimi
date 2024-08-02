@@ -1,6 +1,7 @@
 ﻿using Amazon.S3;
 using Amazon.S3.Model;
 using OneOf;
+using System.IO;
 using VokimiShared.src;
 using VokimiShared.src.models.db_classes;
 using VokimiShared.src.models.db_entities_ids;
@@ -161,23 +162,41 @@ public class VokimiStorageService
         IEnumerable<string>? reservedKeys = reservedKey is null ? null : [reservedKey.ToString()];
         await ClearUnusedImages(prefix, reservedKeys);
     }
-    public async Task<OneOf<string, Err>> MoveConclusionImageToPublished(string imageKey, DraftTestId draftTestId, TestId testId) {
+    public async Task<Err> DeleteFiles(IEnumerable<string> keys) {
         try {
-            string newKey = $"{ImgOperationsHelper.TestsFolder}/{testId}/{ImgOperationsHelper.TestCoverFileName}";
+            var keysToDelete = keys.Select(key => new KeyVersion { Key = key }).ToList();
 
+            if (keysToDelete.Any()) {
+                var deleteRequest = new DeleteObjectsRequest {
+                    BucketName = _bucketName,
+                    Objects = keysToDelete
+                };
+
+                var deleteResponse = await _s3Client.DeleteObjectsAsync(deleteRequest);
+
+                if (deleteResponse.HttpStatusCode != System.Net.HttpStatusCode.OK) {
+                    return new Err("Failed to delete some files");
+                }
+            }
+            return Err.None;
+        } catch {
+            return new Err("Server error. Please try again later");
+        }
+    }
+
+    public async Task<Err> CopyFile(string sourceKey, string destinationKey) {
+        try {
             var copyRequest = new CopyObjectRequest {
                 SourceBucket = _bucketName,
-                SourceKey = imageKey,
+                SourceKey = sourceKey,
                 DestinationBucket = _bucketName,
-                DestinationKey = newKey
+                DestinationKey = destinationKey
             };
 
             CopyObjectResponse copyResponse = await _s3Client.CopyObjectAsync(copyRequest);
 
             if (copyResponse.HttpStatusCode == System.Net.HttpStatusCode.OK) {
-            
-                await ClearDraftTestConclusionUnusedImages(draftTestId);
-                return newKey;
+                return Err.None;
             }
             else {
                 return fileUploadingErr;

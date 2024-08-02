@@ -1,5 +1,7 @@
-﻿<h3>PublishingErrorComponent</h3>
+﻿<h3>An error occurred during publishing. Please try again later</h3>
+<button @onclick="BackToOverviewAction">Back to overview</button>
 
 @code {
-
+    [Parameter]
+    public Action BackToOverviewAction { get; set; }
 }

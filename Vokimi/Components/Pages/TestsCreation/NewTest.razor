@@ -4,7 +4,7 @@
 
 
 @page "/newtest"
-@page "/newtest/{testId}"
+@page "/newtest/{TestId}"
 
 
 <PageTitle>New Test</PageTitle>
@@ -51,9 +51,6 @@
             navigationManager.NavigateTo($"/newtest/{test.Template.ShortId()}/{parsedTestId.Value}");
 
         }
-
-
-
     }
 }
 

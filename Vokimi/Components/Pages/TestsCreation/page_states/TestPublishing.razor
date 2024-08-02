@@ -1,6 +1,15 @@
 ﻿@using Vokimi.Components.Pages.TestsCreation.test_publishing_components
 
+@using VokimiShared.src.models.db_classes.generic_test_answers
+@using VokimiShared.src.models.db_classes.test
+@using VokimiShared.src.models.db_classes.test.test_questions
+@using VokimiShared.src.models.db_classes.test_results.results_for_draft_tests
+@using VokimiShared.src.models.db_classes.test_results.results_for_published_tests
+@using VokimiShared.src.models.dtos
+
+
 @inject IDbContextFactory<VokimiDbContext> dbContextFactory
+@inject VokimiStorageService vokimiStorageService
 
 @rendermode InteractiveServer
 
@@ -14,7 +23,7 @@
                                    BackToErrorsCheckingAction="()=> publisingState=PublisingState.ProblemsChecking" />
         break;
     case PublisingState.PublishingError:
-        <PublishingErrorComponent />
+        <PublishingErrorComponent BackToOverviewAction="BackToOverviewAction" />
         break;
     case PublisingState.SuccessfullyPublished:
         <SuccessfullyPublishedComponent />
@@ -41,22 +50,153 @@
     }
     private PublisingState publisingState;
 
-    private async Task<Err> PublishWithTagsAction(List<string> tags) {
-        using (var dbContext = dbContextFactory.CreateDbContext()) {
 
-            DraftGenericTest? test = await dbContext.DraftGenericTests.FirstOrDefaultAsync(i => i.Id == TestId);
-            if (test is null) {
-                return new Err("Unknown test");
+    private async Task PublishWithTagsAction(List<string> tags) {
+        using (var db = dbContextFactory.CreateDbContext()) {
+
+            DraftGenericTest? draftTest = await db.DraftGenericTests.FirstOrDefaultAsync(i => i.Id == TestId);
+            if (draftTest is null) {
+                ChangeStateToPublishingError();
+                return;
             }
-            string testCover = test.MainInfo.CoverImagePath;
-            return (await GenericTestsPublishingDbOperations.PublishGenericDraftTest(dbContext, test)).Match(
-                publishedTest => {
-                    //update testCover, question and results 
-                    //RemoveDraftTestEntries
-                    //assign tags
-                    return Err.None;
-                }, err => err);
+            if ((await GenericTestsPublishingDbOperations.CheckProblemsForGenericTest(db, draftTest.Id)).Any()) {
+                ChangeStateToPublishingError();
+                return;
+            }
+
+            List<string> imgsToDeleteInCaseOfFailure = [];
+
+            using (var transaction = await db.Database.BeginTransactionAsync()) {
+                try {
+
+                    TestPublishingDto publishingDto = await InitPublishingDto(draftTest, imgsToDeleteInCaseOfFailure);
+
+
+                    Dictionary<string, GenericTestResult> publishedResults =
+                        await PublishResults(draftTest.PossibleResults, db, publishingDto.Id, imgsToDeleteInCaseOfFailure);
+
+                    List<GenericTestQuestion> publishedQuestions =
+                        await PublishQuestions(draftTest.Questions, db, publishingDto.Id, publishedResults, imgsToDeleteInCaseOfFailure);
+
+                    var testToPublish = TestGenericType.CreateNew(publishingDto, publishedQuestions, publishedResults.Values);
+                    db.TestsGenericType.Add(testToPublish);
+
+
+                    foreach (string tag in tags) {
+                        TestTag tagToAssign = await db.TestTags.FirstOrDefaultAsync(t => t.Value == tag);
+                        if (tagToAssign is null) {
+                            tagToAssign = TestTag.CreateNew(tag);
+                            db.TestTags.Add(tagToAssign);
+                        }
+                        tagToAssign.Tests.Add(testToPublish);
+                    }
+
+                    await db.SaveChangesAsync();
+                    await transaction.CommitAsync();
+
+
+                } catch (Exception ex) {
+                    await vokimiStorageService.DeleteFiles(imgsToDeleteInCaseOfFailure);
+                    await transaction.RollbackAsync();
+                    ChangeStateToPublishingError();
+                }
+            }
+            await ClearUnusedDraftTestContent(draftTest, db);
+           
+            publisingState=PublisingState.SuccessfullyPublished;
         }
     }
 
+    private async Task<TestPublishingDto> InitPublishingDto(DraftGenericTest draftTest, List<string> imgsToDeleteInCaseOfFailure) {
+        TestPublishingDto publishingDto = TestPublishingDto.FromBaseDraftTest(draftTest);
+        if (publishingDto.CoverRelocationNeeded) {
+            var newCoverPath = ImgOperationsHelper.TestCoverImg(publishingDto.Id);
+            Err copyingErr = await vokimiStorageService.CopyFile(publishingDto.DraftTestCover, newCoverPath);
+            if (copyingErr.NotNone()) {
+                throw new Exception();
+            }
+            else {
+                publishingDto.NewCover = newCoverPath;
+                imgsToDeleteInCaseOfFailure.Add(newCoverPath);
+            }
+        }
+        return publishingDto;
+    }
+    private async Task<Dictionary<string, GenericTestResult>> PublishResults(
+        ICollection<DraftTestResult> draftTestResults, VokimiDbContext db, TestId testId, List<string> imgsToDeleteInCaseOfFailure) {
+        Dictionary<string, GenericTestResult> publishedResults = [];
+        foreach (var draftResult in draftTestResults) {
+
+            string? resultImg = null;
+
+            if (draftResult.ImagePath is not null) {
+                resultImg = ImgOperationsHelper.TestResultsFolder(testId) + Guid.NewGuid();
+                Err copyingErr = await vokimiStorageService.CopyFile(draftResult.ImagePath, resultImg);
+                if (copyingErr.NotNone()) {
+                    throw new Exception();
+                }
+                else {
+                    imgsToDeleteInCaseOfFailure.Add(resultImg);
+                }
+            }
+
+            var resultToPublish = GenericTestResult.CreateNew(testId, draftResult.Text, resultImg);
+            db.GenericTestResults.Add(resultToPublish);
+            publishedResults.Add(draftResult.StringId, resultToPublish);
+        }
+        return publishedResults;
+
+    }
+    private async Task<List<GenericTestQuestion>> PublishQuestions(
+        ICollection<DraftGenericTestQuestion> questions, VokimiDbContext db, TestId testId,
+        Dictionary<string, GenericTestResult> publishedResults, List<string> imgsToDeleteInCaseOfFailure) {
+        List<GenericTestQuestion> publishedQuestions = [];
+
+        foreach (var draftQuestion in questions) {
+            MultiChoiceQuestionDataId? multiChoiceDataId = null;
+
+            if (draftQuestion.IsMultipleChoice) {
+                var multiChoiceData = MultiChoiceQuestionData.CreateNew(draftQuestion.MultipleChoiceData.MinAnswers, draftQuestion.MultipleChoiceData.MaxAnswers);
+                db.MultiChoiceQuestionsData.Add(multiChoiceData);
+                multiChoiceDataId = multiChoiceData.Id;
+            }
+
+            string? questionImg = null;
+            if (draftQuestion.ImagePath is not null) {
+                questionImg = ImgOperationsHelper.TestQuestionsFolder(testId) + Guid.NewGuid();
+                Err copyingErr = await vokimiStorageService.CopyFile(draftQuestion.ImagePath, questionImg);
+                if (copyingErr.NotNone()) {
+                    throw new Exception();
+                }
+                else {
+                    imgsToDeleteInCaseOfFailure.Add(questionImg);
+                }
+            }
+
+            var questionToPublish = GenericTestQuestion.CreateNew(testId, draftQuestion.Text, questionImg, draftQuestion.AnswersType, multiChoiceDataId);
+            db.GenericTestQuestions.Add(questionToPublish);
+
+            foreach (var draftAnswer in draftQuestion.Answers) {
+                ushort order = draftQuestion.ShuffleAnswers ? (ushort)0 : draftAnswer.OrderInQuestion;
+                var relatedResultIds = draftAnswer.RelatedResultsData.Select(r => r.DraftTestResult.StringId);
+                var relatedResults = publishedResults.Where(p => relatedResultIds.Contains(p.Key)).Select(p => p.Value).ToList();
+                var answerToPublish = GenericTestAnswer.CreateNew(questionToPublish.Id, order, draftAnswer.AdditionalInfoId, relatedResults);
+
+                db.GenericTestAnswers.Add(answerToPublish);
+                db.DraftGenericTestAnswers.Remove(draftAnswer);
+            }
+            db.DraftGenericTestQuestions.Remove(draftQuestion);
+
+            publishedQuestions.Add(questionToPublish);
+        }
+        return publishedQuestions;
+
+    }
+    private async Task ClearUnusedDraftTestContent(DraftGenericTest draftTest, VokimiDbContext dbContext) {
+        //await deleteNotNeededImgsForDraftTest
+        //await RemoveDraftTestEntries(db, draftTest);
+    }
+    private void ChangeStateToPublishingError() {
+        publisingState = PublisingState.PublishingError;
+    }
 }

@@ -133,78 +133,7 @@ namespace Vokimi.src.data.db_operations
             return null;
         }
 
-        internal static async Task<OneOf<TestGenericType, Err>> PublishGenericDraftTest(VokimiDbContext db, DraftGenericTest draftTest) {
-            if ((await CheckProblemsForGenericTest(db, draftTest.Id)).Any()) {
-                return new Err("Some problems with the test. Please try again later");
-            }
-
-            using var transaction = await db.Database.BeginTransactionAsync();
-            try {
-                var publishingDto = TestPublishingDto.FromBaseDraftTest(draftTest);
-
-                var publishedResults = await PublishTestResults(db, draftTest, publishingDto.Id);
-
-                var publishedQuestions = await PublishTestQuestions(db, draftTest, publishingDto.Id, publishedResults);
-
-                var testToPublish = TestGenericType.CreateNew(publishingDto, publishedQuestions, publishedResults.Values);
-                db.TestsGenericType.Add(testToPublish);
-
-                //await RemoveDraftTestEntries(db, draftTest);
-
-                await db.SaveChangesAsync();
-                await transaction.CommitAsync();
-
-                return testToPublish;
-            } catch (Exception ex) {
-                await transaction.RollbackAsync();
-                return new Err("Error publishing the test. Please try again later.");
-            }
-        }
-
-
-        private static async Task<Dictionary<string, GenericTestResult>> PublishTestResults(VokimiDbContext db, DraftGenericTest draftTest, TestId testId) {
-            var publishedResults = new Dictionary<string, GenericTestResult>(draftTest.PossibleResults.Count);
-
-            foreach (var draftResult in draftTest.PossibleResults) {
-                var resultToPublish = GenericTestResult.CreateNew(testId, draftResult.Text, draftResult.ImagePath);
-                db.GenericTestResults.Add(resultToPublish);
-                publishedResults.Add(draftResult.StringId, resultToPublish);
-            }
-
-            return publishedResults;
-        }
-
-        private static async Task<List<GenericTestQuestion>> PublishTestQuestions(VokimiDbContext db, DraftGenericTest draftTest, TestId testId, Dictionary<string, GenericTestResult> publishedResults) {
-            var publishedQuestions = new List<GenericTestQuestion>();
-
-            foreach (var draftQuestion in draftTest.Questions) {
-                MultiChoiceQuestionDataId? multiChoiceDataId = null;
-
-                if (draftQuestion.IsMultipleChoice) {
-                    var multiChoiceData = MultiChoiceQuestionData.CreateNew(draftQuestion.MultipleChoiceData.MinAnswers, draftQuestion.MultipleChoiceData.MaxAnswers);
-                    db.MultiChoiceQuestionsData.Add(multiChoiceData);
-                    multiChoiceDataId = multiChoiceData.Id;
-                }
-
-                var questionToPublish = GenericTestQuestion.CreateNew(testId, draftQuestion.Text, draftQuestion.ImagePath, draftQuestion.AnswersType, multiChoiceDataId);
-                db.GenericTestQuestions.Add(questionToPublish);
-
-                foreach (var draftAnswer in draftQuestion.Answers) {
-                    ushort order = draftQuestion.ShuffleAnswers ? (ushort)0 : draftAnswer.OrderInQuestion;
-                    var relatedResultIds = draftAnswer.RelatedResultsData.Select(r => r.DraftTestResult.StringId);
-                    var relatedResults = publishedResults.Where(p => relatedResultIds.Contains(p.Key)).Select(p => p.Value).ToList();
-                    var answerToPublish = GenericTestAnswer.CreateNew(questionToPublish.Id, order, draftAnswer.AdditionalInfoId, relatedResults);
-
-                    db.GenericTestAnswers.Add(answerToPublish);
-                    db.DraftGenericTestAnswers.Remove(draftAnswer);
-                }
-                db.DraftGenericTestQuestions.Remove(draftQuestion);
-
-                publishedQuestions.Add(questionToPublish);
-            }
-
-            return publishedQuestions;
-        }
+        
 
         internal static async Task RemoveDraftTestEntries(VokimiDbContext db, DraftGenericTest draftTest) {
             foreach (var draftQuestion in draftTest.Questions) {

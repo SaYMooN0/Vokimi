@@ -10,11 +10,6 @@ namespace Vokimi.src.data.db_operations
 {
     internal static class BaseTestPublishingDbOperations
     {
-        internal static async Task AssignTagToTest(VokimiDbContext db, TestTag tag, BaseTest test) {
-            tag.AddTest(test);
-            db.TestTags.Update(tag);
-            await db.SaveChangesAsync();
-        }
         internal static IEnumerable<TestPublishingProblemDto> CheckTestMainInfoForProblems(DraftTestMainInfo mainInfo) {
             List<string> problems = [];
             if (

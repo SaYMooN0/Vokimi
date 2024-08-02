@@ -13,6 +13,5 @@ namespace VokimiShared.src.models.db_classes.tests
             Id = new(),
             Value = value
         };
-        public void AddTest(BaseTest test) => Tests.Add(test);
     }
 }

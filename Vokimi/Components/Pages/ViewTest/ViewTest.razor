@@ -1,0 +1,47 @@
+﻿@inject IDbContextFactory<VokimiDbContext> dbContextFactory
+@inject AuthHelperService authHelperService
+@inject NavigationManager navigationManager
+
+
+@page "/view-test"
+@page "/view-test/{TestId}"
+
+
+<PageTitle>New Test</PageTitle>
+@System.Text.Json.JsonSerializer.Serialize(Vm)
+@code {
+    [Parameter]
+    public string TestId { get; set; } = string.Empty;
+
+
+    [CascadingParameter]
+    public HttpContext httpContext { get; set; }
+
+    private TestId? parsedTestId = null;
+    private ViewTestPageViewModel Vm;
+
+    protected override async Task OnInitializedAsync() {
+
+        if (!Guid.TryParse(TestId, out Guid parsedGuid)) {
+            RedirectToNotFound();
+            return;
+        }
+        parsedTestId = new(parsedGuid);
+
+        using (var db = dbContextFactory.CreateDbContext()) {
+
+            BaseTest? test = await db.TestsSharedInfo.FirstOrDefaultAsync(t => t.Id == parsedTestId);
+            if (test is null) {
+                RedirectToNotFound();
+                return;
+
+            }
+            Vm=ViewTestPageViewModel.FromTest(test);
+        }
+    }
+    private void RedirectToNotFound() {
+        navigationManager.NavigateTo("/test-not-found");
+    }
+}
+
+

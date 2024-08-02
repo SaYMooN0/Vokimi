@@ -16,14 +16,17 @@ namespace VokimiShared.src
             //draft tests
             DraftTestCoversFolder = "draft_tests_covers",
             DraftTestQuestionsFolder = "draft_tests_questions",
-            DraftTestResultsFolder = "draft_tests_results"
-            ;
+            DraftTestResultsFolder = "draft_tests_results";
+        private const string
+            ResultsFolderName = "results",
+            QuestionsFolderName = "questions";
         public const string
             TestCoverFileName="test_cover";
-        public static string SetNewTestCover(string draftTestCover, TestId testId) =>
-            draftTestCover == DefaultTestCoverImg ? DefaultTestCoverImg : $"{TestsFolder}/{testId}/{TestCoverFileName}";
-
         public static string DefaultTestCoverImg => $"{GeneralFolder}/test_cover_default.webp";
+        public static string TestCoverImg(TestId testId) => $"{TestsFolder}/{testId}/{TestCoverFileName}";
+        public static string TestResultsFolder(TestId testId) => $"{TestsFolder}/{testId}/{ResultsFolderName}/";
+        public static string TestQuestionsFolder(TestId testId) => $"{TestsFolder}/{testId}/{QuestionsFolderName}/";
+
         public static string ImgUrl(string fileKey) =>
            $"vokimiimgs/GetImage/{fileKey}";
         public static string ImageUrlWithVersion(string path) =>

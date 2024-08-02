@@ -17,7 +17,7 @@ namespace VokimiShared.src.models.db_classes.test.test_types
                 Id = dto.Id,
                 CreatorId = dto.CreatorId,
                 Name = dto.Name,
-                Cover = ImgOperationsHelper.SetNewTestCover(dto.Cover, dto.Id),
+                Cover = dto.NewCover,
                 Description = dto.Description,
                 Language = dto.Language,
                 Privacy = dto.Privacy,
