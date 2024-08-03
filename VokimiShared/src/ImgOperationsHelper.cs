@@ -23,6 +23,7 @@ namespace VokimiShared.src
         public const string
             TestCoverFileName="test_cover";
         public static string DefaultTestCoverImg => $"{GeneralFolder}/test_cover_default.webp";
+        public static string DefaultProfilePicture => $"{GeneralFolder}/default_profile_picture.webp";
         public static string TestCoverImg(TestId testId) => $"{TestsFolder}/{testId}/{TestCoverFileName}";
         public static string TestResultsFolder(TestId testId) => $"{TestsFolder}/{testId}/{ResultsFolderName}/";
         public static string TestQuestionsFolder(TestId testId) => $"{TestsFolder}/{testId}/{QuestionsFolderName}/";

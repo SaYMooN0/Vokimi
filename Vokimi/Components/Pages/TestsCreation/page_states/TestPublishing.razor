@@ -33,9 +33,6 @@
 }
 
 
-
-
-
 @code {
 
     [CascadingParameter(Name = "TestId")] public DraftTestId TestId { get; set; }
@@ -79,8 +76,14 @@
                         await PublishQuestions(draftTest.Questions, db, publishingDto.Id, publishedResults, imgsToDeleteInCaseOfFailure);
 
                     var testToPublish = TestGenericType.CreateNew(publishingDto, publishedQuestions, publishedResults.Values);
-                    db.TestsGenericType.Add(testToPublish);
 
+                    AppUser? creator = await db.AppUsers.FirstOrDefaultAsync(u => u.Id == draftTest.CreatorId);
+                    if (creator is null) {
+                        throw new Exception();
+                    }
+                    // creator.PublishedTests.Add(testToPublish);
+                    db.TestsGenericType.Add(testToPublish);
+                    await db.SaveChangesAsync();
 
                     foreach (string tag in tags) {
                         TestTag tagToAssign = await db.TestTags.FirstOrDefaultAsync(t => t.Value == tag);
@@ -90,10 +93,12 @@
                         }
                         tagToAssign.Tests.Add(testToPublish);
                     }
+                    await ClearUnusedDraftTestContent(draftTest, db);
 
                     await db.SaveChangesAsync();
                     await transaction.CommitAsync();
-
+                    publisingState = PublisingState.SuccessfullyPublished;
+                    StateHasChanged();
 
                 } catch (Exception ex) {
                     await vokimiStorageService.DeleteFiles(imgsToDeleteInCaseOfFailure);
@@ -101,9 +106,8 @@
                     ChangeStateToPublishingError();
                 }
             }
-            await ClearUnusedDraftTestContent(draftTest, db);
-           
-            publisingState=PublisingState.SuccessfullyPublished;
+
+
         }
     }
 
@@ -129,7 +133,7 @@
 
             string? resultImg = null;
 
-            if (draftResult.ImagePath is not null) {
+            if (!string.IsNullOrEmpty(draftResult.ImagePath)) {
                 resultImg = ImgOperationsHelper.TestResultsFolder(testId) + Guid.NewGuid();
                 Err copyingErr = await vokimiStorageService.CopyFile(draftResult.ImagePath, resultImg);
                 if (copyingErr.NotNone()) {
@@ -162,7 +166,7 @@
             }
 
             string? questionImg = null;
-            if (draftQuestion.ImagePath is not null) {
+            if (!string.IsNullOrEmpty(draftQuestion.ImagePath)) {
                 questionImg = ImgOperationsHelper.TestQuestionsFolder(testId) + Guid.NewGuid();
                 Err copyingErr = await vokimiStorageService.CopyFile(draftQuestion.ImagePath, questionImg);
                 if (copyingErr.NotNone()) {
@@ -193,10 +197,25 @@
 
     }
     private async Task ClearUnusedDraftTestContent(DraftGenericTest draftTest, VokimiDbContext dbContext) {
-        //await deleteNotNeededImgsForDraftTest
-        //await RemoveDraftTestEntries(db, draftTest);
+
+        List<string> imgsToDelete = [];
+        foreach (var draftQuestion in draftTest.Questions) {
+            if (!string.IsNullOrEmpty(draftQuestion.ImagePath)) {
+                imgsToDelete.Add(draftQuestion.ImagePath);
+            }
+        }
+
+        foreach (var draftResult in draftTest.PossibleResults) {
+            if (!string.IsNullOrEmpty(draftResult.ImagePath)) {
+                imgsToDelete.Add(draftResult.ImagePath);
+            }
+        }
+
+        await vokimiStorageService.DeleteFiles(imgsToDelete);
+        await GenericTestsPublishingDbOperations.RemoveDraftTestEntries(dbContext, draftTest);
     }
     private void ChangeStateToPublishingError() {
         publisingState = PublisingState.PublishingError;
+        StateHasChanged();
     }
 }

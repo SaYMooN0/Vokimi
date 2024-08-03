@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using VokimiShared.src.models.db_classes.users;
 using VokimiShared.src.models.db_entities_ids;
+using Vokimi.src.data.context_configuration.db_entities_relations_classes;
 
 namespace Vokimi.src.data.context_configuration.model_builder_extensions
 {
@@ -16,6 +17,24 @@ namespace Vokimi.src.data.context_configuration.model_builder_extensions
                 entity.HasMany(x => x.DraftTests)
                       .WithOne()
                       .HasForeignKey(x => x.CreatorId);
+
+                entity.HasMany(x => x.PublishedTests)
+                    .WithOne(x => x.Creator)
+                    .HasForeignKey(x => x.CreatorId);
+
+                entity.HasMany(x => x.Friends)
+                      .WithMany()
+                      .UsingEntity<RelationsAppUserWithFriend>(
+                          j => j.HasOne(uf => uf.Friend).WithMany().HasForeignKey(uf => uf.FriendId),
+                          j => j.HasOne(uf => uf.User).WithMany().HasForeignKey(uf => uf.UserId)
+                      );
+
+                entity.HasMany(x => x.Followers)
+                      .WithMany()
+                      .UsingEntity<RelationsAppUserWithFollower>(
+                          j => j.HasOne(uf => uf.Follower).WithMany().HasForeignKey(uf => uf.FollowerId),
+                          j => j.HasOne(uf => uf.User).WithMany().HasForeignKey(uf => uf.UserId)
+                      );
             });
         }
 

@@ -62,7 +62,7 @@ namespace Vokimi.src.data.context_configuration.model_builder_extensions
 
                 entity.HasMany(e => e.AnswersLeadingToResult)
                     .WithMany(e => e.RelatedResults)
-                    .UsingEntity<GenericTestAnswerLeadingToResultRelations>(
+                    .UsingEntity<RelationsGenericTestAnswerLeadingToResult>(
                          j => j.HasOne(pt => pt.GenericTestAnswer).WithMany().HasForeignKey(pt => pt.GenericTestAnswerId),
                          j => j.HasOne(pt => pt.GenericTestResult).WithMany().HasForeignKey(pt => pt.GenericTestResultId)
                     );

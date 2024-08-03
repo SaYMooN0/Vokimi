@@ -4,7 +4,7 @@ using VokimiShared.src.models.db_entities_ids;
 
 namespace Vokimi.src.data.context_configuration.db_entities_relations_classes
 {
-    public class GenericTestAnswerLeadingToResultRelations
+    public class RelationsGenericTestAnswerLeadingToResult
     {
         public GenericTestAnswerId GenericTestAnswerId { get; init; }
         public GenericTestResultId GenericTestResultId { get; init; }

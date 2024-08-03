@@ -4,7 +4,7 @@ using VokimiShared.src.models.db_entities_ids;
 
 namespace Vokimi.src.data.context_configuration.db_entities_relations_classes
 {
-    public class TestWithTagRelations
+    public class RelationsTestWithTag
     {
         public TestId TestId { get; set; }
         public virtual BaseTest Test { get; set; }

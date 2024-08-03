@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Vokimi.src.data.context_configuration.db_entities_relations_classes;
-using VokimiShared.src.models.db_classes.generic_test_answers;
 using VokimiShared.src.models.db_classes.test_creation.generic_test_related;
 using VokimiShared.src.models.db_entities_ids;
 
@@ -47,7 +46,7 @@ namespace Vokimi.src.data.context_configuration.model_builder_extensions
 
                 entity.HasMany(e => e.RelatedResultsData)
                     .WithMany(e => e.AnswersLeadingToResult)
-                    .UsingEntity<DraftGenericTestAnswerResultDataRelations>(
+                    .UsingEntity<RelationsDraftGenericTestAnswerResultData>(
                         j => j.HasOne(x => x.DraftTestResultData)
                               .WithMany()
                               .HasForeignKey(x => x.DraftTestResultDataId),

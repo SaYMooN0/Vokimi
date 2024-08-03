@@ -136,6 +136,8 @@ namespace Vokimi.src.data.db_operations
         
 
         internal static async Task RemoveDraftTestEntries(VokimiDbContext db, DraftGenericTest draftTest) {
+
+
             foreach (var draftQuestion in draftTest.Questions) {
                 foreach (var draftAnswer in draftQuestion.Answers) {
                     db.DraftGenericTestAnswers.Remove(draftAnswer);
@@ -147,6 +149,9 @@ namespace Vokimi.src.data.db_operations
                 db.DraftTestTypeSpecificResultsData.Remove(draftResult.TestTypeSpecificData);
                 db.DraftTestResults.Remove(draftResult);
             }
+
+            db.DraftTestMainInfo.Remove(draftTest.MainInfo);
+            db.DraftTestsSharedInfo.Remove(draftTest);
         }
 
     }

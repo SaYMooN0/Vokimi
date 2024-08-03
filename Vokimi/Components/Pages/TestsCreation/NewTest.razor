@@ -1,25 +1,45 @@
-﻿@inject IDbContextFactory<VokimiDbContext> dbContextFactory
+﻿@using Vokimi.Components.Pages.TestsCreation.test_cretion_components_with_templates
+
+@inject IDbContextFactory<VokimiDbContext> dbContextFactory
 @inject AuthHelperService authHelperService
 @inject NavigationManager navigationManager
+@inject IHttpContextAccessor httpContextAccessor
 
+
+@attribute [Authorize]
+@rendermode InteractiveServer
 
 @page "/newtest"
 @page "/newtest/{TestId}"
 
-
 <PageTitle>New Test</PageTitle>
-<div class="error-component">@pageInitializationError"</div>
+
+@if (string.IsNullOrEmpty(pageInitializationError)) {
+    <CascadingValue Value="@parsedTestId.Value" Name="TestId">
+        @switch (testTemplate) {
+            case TestTemplate.Generic:
+                <GenericTestCreationComponent SetPageInitError="(err)=>pageInitializationError=err" />
+                break;
+            case TestTemplate.Knowledge:
+                <KnoweldgeTestCreationComponent />
+                break;
+            default:
+                <div class="error-component">Unknown Error</div>
+                break;
+        }
+    </CascadingValue>
+
+}
+else {
+    <div class="error-component">@pageInitializationError</div>
+}
 
 @code {
-    [Parameter]
-    public string TestId { get; set; } = string.Empty;
-
-
-    [CascadingParameter]
-    public HttpContext httpContext { get; set; }
+    [Parameter] public string TestId { get; set; } = string.Empty;
 
     private string pageInitializationError = string.Empty;
     private DraftTestId? parsedTestId = null;
+    private TestTemplate testTemplate;
 
 
     protected override async Task OnInitializedAsync() {
@@ -32,23 +52,21 @@
         }
         parsedTestId = new(parsedGuid);
 
-        AppUserId? userId = authHelperService.GetUserIdFromClaims(httpContext.User);
+        AppUserId? userId = authHelperService.GetUserIdFromClaims(httpContextAccessor.HttpContext.User);
         if (userId is null) {
             pageInitializationError = "An error has occurred. Try to log out of your account and log in again.";
             return;
         }
+
         using (var db = dbContextFactory.CreateDbContext()) {
-            AppUser? user = await db.AppUsers.FirstOrDefaultAsync(u => u.Id == userId.Value);
-            if (user is null) {
-                pageInitializationError = "An error has occurred. Try to log out of your account and log in again.";
-                return;
-            }
             var test = await db.DraftTestsSharedInfo.FirstOrDefaultAsync(t => t.Id == parsedTestId.Value);
             if (test is null) {
-                pageInitializationError = "Unknown test";
-                return;
+                pageInitializationError = "Test not found";
             }
-            navigationManager.NavigateTo($"/newtest/{test.Template.ShortId()}/{parsedTestId.Value}");
+            else if (test.CreatorId != userId) {
+                pageInitializationError = "You don't have access to this test";
+            }
+            else { testTemplate = test.Template; }
 
         }
     }

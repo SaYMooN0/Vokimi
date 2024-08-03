@@ -1,0 +1,78 @@
+﻿@inject IDbContextFactory<VokimiDbContext> dbContextFactory
+
+<div class="central-align">
+    @switch (pageState) {
+        case TestCreationPageState.Overview:
+            <TestOverview ChangePageStateToMainInfoEditing="()=>ChangePageState(TestCreationPageState.MainInfoEditing)"
+                          ChangePageStateToQuestionEditing="ChangePageStateToQuestionEditing"
+                          ChangePageStateToConclusionEditing="()=>ChangePageState(TestCreationPageState.ConclusionEditing)"
+                          ChangePageStateToResultsEditing="()=>ChangePageState(TestCreationPageState.ResultsEditing)"
+                          ChangePageStateToStylesEditing="()=>ChangePageState(TestCreationPageState.StylesEditing)"
+                          ChangePageStateToPublishing="()=>ChangePageState(TestCreationPageState.TestPublishing)" />
+            break;
+        case TestCreationPageState.MainInfoEditing:
+            <MainInfoEditing BackToOverviewAction="()=>ChangePageState(TestCreationPageState.Overview)" />
+            break;
+        case TestCreationPageState.QuestionEditing:
+            <QuestionEditing QuestionId="currentQuestionToEditId"
+                             BackToOverviewAction="()=>ChangePageState(TestCreationPageState.Overview)" />
+            break;
+        case TestCreationPageState.ResultsEditing:
+            <ResultsEditing BackToOverviewAction="()=>ChangePageState(TestCreationPageState.Overview)" />
+            break;
+        case TestCreationPageState.ConclusionEditing:
+            <ConclusionEditing BackToOverviewAction="()=>ChangePageState(TestCreationPageState.Overview)" />
+            break;
+        case TestCreationPageState.StylesEditing:
+            <StylesEditing BackToOverviewAction="()=>ChangePageState(TestCreationPageState.Overview)" />
+            break;
+        case TestCreationPageState.TestPublishing:
+            <TestPublishing BackToOverviewAction="()=>ChangePageState(TestCreationPageState.Overview)" />
+            break;
+        default:
+            <h2>An error has occurred, please refresh the page</h2>
+            break;
+    }
+</div>
+
+@code {
+    private DraftGenericTest draftTest { get; set; }
+    [CascadingParameter(Name = "TestId")] public DraftTestId TestId { get; set; }
+    [Parameter] public Action<string> SetPageInitError { get; set; }
+
+    private TestCreationPageState pageState { get; set; } = TestCreationPageState.Overview;
+
+    private enum TestCreationPageState
+    {
+        Overview,
+        MainInfoEditing,
+        QuestionEditing,
+        ResultsEditing,
+        ConclusionEditing,
+        StylesEditing,
+        TestPublishing
+
+    }
+
+    private DraftTestQuestionId currentQuestionToEditId;
+    private void ChangePageStateToQuestionEditing(DraftTestQuestionId questionId) {
+        currentQuestionToEditId = questionId;
+        ChangePageState(TestCreationPageState.QuestionEditing);
+    }
+
+    private void ChangePageState(TestCreationPageState newState) {
+        pageState = newState;
+        StateHasChanged();
+    }
+    protected override async Task OnInitializedAsync() {
+        using (var db = dbContextFactory.CreateDbContext()) {
+            DraftGenericTest? genericTest = await db.DraftGenericTests.FirstOrDefaultAsync(t => t.Id == TestId);
+            if (genericTest is null) {
+                SetPageInitError("Test not found");
+            }
+            else {
+                draftTest = genericTest;
+            }
+        }
+    }
+}

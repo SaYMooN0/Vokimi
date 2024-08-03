@@ -15,16 +15,11 @@ namespace Vokimi.src.data.context_configuration.model_builder_extensions
             {
                 entity.HasKey(x => x.Id);
                 entity.Property(x => x.Id).HasConversion(v => v.Value, v => new TestId(v));
-                entity.Property(x => x.CreatorId).IsRequired();
-                entity.Property(x => x.Name).IsRequired();
-                entity.Property(x => x.Language).IsRequired();
-                entity.Property(x => x.Privacy).IsRequired();
-                entity.Property(x => x.CreationDate).IsRequired();
-                entity.Property(x => x.PublicationDate).IsRequired();
+
                 entity.Property(x => x.ConclusionId).HasConversion(
                     v => v.HasValue ? v.Value.Value : (Guid?)null,
                     v => v.HasValue ? new TestConclusionId(v.Value) : null);
-                entity.Property(x => x.StylesSheetId).HasConversion(v => v.Value, v => new TestStylesSheetId(v));
+                
 
                 entity.HasOne(x => x.Conclusion)
                       .WithMany()
@@ -36,7 +31,7 @@ namespace Vokimi.src.data.context_configuration.model_builder_extensions
 
                 entity.HasMany(x => x.Tags)
                       .WithMany(x => x.Tests)
-                      .UsingEntity<TestWithTagRelations>(
+                      .UsingEntity<RelationsTestWithTag>(
                           j => j.HasOne(t => t.Tag).WithMany().HasForeignKey(t => t.TagId),
                           j => j.HasOne(t => t.Test).WithMany().HasForeignKey(t => t.TestId)
                       );
