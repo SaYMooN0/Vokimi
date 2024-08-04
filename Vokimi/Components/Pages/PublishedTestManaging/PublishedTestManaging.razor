@@ -1,0 +1,48 @@
+﻿@inject IDbContextFactory<VokimiDbContext> dbContextFactory
+@inject AuthHelperService authHelperService
+@inject TestAccessibilityDetectionService testAccessibilityDetectionService
+
+@page "/test-managing"
+@page "/test-managing/{TestId}"
+
+
+@if (hasAccess) {
+    <h3>Published Test Managing</h3>
+    <p>
+        statistics
+        edit test styles
+        edit test conclusion
+        @TestId
+    </p>
+
+}
+
+else {
+    <div> You don't have access to this test</div>
+}
+@code {
+    [Parameter] public string TestId { get; set; } = string.Empty;
+    [CascadingParameter] public HttpContext httpContext { get; set; }
+
+    private TestId? parsedTestId = null;
+    private bool hasAccess = false;
+
+    protected override async Task OnInitializedAsync() {
+
+        if (!Guid.TryParse(TestId, out Guid parsedGuid)) {
+            hasAccess = false;
+            return;
+        }
+        parsedTestId = new(parsedGuid);
+
+        using (var db = dbContextFactory.CreateDbContext()) {
+
+            BaseTest? test = await db.TestsSharedInfo.FirstOrDefaultAsync(t => t.Id == parsedTestId);
+            if (test is null) {
+                hasAccess = false;
+                return;
+            }
+            hasAccess = testAccessibilityDetectionService.IsViewerCreator(httpContext.User, db, test);
+        }
+    }
+}

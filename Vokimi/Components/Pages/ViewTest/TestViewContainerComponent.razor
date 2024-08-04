@@ -1,0 +1,8 @@
+﻿<h3>TestViewContainerComponent</h3>
+@TestId
+
+@code {
+ 
+    private ViewTestPageViewModel Vm;
+    [CascadingParameter(Name ="TestId")] public TestId TestId { get; set; }
+}

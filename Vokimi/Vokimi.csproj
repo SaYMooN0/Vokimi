@@ -33,6 +33,7 @@
 
   <ItemGroup>
     <Folder Include="Components\Pages\TestTaking\test_taking_with_templates\" />
+    <Folder Include="Components\Pages\ViewTest\test_view_container_sections\" />
   </ItemGroup>
 
 </Project>

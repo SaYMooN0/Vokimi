@@ -3,47 +3,60 @@
 @inject NavigationManager navigationManager
 @inject IDbContextFactory<VokimiDbContext> dbContextFactory
 
-<TestsViewSection SectionLabel=@($"Draft Tests ({draftTestsCount})")>
-    <div class="test-vms-container">
-        @if (draftTests is not null && draftTests.Length > 0) {
-            @foreach (var draftTestVm in draftTests) {
-                <DraftTestViewComponent Vm="draftTestVm" />
-            }
+@if (draftTestsCount == 0 && publishedTestsCount == 0) {
+    <div class="no-tests-created">You haven't created any tests yet</div>
+}
+else {
+    @if (draftTests.Length > 0) {
+        <TestsViewSection SectionLabel=@($"Draft Tests ({draftTestsCount})")>
+            <div class="test-vms-container">
 
-            @if (draftTestsCount > testPackageCount) {
-                <div class="see-all-btn">
-                    See All
-                    <svg viewBox="0 0 448 512">
-                        <path d="M438.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-160-160c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L338.8 224 32 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l306.7 0L233.4 393.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l160-160z" />
-                    </svg>
-                </div>
-            }
-        }
-        else {
-            <label class="no-draft-test">You have no draft tests</label>
-        }
-    </div>
-</TestsViewSection>
+                @foreach (var testVm in draftTests) {
+                    <TestPreviewDisplayComponent Vm="testVm" />
+                }
 
-<TestsViewSection SectionLabel=@($"Published Tests ({publishedTestsCount})")>
-    <div class="test-vms-container">
-    </div>
-</TestsViewSection>
+                @if (draftTestsCount > testPackageCount) {
+                    <div class="see-all-btn">
+                        See All
+                        <svg viewBox="0 0 448 512">
+                            <path d="M438.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-160-160c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L338.8 224 32 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l306.7 0L233.4 393.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l160-160z" />
+                        </svg>
+                    </div>
+                }
+            </div>
+        </TestsViewSection>
+    }
+    @if (publishedTests.Length > 0) {
+        <TestsViewSection SectionLabel=@($"Published Tests ({publishedTestsCount})")>
+            <div class="test-vms-container">
 
-<button>Published Tests Statistic</button>
+                @foreach (var testVm in publishedTests) {
+                    <TestPreviewDisplayComponent Vm="testVm" />
+                }
 
+                @if (publishedTestsCount > testPackageCount) {
+                    <div class="see-all-btn">
+                        See All
+                        <svg viewBox="0 0 448 512">
+                            <path d="M438.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-160-160c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L338.8 224 32 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l306.7 0L233.4 393.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l160-160z" />
+                        </svg>
+                    </div>
+                }
+            </div>
+        </TestsViewSection>
+    }
+}
 <div class="create-test-button" @onclick="OpenTemplateChoosingDialog">Create New</div>
 
 <NewTestTemplateChoosingDialog @ref="newTestTemplateChoosingDialogRef" />
 
 @code {
+    private int testPackageCount = 4;
     private int draftTestsCount = 0;
     private int publishedTestsCount = 0;
-    private int testPackageCount = 4;
 
-
-    private DraftTestViewModel[] draftTests = [];
-    private List<DraftTestViewModel> userTests = new();
+    private TestDisplayViewModel[] draftTests = [];
+    private TestDisplayViewModel[] publishedTests = [];
     private NewTestTemplateChoosingDialog newTestTemplateChoosingDialogRef;
 
     protected override async Task OnInitializedAsync() {
@@ -62,9 +75,14 @@
             draftTestsCount = user.DraftTests.Count();
             draftTests = user.DraftTests
                 .Take(testPackageCount)
-                .Select(t => DraftTestViewModel.FromTest(t))
+                .Select(t => TestDisplayViewModel.FromDraftTest(t))
                 .ToArray();
-            // userTests=
+
+            publishedTestsCount = user.PublishedTests.Count();
+            publishedTests = user.PublishedTests
+                .Take(testPackageCount)
+                .Select(t => TestDisplayViewModel.FromPublishedTest(t))
+                .ToArray();
         }
 
     }

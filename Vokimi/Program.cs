@@ -84,13 +84,14 @@ namespace Vokimi
 
 
             services.AddScoped<AuthHelperService>();
+            services.AddScoped<TestAccessibilityDetectionService>();
 
             services.AddAuthentication(AuthHelperService.AuthScheme)
                 .AddCookie(options => {
                     options.Cookie.Name = AuthHelperService.AuthCookieName;
                     options.LoginPath = "/acc";
                     options.LogoutPath = "/logout";
-                    options.AccessDeniedPath = "/access-denied";
+                    options.AccessDeniedPath = "/acc-access-denied";
                 });
             services.AddAuthorization();
             services.AddCascadingAuthenticationState();

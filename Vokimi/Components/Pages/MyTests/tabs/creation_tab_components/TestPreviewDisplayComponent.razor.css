@@ -1,4 +1,4 @@
-﻿.draft-test-view {
+﻿.test-display {
     width: 21vw;
     max-width: 21vw;
     position: relative;
@@ -63,39 +63,39 @@
         transition: transform 0.35s ease-out, margin-left 0.5s ease-in-out;
     }
 
-.draft-test-view:hover .hover-overlay {
+.test-display:hover .hover-overlay {
     font-size: 24px;
     height: 74%;
     opacity: 1;
 }
 
-    .draft-test-view:hover .hover-overlay svg {
+    .test-display:hover .hover-overlay svg {
         margin-left: 18px;
         transform: scale(1.8);
     }
 
-.draft-test-view:active {
+.test-display:active {
     transform: scale(1.02);
 }
 
 
 @media (max-width: 1400px) {
-    .draft-test-view {
+    .test-display {
         width: 19.8vw;
         max-width: 19.8vw;
     }
 
-        .draft-test-view:hover .hover-overlay {
+        .test-display:hover .hover-overlay {
             font-size: 22px;
             height: 72%;
         }
-            .draft-test-view:hover .hover-overlay svg {
+            .test-display:hover .hover-overlay svg {
                 margin-left: 16px;
             }
 }
 
 @media (max-width: 1100px) {
-    .draft-test-view {
+    .test-display {
         margin-bottom:20px;
         justify-self:center;
         width: 84%;

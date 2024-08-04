@@ -1,0 +1,72 @@
+﻿@using Vokimi.Components.Pages.ViewTest.access_denied_components
+
+@inject IDbContextFactory<VokimiDbContext> dbContextFactory
+@inject AuthHelperService authHelperService
+@inject NavigationManager navigationManager
+@inject TestAccessibilityDetectionService testAccessibilityDetectionService
+
+@page "/view-test"
+@page "/view-test/{TestId}"
+@using static Vokimi.Services.TestAccessibilityDetectionService
+
+
+<PageTitle>New Test</PageTitle>
+
+@switch (AccessState) {
+    case TestAccessibility.NotAccessible:
+        <AccessDenied />
+        break;
+    case TestAccessibility.FriendshipNeeded:
+        <FriendshipNeededComponent />
+        break;
+    case TestAccessibility.FollowingNeeded:
+        <FollowingNeededComponent />
+        break;
+
+    case TestAccessibility.Accessible:
+        <CascadingValue Value="parsedTestId.Value" Name="TestId">
+            <TestViewContainerComponent />
+        </CascadingValue>
+        break;
+    default:
+        <AccessDenied />
+        break;
+}
+@code {
+    [Parameter]
+    public string TestId { get; set; } = string.Empty;
+
+
+    [CascadingParameter]
+    public HttpContext httpContext { get; set; }
+
+    private TestId? parsedTestId = null;
+    private TestAccessibility AccessState = TestAccessibility.NotAccessible;
+
+    protected override async Task OnInitializedAsync() {
+
+        if (!Guid.TryParse(TestId, out Guid parsedGuid)) {
+            RedirectToNotFound();
+            return;
+        }
+        parsedTestId = new(parsedGuid);
+
+        using (var db = dbContextFactory.CreateDbContext()) {
+
+            BaseTest? test = await db.TestsSharedInfo.FirstOrDefaultAsync(t => t.Id == parsedTestId);
+            if (test is null) {
+                RedirectToNotFound();
+                return;
+
+            }
+            AccessState = testAccessibilityDetectionService.DoesUserHaveAccess(httpContext.User, db, test);
+
+
+        }
+    }
+    private void RedirectToNotFound() {
+        navigationManager.NavigateTo("/test-not-found");
+    }
+}
+
+

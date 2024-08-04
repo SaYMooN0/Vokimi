@@ -1,9 +1,9 @@
-﻿<a href="@Vm.OverviewLink" class="draft-test-view">
+﻿<a href="@Vm.OverviewLink" class="test-display">
     <img class="image-cover" src="@ImgOperationsHelper.ImgUrl(Vm.ImagePath)" />
- 
-        <div class="template-icon-wrapper">
-            <DynamicComponent Type="Vm.Template.TemplateIconComponent()" />
-        </div>
+
+    <div class="template-icon-wrapper">
+        <DynamicComponent Type="Vm.Template.TemplateIconComponent()" />
+    </div>
 
     <label class="test-name">@Vm.Name</label>
 
@@ -16,6 +16,5 @@
 </a>
 
 @code {
-    [Parameter]
-    public DraftTestViewModel Vm { get; set; }
+    [Parameter] public TestDisplayViewModel Vm { get; set; }
 }
