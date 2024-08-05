@@ -1,0 +1,8 @@
+﻿<div class="test-name">@TestName</div>
+<a href="/acc/@CreatorId" class="creatot-link">by @CreatorUserName</a>
+
+@code {
+    [Parameter] public string TestName { get; set; }
+    [Parameter] public string CreatorUserName { get; set; }
+    [Parameter] public AppUserId CreatorId { get; set; }
+}

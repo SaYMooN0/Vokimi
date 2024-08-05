@@ -1,0 +1,50 @@
+﻿@rendermode InteractiveServer
+
+<div class="middle-part-tabs-container">
+    <div class="tab-links-container">
+        <div class="@TabLinkCssClass(MiddlePartTabs.Info)" @onclick="() => SetActiveTab(MiddlePartTabs.Info)">Info</div>
+        <div class="@TabLinkCssClass(MiddlePartTabs.Comments)" @onclick="() => SetActiveTab(MiddlePartTabs.Comments)">Comments</div>
+        <div class="@TabLinkCssClass(MiddlePartTabs.Discussion)" @onclick="() => SetActiveTab(MiddlePartTabs.Discussion)">Results Discussion</div>
+    </div>
+    <div class="tabs-contents-container">
+        <div class="@TabContentCssClass(MiddlePartTabs.Info)">
+            @InfoContent
+        </div>
+        <div class="@TabContentCssClass(MiddlePartTabs.Comments)">
+            @CommentsContent
+        </div>
+        <div class="@TabContentCssClass(MiddlePartTabs.Discussion)">
+            @DiscussionContent
+        </div>
+    </div>
+</div>
+
+@code {
+    private MiddlePartTabs ActiveMiddlePartTab = MiddlePartTabs.Info;
+
+    [Parameter]
+    public RenderFragment InfoContent { get; set; }
+
+    [Parameter]
+    public RenderFragment CommentsContent { get; set; }
+
+    [Parameter]
+    public RenderFragment DiscussionContent { get; set; }
+
+    private void SetActiveTab(MiddlePartTabs tab) {
+        ActiveMiddlePartTab = tab;
+    }
+
+    private enum MiddlePartTabs
+    {
+        Info,
+        Comments,
+        Discussion
+    }
+
+    private string TabContentCssClass(MiddlePartTabs tab) =>
+        tab == ActiveMiddlePartTab ? "tab-content" : "tab-content-hidden";
+
+    private string TabLinkCssClass(MiddlePartTabs tab) =>
+        tab == ActiveMiddlePartTab ? "tab-link tab-link-active" : "tab-link";
+}

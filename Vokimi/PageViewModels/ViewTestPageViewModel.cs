@@ -6,12 +6,35 @@ namespace Vokimi.PageViewModels
 {
     public record class ViewTestPageViewModel(
         string Name,
-        string ImagePath,
+        string CoverPath,
         TestTemplate Template,
-        AppUserId CreatorId
-        ) {
-        public static ViewTestPageViewModel FromTest(BaseTest test)=>
-            new(test.Name, test.Cover, test.Template, test.CreatorId);
+        Language TestLang,
+        string? Description,
+        string[] Tags,
+        AppUserId CreatorId,
+        string CreatorUsername
+        )
+    {
+        public static ViewTestPageViewModel Empty => new(
+            string.Empty,
+            string.Empty,
+            TestTemplate.Generic,
+            Language.Other,
+            null,
+            [],
+            new(),
+            string.Empty
+        );
+        public static ViewTestPageViewModel FromTest(BaseTest test) => new(
+            test.Name,
+            test.Cover,
+            test.Template,
+            test.Language,
+            test.Description,
+            test.Tags.Select(t => t.Value).ToArray(),
+            test.CreatorId,
+            test.Creator.Username
+        );
 
     }
 }

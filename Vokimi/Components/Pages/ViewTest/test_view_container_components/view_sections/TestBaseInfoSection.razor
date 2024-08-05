@@ -1,0 +1,21 @@
+﻿<div class="base-info-section">
+    <div class="type-and-lang-container">
+        <div class="test-type">@Template</div>
+        <div class="test-lang">@TestLang.FullName()</div>
+    </div>
+    @if (!string.IsNullOrEmpty(Description)) {
+        <div class="test-description">@Description</div>
+    }
+    <div class="tags-container">
+        @foreach (var tag in Tags) {
+            <div class="tag-display">#@tag</div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public TestTemplate Template { get; set; }
+    [Parameter] public Language TestLang { get; set; }
+    [Parameter] public string? Description { get; set; }
+    [Parameter] public string[] Tags { get; set; }
+}

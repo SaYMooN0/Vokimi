@@ -1,5 +1,8 @@
 ﻿@using Vokimi.Components.Pages.ViewTest.access_denied_components
 
+@rendermode InteractiveServer
+
+@inject IHttpContextAccessor httpContextAccessor
 @inject IDbContextFactory<VokimiDbContext> dbContextFactory
 @inject AuthHelperService authHelperService
 @inject NavigationManager navigationManager
@@ -24,7 +27,7 @@
         break;
 
     case TestAccessibility.Accessible:
-        <CascadingValue Value="parsedTestId.Value" Name="TestId">
+        <CascadingValue Value="@parsedTestId.Value" Name="TestId">
             <TestViewContainerComponent />
         </CascadingValue>
         break;
@@ -37,14 +40,11 @@
     public string TestId { get; set; } = string.Empty;
 
 
-    [CascadingParameter]
-    public HttpContext httpContext { get; set; }
-
     private TestId? parsedTestId = null;
     private TestAccessibility AccessState = TestAccessibility.NotAccessible;
 
     protected override async Task OnInitializedAsync() {
-
+        await base.OnInitializedAsync();
         if (!Guid.TryParse(TestId, out Guid parsedGuid)) {
             RedirectToNotFound();
             return;
@@ -59,7 +59,7 @@
                 return;
 
             }
-            AccessState = testAccessibilityDetectionService.DoesUserHaveAccess(httpContext.User, db, test);
+            AccessState = testAccessibilityDetectionService.DoesUserHaveAccess(httpContextAccessor.HttpContext.User, db, test);
 
 
         }

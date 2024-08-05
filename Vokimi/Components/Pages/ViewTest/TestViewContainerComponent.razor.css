@@ -1,0 +1,5 @@
+﻿.test-view-container {
+    max-width: 90vw;
+    display: grid;
+    grid-template-columns: auto 1fr;
+}

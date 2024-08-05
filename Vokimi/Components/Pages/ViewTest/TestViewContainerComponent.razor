@@ -1,8 +1,48 @@
-﻿<h3>TestViewContainerComponent</h3>
-@TestId
+﻿@using Vokimi.Components.Pages.ViewTest.test_view_container_components.view_sections
+@using Vokimi.Components.Pages.ViewTest.test_view_container_components
+
+@rendermode InteractiveServer
+
+
+@inject IDbContextFactory<VokimiDbContext> dbContextFactory
+
+<div class="test-view-container">
+    <div class="view-left-part">
+        <TestCoverSection CoverPath="@Vm.CoverPath" />
+    </div>
+    <div class="view-middle-part">
+        <TestNameAndCreatorSection TestName="@Vm.Name"
+                                   CreatorUserName="@Vm.CreatorUsername"
+                                   CreatorId="Vm.CreatorId" />
+        <MiddlePartTabsContainer>
+            <InfoContent>
+                <TestBaseInfoSection Template="@Vm.Template"
+                                     TestLang="@Vm.TestLang"
+                                     Description="@Vm.Description"
+                                     Tags="@Vm.Tags" />
+            </InfoContent>
+            <CommentsContent>
+                <TestCommentsSession />
+            </CommentsContent>
+            <DiscussionContent>
+                <ResultsDiscussionSection />
+            </DiscussionContent>
+        </MiddlePartTabsContainer>
+    </div>
+</div>
+
 
 @code {
- 
-    private ViewTestPageViewModel Vm;
-    [CascadingParameter(Name ="TestId")] public TestId TestId { get; set; }
+    private ViewTestPageViewModel Vm { get; set; } = ViewTestPageViewModel.Empty;
+    [CascadingParameter(Name = "TestId")] public TestId TestId { get; set; }
+
+
+    protected override async Task OnInitializedAsync() {
+        using (var db = dbContextFactory.CreateDbContext()) {
+            BaseTest test = await db.TestsSharedInfo.FirstOrDefaultAsync(t => t.Id == TestId);
+            Vm = ViewTestPageViewModel.FromTest(test);
+        }
+        await base.OnInitializedAsync();
+    }
+
 }

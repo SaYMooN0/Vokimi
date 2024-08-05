@@ -1,0 +1,12 @@
+﻿<div class="test-cover-section">
+    <img class="test-cover-img" src="@ImgOperationsHelper.ImgUrl(CoverPath)" />
+
+    <div class="take-test-btn section-btn">Take Test</div>
+    <AuthorizeView>
+        <div class="add-to-collecion-btn section-btn">Add To Collection</div>
+    </AuthorizeView>
+</div>
+
+@code {
+    [Parameter] public string CoverPath { get; set; }
+}
