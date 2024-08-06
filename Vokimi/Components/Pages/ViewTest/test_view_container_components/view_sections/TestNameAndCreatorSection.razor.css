@@ -1,0 +1,21 @@
+﻿.test-name {
+    font-family: Roboto;
+    font-size: 24px;
+}
+
+.creatot-link {
+    display: block;
+    margin: 4px 0 4px 10px;
+    font-family: Roboto;
+    font-size: 19px;
+    color: var(--grey);
+}
+
+    .creatot-link a {
+        color: inherit;
+        text-decoration: none;
+    }
+
+        .creatot-link a:hover {
+            color: var(--primary);
+        }

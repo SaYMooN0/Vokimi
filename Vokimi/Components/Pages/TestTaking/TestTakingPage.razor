@@ -1,0 +1,63 @@
+﻿@using static Vokimi.Services.TestAccessibilityDetectionService
+@using Vokimi.Components.Pages.TestTaking.test_taking_components
+@rendermode InteractiveServer
+
+@inject IHttpContextAccessor httpContextAccessor
+@inject IDbContextFactory<VokimiDbContext> dbContextFactory
+@inject AuthHelperService authHelperService
+@inject NavigationManager navigationManager
+@inject TestAccessibilityDetectionService testAccessibilityDetectionService
+
+@page "/test-taking"
+@page "/test-taking/{TestId}"
+
+
+<PageTitle>New Test</PageTitle>
+
+@if (hasAccess) {
+    <CascadingValue Value="@parsedTestId.Value" Name="TestId">
+        <TestTakingComponent />
+    </CascadingValue>
+}
+else {
+    <h2>You don't have access to this test</h2>
+}
+
+@code {
+    [Parameter]
+    public string TestId { get; set; } = string.Empty;
+
+
+    private TestId? parsedTestId = null;
+    private bool hasAccess = false;
+
+    protected override async Task OnInitializedAsync() {
+        await base.OnInitializedAsync();
+        if (!Guid.TryParse(TestId, out Guid parsedGuid)) {
+            navigationManager.NavigateTo("/test-not-found");
+            return;
+        }
+
+        parsedTestId = new(parsedGuid);
+        using (var db = dbContextFactory.CreateDbContext()) {
+
+            BaseTest? test = await db.TestsSharedInfo.FirstOrDefaultAsync(t => t.Id == parsedTestId);
+            if (test is null) {
+                navigationManager.NavigateTo("/test-not-found");
+                return;
+
+            }
+            var access = testAccessibilityDetectionService.DoesUserHaveAccess(httpContextAccessor.HttpContext.User, db, test);
+            if (access == TestAccessibility.Accessible) {
+                hasAccess = true;
+            }
+            else {
+                hasAccess = false;
+                navigationManager.NavigateTo($"/view-test/{TestId}");
+            }
+
+        }
+    }
+}
+
+

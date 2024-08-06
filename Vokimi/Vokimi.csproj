@@ -31,8 +31,4 @@
     <PackageReference Include="OneOf" Version="3.0.271" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Components\Pages\TestTaking\test_taking_with_templates\" />
-  </ItemGroup>
-
 </Project>

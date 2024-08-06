@@ -8,17 +8,17 @@
 }
 
 .tab-links-container {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
     border-bottom: 1px solid var(--grey);
 }
 
 .tab-link {
-    flex: 1;
-    padding: 12px 16px;
+    padding: 12px 0;
     text-align: center;
     cursor: pointer;
     font-size: 16px;
-    font-weight: 500;
+    font-family: Roboto;
     border-right: 1px solid var(--grey);
 }
 
@@ -27,7 +27,6 @@
     }
 
 .tab-link-active {
-    font-weight: bold;
     text-decoration: underline;
     text-decoration-thickness: 2px;
     text-decoration-color: var(--primary);

@@ -1,0 +1,20 @@
+﻿<div class="test-taking-container">
+    <label class="question-number-label">Question @(currentQuestion + 1) / @currentQuestion</label>
+    <div class="main-part">
+        <div class="change-question-btn">
+            <DynamicComponent Type="@arrowType.ArrowIconComponent(false)" />
+        </div>
+        <div class="current-question-content">
+        </div>
+        <div class="change-question-btn">
+            <DynamicComponent Type="@arrowType.ArrowIconComponent(true)" />
+        </div>
+    </div>
+   
+</div>
+@code {
+    private ushort currentQuestion = 0;
+    private ushort questionsCount = 0;
+    private ArrowIconType arrowType = ArrowIconType.Default;
+    [CascadingParameter(Name = "TestId")] public TestId TestId { get; set; }
+}

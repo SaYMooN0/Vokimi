@@ -1,5 +1,5 @@
 ﻿.test-cover-section {
-    max-width: 400px;
+    max-width: 500px;
     min-width: 220px;
     display: flex;
     flex-direction: column;
@@ -10,9 +10,50 @@
 .test-cover-img {
     width: 100%;
     object-fit: contain;
+    box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgb(67, 58, 178, 0.10) 0px 0px 0px 1px;
+    border-radius: 8px;
+    margin-bottom: 6px;
 }
 
 .section-btn {
-    width: 90%;
-    background-color: var(--grey);
+    width: 80%;
+    min-width: 220px;
+    height: 36px;
+    background-color: var(--primary);
+    border-radius: 6px;
+    color: white;
+    font-family: Roboto;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+    .section-btn:hover {
+        background-color: var(--primary-hov);
+    }
+
+.take-test-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.add-to-collecion-btn {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 12px;
+    box-sizing: border-box;
+}
+
+    .add-to-collecion-btn label {
+        cursor: inherit;
+    }
+
+.collecion-btn-icon {
+    height: 100%;
+    aspect-ratio: 1/1;
+    box-sizing: border-box;
+    color: white;
+    fill: none;
+    padding: 4px;
 }

@@ -1,5 +1,7 @@
 ﻿.test-view-container {
-    max-width: 90vw;
+    margin: 20px auto;
+    max-width: calc(74vw + 140px);
     display: grid;
     grid-template-columns: auto 1fr;
+    gap:30px;
 }
