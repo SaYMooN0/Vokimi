@@ -5,9 +5,9 @@ namespace VokimiShared.src.models.db_classes.test.test_questions
     public class MultiChoiceQuestionData
     {
         public MultiChoiceQuestionDataId Id { get; init; }
-        public int MinAnswersCount { get; init; }
-        public int MaxAnswersCount { get; init; }
-        public static MultiChoiceQuestionData CreateNew(int minAnswersCount, int maxAnswersCount) =>
+        public ushort MinAnswersCount { get; init; }
+        public ushort MaxAnswersCount { get; init; }
+        public static MultiChoiceQuestionData CreateNew(ushort minAnswersCount, ushort maxAnswersCount) =>
             new() {
                 Id = new(),
                 MinAnswersCount = minAnswersCount,

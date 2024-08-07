@@ -8,10 +8,10 @@ namespace VokimiShared.src.models.db_classes.test.test_types
     {
         public override TestTemplate Template => TestTemplate.Generic;
 
-        public virtual ICollection<GenericTestQuestion> Questions { get; init; } = [];
+        public virtual List<GenericTestQuestion> Questions { get; init; } = [];
         public virtual ICollection<GenericTestResult> PossibleResults { get; init; } = [];
         public static TestGenericType CreateNew(TestPublishingDto dto,
-            ICollection<GenericTestQuestion> questions,
+            List<GenericTestQuestion> questions,
             ICollection<GenericTestResult> possibleResults) =>
             new() {
                 Id = dto.Id,

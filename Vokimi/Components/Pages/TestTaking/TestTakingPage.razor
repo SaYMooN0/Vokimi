@@ -1,5 +1,5 @@
 ﻿@using static Vokimi.Services.TestAccessibilityDetectionService
-@using Vokimi.Components.Pages.TestTaking.test_taking_components
+@using Vokimi.Components.Pages.TestTaking.test_taking_components.components_for_generic_test
 @rendermode InteractiveServer
 
 @inject IHttpContextAccessor httpContextAccessor
@@ -16,7 +16,19 @@
 
 @if (hasAccess) {
     <CascadingValue Value="@parsedTestId.Value" Name="TestId">
-        <TestTakingComponent />
+        @switch (testTemplate) {
+            @case TestTemplate.Generic:
+                <TestTakingComponentForGeneric />
+                break;
+            @case TestTemplate.Knowledge:
+                <div>
+                    TestTakingComponentFor knowledge
+                </div>
+                break;
+            @default:
+                <div>An error occurred</div>
+                break;
+        }
     </CascadingValue>
 }
 else {
@@ -24,12 +36,12 @@ else {
 }
 
 @code {
-    [Parameter]
-    public string TestId { get; set; } = string.Empty;
+    [Parameter] public string TestId { get; set; } = string.Empty;
 
 
     private TestId? parsedTestId = null;
     private bool hasAccess = false;
+    private TestTemplate testTemplate;
 
     protected override async Task OnInitializedAsync() {
         await base.OnInitializedAsync();

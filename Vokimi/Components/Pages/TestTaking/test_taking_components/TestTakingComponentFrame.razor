@@ -1,0 +1,54 @@
+﻿<div class="test-taking-container">
+    <label class="question-number-label">Question @(CurrentQuestionNumber + 1) / @QuestionsCount</label>
+
+    <div class="current-question-content">
+        <label class="question-text">@QuestionText</label>
+        <div class="answers-content">
+            @AnswersContent
+        </div>
+    </div>
+    <div class="prev-next-btns-container">
+        <div class="prev-question-btn" @onclick="PrevButtonClicked">
+            Previous
+            <DynamicComponent Type="@ArrowsType.ArrowIconComponent(false)" />
+        </div>
+        <div class="next-question-btn" @onclick="NextButtonClicked">
+            Next
+            <DynamicComponent Type="@ArrowsType.ArrowIconComponent(true)" />
+        </div>
+    </div>
+    <style>
+        .arrow-icon {
+            height: 100%;
+            aspect-ratio: 1/1;
+            color: white;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .prev-question-btn .arrow-icon {
+            left: 0;
+        }
+
+        .next-question-btn .arrow-icon {
+            right: 0;
+        }
+    </style>
+
+</div>
+@code {
+    [Parameter] public ArrowIconType ArrowsType { get; set; }
+    [Parameter] public ushort CurrentQuestionNumber { get; set; }
+    [Parameter] public ushort QuestionsCount { get; set; }
+    [Parameter] public string QuestionText { get; set; }
+    [Parameter] public RenderFragment AnswersContent { get; set; }
+
+    private void PrevButtonClicked() {
+        throw new NotImplementedException();
+    }
+
+    private void NextButtonClicked() {
+        throw new NotImplementedException();
+    }
+}

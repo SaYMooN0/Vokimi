@@ -1,0 +1,14 @@
+﻿.prev-next-btns-container {
+    display: grid;
+    width: 600px;
+    grid-template-columns: 1fr 1fr;
+}
+
+    .prev-next-btns-container div {
+        width: 240px;
+        height: 38px;
+        padding: 4px 40px;
+        box-sizing: border-box;
+        position: relative;
+        background-color: violet;
+    }

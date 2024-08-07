@@ -1,0 +1,51 @@
+﻿@inject IDbContextFactory<VokimiDbContext> dbContextFactory
+
+@if (string.IsNullOrEmpty(initError)) {
+    <TestTakingComponentFrame ArrowsType="Vm.ArrowIcons"
+                              CurrentQuestionNumber="Vm.CurrentQuestionNumber"
+                              QuestionsCount="Vm.TotalNumberOfQuestions"
+                              QuestionText="@Vm.CurrentQuestion.Text">
+        <AnswersContent>
+            @foreach (var answer in Vm.CurrentQuestion.Answers) {
+                @switch (Vm.CurrentQuestion.AnswersType) {
+                    case AnswersType.TextOnly:
+                        <GenericTestTextOnlyAnswerDisplayComponent />
+                        break;
+                    case AnswersType.ImageOnly:
+                        <GenericTestImageOnlyAnswerDisplayComponent />
+                        break;
+                    case AnswersType.TextAndImage:
+                        <GenericTestTextAndImageAnswerDisplayComponent />
+                        break;
+                    default:
+                        <div>
+                            Unexpected err
+                        </div>
+                        break;
+
+                }
+            }
+        </AnswersContent>
+    </TestTakingComponentFrame>
+}
+else {
+    <h2 class="init-error-message">@initError</h2>
+}
+@code {
+    [CascadingParameter(Name = "TestId")] public TestId TestId { get; set; }
+    private Dictionary<ushort, List<GenericTestAnswerId>> chosenAnswers = [];
+    GenericTestTakingViewModel Vm = GenericTestTakingViewModel.Empty;
+    private string? initError = null;
+
+    protected override async Task OnInitializedAsync() {
+        await base.OnInitializedAsync();
+        using (var dbContext = dbContextFactory.CreateDbContext()) {
+            TestGenericType? test = await dbContext.TestsGenericType.FirstOrDefaultAsync(t => t.Id == TestId);
+            if (test is null) {
+                initError = "Test not found";
+                return;
+            }
+            Vm = GenericTestTakingViewModel.FromTest(test);
+        }
+    }
+}
