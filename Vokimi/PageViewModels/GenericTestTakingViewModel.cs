@@ -38,6 +38,7 @@ namespace Vokimi.PageViewModels
         ushort MaxAnswersCount,
         GenericTestTakingAnswerDto[] Answers)
     {
+        internal bool IsMultiChoice => MinAnswersCount != 1 || MaxAnswersCount != 1;
         internal static GenericTestTakingQuestionDto FromGenericTestQuestion(GenericTestQuestion question) => new(
             question.Text,
             question.AnswersType,
@@ -69,6 +70,7 @@ namespace Vokimi.PageViewModels
 
                 _ => throw new ArgumentException($"Unsupported type {nameof(type)}")
             };
+
     }
     internal abstract record class GenericTestTakingAnswerDto(GenericTestAnswerId Id, ushort OrderInQuestion);
     internal record class GenericTestTakingAnswerTextOnlyDto(GenericTestAnswerId Id, ushort OrderInQuestion, string Text)

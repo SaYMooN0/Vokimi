@@ -3,9 +3,11 @@
     padding: 0 calc(12% - 80px);
     box-sizing: border-box;
 }
-.top-input-zone{
-    margin-top:40px;
+
+.top-inputs-zone {
+    margin-top: 40px;
 }
+
 .add-feedback-zone {
     display: flex;
     flex-direction: column;

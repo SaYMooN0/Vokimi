@@ -13,7 +13,7 @@ namespace VokimiShared.src.models.form_classes.result_editing
         public string GetResultStringId() => StringId;
         public static ResultWithSaveIdForm FromDraftTestResult(DraftTestResult result) => new() {
             Id = result.Id,
-            StringId = result.StringId,
+            StringId = result.Name,
             Text = result.Text,
             ImagePath = result.ImagePath
         };

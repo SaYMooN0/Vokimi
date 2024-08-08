@@ -7,6 +7,7 @@
             @AnswersContent
         </div>
     </div>
+    <p class="error-message">@errorMessage</p>
     <div class="prev-next-btns-container">
         <div class="prev-question-btn" @onclick="PrevButtonClicked">
             Previous
@@ -43,12 +44,25 @@
     [Parameter] public ushort QuestionsCount { get; set; }
     [Parameter] public string QuestionText { get; set; }
     [Parameter] public RenderFragment AnswersContent { get; set; }
+    [Parameter] public Func<Err> GoToNextQuestion { get; set; }
+    [Parameter] public Func<Err> GoToPreviousQuestion { get; set; }
 
+    private string errorMessage = string.Empty;
     private void PrevButtonClicked() {
-        throw new NotImplementedException();
+        errorMessage = string.Empty;
+        Err err = GoToPreviousQuestion();
+        if (err.NotNone()) {
+            errorMessage = err.ToString();
+        }
+        StateHasChanged();
     }
 
     private void NextButtonClicked() {
-        throw new NotImplementedException();
+        errorMessage = string.Empty;
+        Err err = GoToPreviousQuestion();
+        if (err.NotNone()) {
+            errorMessage = err.ToString();
+        }
+        StateHasChanged();
     }
 }

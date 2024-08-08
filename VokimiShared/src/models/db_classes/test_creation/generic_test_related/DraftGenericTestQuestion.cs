@@ -10,22 +10,25 @@ namespace VokimiShared.src.models.db_classes.test_creation.generic_test_related
         public string? ImagePath { get; private set; }
         public bool ShuffleAnswers { get; private set; }
         public AnswersType AnswersType { get; init; }
+        public ushort OrderInTest { get; private set; }
         public bool IsMultipleChoice { get; private set; }
         public MultipleChoiceAdditionalData? MultipleChoiceData { get; private set; }
         public virtual ICollection<DraftGenericTestAnswer> Answers { get; private set; } = new List<DraftGenericTestAnswer>();
 
         public DraftTestId DraftTestId { get; init; }
-        public static DraftGenericTestQuestion CreateNew(string text, AnswersType answersType, DraftTestId testId) => new() {
+        public static DraftGenericTestQuestion CreateNew(string text, AnswersType answersType, DraftTestId testId, ushort orderInTest) => new() {
             Id = new(),
             Text = text,
             ImagePath = null,
             ShuffleAnswers = false,
             AnswersType = answersType,
+            OrderInTest = orderInTest,
             IsMultipleChoice = false,
             MultipleChoiceData = null,
             DraftTestId = testId,
             Answers = new List<DraftGenericTestAnswer>()
         };
+        public void UpdateOrderInTest(ushort newOrder) => OrderInTest = newOrder;
         public void UpdateAsSingleChoice(
             string text,
             string? imagePath,

@@ -1,7 +1,7 @@
 ﻿<div class="test-cover-section">
     <img class="test-cover-img" src="@ImgOperationsHelper.ImgUrl(CoverPath)" />
 
-    <div class="take-test-btn section-btn">Take Test</div>
+    <a class="take-test-btn section-btn" href=@($"/test-taking/{TestId}")>Take Test</a>
     <AuthorizeView>
         <div class="add-to-collecion-btn section-btn">
             <svg viewBox="0 0 24 24" class="collecion-btn-icon">
@@ -21,4 +21,5 @@
 
 @code {
     [Parameter] public string CoverPath { get; set; }
+    [CascadingParameter(Name = "TestId")] public TestId TestId { get; set; }
 }

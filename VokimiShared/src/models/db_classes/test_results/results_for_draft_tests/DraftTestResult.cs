@@ -6,7 +6,7 @@ namespace VokimiShared.src.models.db_classes.test_results.results_for_draft_test
     {
         public DraftTestResultId Id { get; init; }
         public DraftTestId TestId { get; init; }
-        public string StringId { get; init; }
+        public string Name { get; init; }
         public string? Text { get; private set; }
         public string? ImagePath { get; private set; }
         public DraftTestTypeSpecificResultDataId TestTypeSpecificDataId { get; private set; }
@@ -25,7 +25,7 @@ namespace VokimiShared.src.models.db_classes.test_results.results_for_draft_test
             => new() {
                 Id = new(),
                 TestId = testId,
-                StringId = stringId,
+                Name = stringId,
                 Text = text,
                 ImagePath = imagePath,
                 TestTypeSpecificDataId= testTypeSpecificDataId

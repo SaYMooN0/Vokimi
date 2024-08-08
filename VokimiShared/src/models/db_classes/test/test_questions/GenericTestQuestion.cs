@@ -12,8 +12,9 @@ namespace VokimiShared.src.models.db_classes.test
         public string Text { get; init; }
         public string? ImagePath { get; init; }
         public AnswersType AnswersType { get; init; }
+        public ushort OrderInTest { get; init; }
 
-        //if null question is not multi choice
+        //if MultiChoiceQuestionData is null question is not multi choice
         public MultiChoiceQuestionDataId? MultiChoiceQuestionDataId { get; init; }
         public virtual MultiChoiceQuestionData? MultiChoiceQuestionData { get; protected set; }
 
@@ -24,6 +25,7 @@ namespace VokimiShared.src.models.db_classes.test
                                                     string text,
                                                     string? imagePath,
                                                     AnswersType answersType,
+                                                    ushort orderInTest,
                                                     MultiChoiceQuestionDataId? multiChoiceQuestionDataId) =>
             new() {
                 Id = new(),
@@ -31,6 +33,7 @@ namespace VokimiShared.src.models.db_classes.test
                 Text = text,
                 ImagePath = imagePath,
                 AnswersType = answersType,
+                OrderInTest = orderInTest,
                 MultiChoiceQuestionDataId = multiChoiceQuestionDataId
             };
 

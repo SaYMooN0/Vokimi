@@ -57,7 +57,7 @@ namespace VokimiShared.src.models.form_classes
             List<BaseAnswerForm> answers =[];
 
             foreach (var answer in q.Answers.OrderBy(a => a.OrderInQuestion)) {
-                var resultStringIds = answer.RelatedResultsData.Select(r => r.DraftTestResult.StringId).ToList();
+                var resultStringIds = answer.RelatedResultsData.Select(r => r.DraftTestResult.Name).ToList();
 
                 BaseAnswerForm form = q.AnswersType switch {
                     AnswersType.ImageOnly => new ImageOnlyAnswerForm {

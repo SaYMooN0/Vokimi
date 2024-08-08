@@ -42,11 +42,11 @@ namespace Vokimi.src.data.db_operations
             foreach (var result in results) {
                 if (result.TestTypeSpecificData is DraftGenericTestResultData resultData) {
                     if (resultData.AnswersLeadingToResult.Count == 0) {
-                        problems.Add($"Result with id: '{result.StringId}' has no answers leading to it");
+                        problems.Add($"Result with id: '{result.Name}' has no answers leading to it");
                     }
                 }
                 else {
-                    problems.Add($"Result with id: '{result.StringId}' has been saved incorrectly. Please recreate it");
+                    problems.Add($"Result with id: '{result.Name}' has been saved incorrectly. Please recreate it");
                     continue;
                 }
 

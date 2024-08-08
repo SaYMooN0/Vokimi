@@ -1,6 +1,4 @@
 ﻿.test-cover-section {
-    max-width: 500px;
-    min-width: 220px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -8,16 +6,18 @@
 }
 
 .test-cover-img {
-    width: 100%;
+    max-width: calc(120px + 21vw);
+    min-width: 220px;
+    max-height: calc(120px + 40vh);
     object-fit: contain;
     box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgb(67, 58, 178, 0.10) 0px 0px 0px 1px;
-    border-radius: 8px;
+    border-radius: 12px;
     margin-bottom: 6px;
 }
 
 .section-btn {
     width: 80%;
-    min-width: 220px;
+    min-width: 300px;
     height: 36px;
     background-color: var(--primary);
     border-radius: 6px;
@@ -35,6 +35,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    text-decoration: none;
 }
 
 .add-to-collecion-btn {

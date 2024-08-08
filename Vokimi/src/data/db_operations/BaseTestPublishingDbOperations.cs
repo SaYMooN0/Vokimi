@@ -37,7 +37,7 @@ namespace Vokimi.src.data.db_operations
 
             if (textLength < BaseTestCreationConsts.ResultMinTextLength ||
                 textLength > BaseTestCreationConsts.ResultMaxTextLength) {
-                return $"Text of the result with id: '{result.StringId}' is {textLength} characters long. The length must be " +
+                return $"Text of the result with id: '{result.Name}' is {textLength} characters long. The length must be " +
                        $"from {BaseTestCreationConsts.ResultMinTextLength} to {BaseTestCreationConsts.ResultMaxTextLength} characters";
             }
             else { return null; }

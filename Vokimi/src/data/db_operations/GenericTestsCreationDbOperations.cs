@@ -14,7 +14,8 @@ namespace Vokimi.src.data.db_operations
     {
         internal static async Task<Err> CreateNewQuestion(VokimiDbContext db, DraftGenericTest test, string questionText, AnswersType answersType) {
             try {
-                var draftTestQuestion = DraftGenericTestQuestion.CreateNew(questionText, answersType, test.Id);
+                ushort questionOrder = (ushort)test.Questions.Count;
+                var draftTestQuestion = DraftGenericTestQuestion.CreateNew(questionText, answersType, test.Id, questionOrder);
                 test.Questions.Add(draftTestQuestion);
                 await db.SaveChangesAsync();
                 return Err.None;
@@ -33,7 +34,7 @@ namespace Vokimi.src.data.db_operations
 
                     Dictionary<string, DraftTestResultId> results = db.DraftTestResults
                         .Where(t => t.TestId == question.DraftTestId)
-                        .ToDictionary(res => res.StringId, res => res.Id);
+                        .ToDictionary(res => res.Name, res => res.Id);
 
                     foreach (var answerForm in newData.Answers) {
                         if (answerForm.Validate().NotNone())
@@ -117,6 +118,68 @@ namespace Vokimi.src.data.db_operations
                 } catch (Exception ex) {
                     await transaction.RollbackAsync();
                     return new Err("Server error. Please try again later");
+                }
+            }
+        }
+        internal static async Task MoveQuestionUpInOrder(
+            VokimiDbContext db, DraftTestId testId, DraftTestQuestionId questionId) {
+            using (var transaction = await db.Database.BeginTransactionAsync()) {
+                try {
+                    DraftGenericTest? test = await db.DraftGenericTests.FirstOrDefaultAsync(i => i.Id == testId);
+                    if (test is null) {
+                        return;
+                    }
+                    DraftGenericTestQuestion? questionToMoveUp = test.Questions.FirstOrDefault(i => i.Id == questionId);
+                    if (questionToMoveUp is null) {
+                        return;
+                    }
+                    if (questionToMoveUp.OrderInTest == 0) {
+                        return;
+                    }
+                    ushort questionToMoveUpCurrentOrder = questionToMoveUp.OrderInTest;
+                    DraftGenericTestQuestion? questionToMoveDown =
+                        test.Questions.FirstOrDefault(q => q.OrderInTest == questionToMoveUpCurrentOrder - 1);
+                    if (questionToMoveDown is not null) {
+                        questionToMoveDown.UpdateOrderInTest(questionToMoveUpCurrentOrder);
+                        db.DraftGenericTestQuestions.Update(questionToMoveDown);
+                    }
+                    questionToMoveUp.UpdateOrderInTest((ushort)(questionToMoveUpCurrentOrder - 1));
+
+                    db.DraftGenericTestQuestions.Update(questionToMoveUp);
+                    await db.SaveChangesAsync();
+                } catch (Exception ex) {
+                    await transaction.RollbackAsync();
+                }
+            }
+        }
+        internal static async Task MoveQuestionDownInOrder(
+           VokimiDbContext db, DraftTestId testId, DraftTestQuestionId questionId) {
+            using (var transaction = await db.Database.BeginTransactionAsync()) {
+                try {
+                    DraftGenericTest? test = await db.DraftGenericTests.FirstOrDefaultAsync(i => i.Id == testId);
+                    if (test is null) {
+                        return;
+                    }
+                    DraftGenericTestQuestion? questionToMoveDown = test.Questions.FirstOrDefault(i => i.Id == questionId);
+                    if (questionToMoveDown is null) {
+                        return;
+                    }
+                    if (questionToMoveDown.OrderInTest == test.Questions.Count - 1) {
+                        return;
+                    }
+                    ushort questionToMoveDownCurrentOrder = questionToMoveDown.OrderInTest;
+                    DraftGenericTestQuestion? questionToMoveUp =
+                        test.Questions.FirstOrDefault(q => q.OrderInTest == questionToMoveDownCurrentOrder + 1);
+                    if (questionToMoveUp is not null) {
+                        questionToMoveUp.UpdateOrderInTest(questionToMoveDownCurrentOrder);
+                        db.DraftGenericTestQuestions.Update(questionToMoveUp);
+                    }
+                    questionToMoveDown.UpdateOrderInTest((ushort)(questionToMoveDownCurrentOrder + 1));
+
+                    db.DraftGenericTestQuestions.Update(questionToMoveDown);
+                    await db.SaveChangesAsync();
+                } catch (Exception ex) {
+                    await transaction.RollbackAsync();
                 }
             }
         }

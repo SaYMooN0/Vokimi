@@ -29,6 +29,14 @@
         var q = Questions[i];
         var localIndex = i;
         <div class="question-view-component">
+            <div class="question-order-buttons">
+                <svg viewBox="0 0 24 24" fill="none" @onclick="()=>MoveQuestionUpInOrder(q.Id)">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M11.4697 8.46967C11.7626 8.17678 12.2374 8.17678 12.5303 8.46967L18.5303 14.4697C18.7448 14.6842 18.809 15.0068 18.6929 15.287C18.5768 15.5673 18.3033 15.75 18 15.75H6C5.69665 15.75 5.42318 15.5673 5.30709 15.287C5.191 15.0068 5.25517 14.6842 5.46967 14.4697L11.4697 8.46967Z" fill="#141B34" />
+                </svg>
+                <svg viewBox="0 0 24 24" fill="none" @onclick="()=>MoveQuestionDownInOrder(q.Id)">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M5.99977 8.25005L17.9998 8.25C18.3031 8.25 18.5766 8.43273 18.6927 8.71298C18.8088 8.99324 18.7446 9.31583 18.5301 9.53033L12.5301 15.5303C12.2373 15.8232 11.7624 15.8232 11.4695 15.5303L5.46944 9.53038C5.25494 9.31588 5.19077 8.9933 5.30686 8.71304C5.42294 8.43278 5.69642 8.25005 5.99977 8.25005Z" fill="#141B34" />
+                </svg>
+            </div>
             <div class="question-info">
                 <p class="question-text">@(localIndex + 1). @q.Text</p>
                 <label class="answers-count">Answers count: @q.AnswersCount (@(q.IsMultipleChoice ? "Multi-Answer" : "Single-Answer"))</label>
@@ -70,19 +78,12 @@
 
 
 
-    private void OnDelteQuestionPressed(int i, DraftTestQuestionId questionId) =>
-        confirmationDialogRef.Open(
-            $"Are you sure you want to delete #{i + 1} question?",
-            () => DeleteQuestionFunc(questionId)
-        );
-
 
     protected override void OnInitialized() {
         base.OnInitialized();
         using (var dbContext = dbContextFactory.CreateDbContext()) {
             FetchQuestions(dbContext);
         }
-
     }
     private void FetchQuestions(VokimiDbContext dbContext) {
         DraftGenericTest? test = dbContext.DraftGenericTests.FirstOrDefault(t => t.Id == TestId);
@@ -92,10 +93,30 @@
         else {
             Questions = test.Questions
                 .Select(QuestionBriefInfoDto.FromDraftGenericTestQuestion)
+                .OrderBy(b => b.OrderInTest)
                 .ToList();
         }
         StateHasChanged();
     }
+    private async void MoveQuestionUpInOrder(DraftTestQuestionId questionId) {
+        using (var dbContext = dbContextFactory.CreateDbContext()) {
+            await GenericTestsCreationDbOperations.MoveQuestionUpInOrder(dbContext, TestId, questionId);
+            FetchQuestions(dbContext);
+        }
+
+    }
+    private async void MoveQuestionDownInOrder(DraftTestQuestionId questionId) {
+        using (var dbContext = dbContextFactory.CreateDbContext()) {
+            await GenericTestsCreationDbOperations.MoveQuestionDownInOrder(dbContext, TestId, questionId);
+            FetchQuestions(dbContext);
+        }
+    }
+    private void OnDelteQuestionPressed(int i, DraftTestQuestionId questionId) =>
+        confirmationDialogRef.Open(
+            $"Are you sure you want to delete #{i + 1} question?",
+            () => DeleteQuestionFunc(questionId)
+        );
+
     private async Task<Err> DeleteQuestionFunc(DraftTestQuestionId questionId) {
         Err deletionErr = Err.None;
         using (var dbContext = await dbContextFactory.CreateDbContextAsync()) {
@@ -110,14 +131,18 @@
         DraftTestQuestionId Id,
         string Text,
         ushort AnswersCount,
-        bool IsMultipleChoice)
+        AnswersType AnswersType,
+        bool IsMultipleChoice,
+        ushort OrderInTest)
     {
         internal static QuestionBriefInfoDto FromDraftGenericTestQuestion(DraftGenericTestQuestion question) =>
             new(
                 question.Id,
                 question.Text,
                 (ushort)question.Answers.Count,
-                question.IsMultipleChoice
+                question.AnswersType,
+                question.IsMultipleChoice,
+                question.OrderInTest
             );
     }
 }

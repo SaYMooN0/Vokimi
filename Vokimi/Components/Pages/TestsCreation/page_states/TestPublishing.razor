@@ -144,9 +144,9 @@
                 }
             }
 
-            var resultToPublish = GenericTestResult.CreateNew(testId, draftResult.Text, resultImg);
+            var resultToPublish = GenericTestResult.CreateNew(testId, draftResult.Name, draftResult.Text, resultImg);
             db.GenericTestResults.Add(resultToPublish);
-            publishedResults.Add(draftResult.StringId, resultToPublish);
+            publishedResults.Add(draftResult.Name, resultToPublish);
         }
         return publishedResults;
 
@@ -154,9 +154,11 @@
     private async Task<List<GenericTestQuestion>> PublishQuestions(
         ICollection<DraftGenericTestQuestion> questions, VokimiDbContext db, TestId testId,
         Dictionary<string, GenericTestResult> publishedResults, List<string> imgsToDeleteInCaseOfFailure) {
-        List<GenericTestQuestion> publishedQuestions = [];
 
-        foreach (var draftQuestion in questions) {
+        List<GenericTestQuestion> publishedQuestions = [];
+        ushort questionOrder = 0;
+
+        foreach (var draftQuestion in questions.OrderBy(i => i.OrderInTest)) {
             MultiChoiceQuestionDataId? multiChoiceDataId = null;
 
             if (draftQuestion.IsMultipleChoice) {
@@ -177,12 +179,15 @@
                 }
             }
 
-            var questionToPublish = GenericTestQuestion.CreateNew(testId, draftQuestion.Text, questionImg, draftQuestion.AnswersType, multiChoiceDataId);
+            GenericTestQuestion questionToPublish = GenericTestQuestion.CreateNew(testId,
+                    draftQuestion.Text, questionImg, draftQuestion.AnswersType, questionOrder, multiChoiceDataId);
             db.GenericTestQuestions.Add(questionToPublish);
+
+            questionOrder++;
 
             foreach (var draftAnswer in draftQuestion.Answers) {
                 ushort order = draftQuestion.ShuffleAnswers ? (ushort)0 : draftAnswer.OrderInQuestion;
-                var relatedResultIds = draftAnswer.RelatedResultsData.Select(r => r.DraftTestResult.StringId);
+                var relatedResultIds = draftAnswer.RelatedResultsData.Select(r => r.DraftTestResult.Name);
                 var relatedResults = publishedResults.Where(p => relatedResultIds.Contains(p.Key)).Select(p => p.Value).ToList();
                 var answerToPublish = GenericTestAnswer.CreateNew(questionToPublish.Id, order, draftAnswer.AdditionalInfoId, relatedResults);
 

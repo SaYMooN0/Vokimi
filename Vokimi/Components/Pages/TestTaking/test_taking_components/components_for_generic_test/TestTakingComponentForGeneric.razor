@@ -9,7 +9,9 @@
             @foreach (var answer in Vm.CurrentQuestion.Answers) {
                 @switch (Vm.CurrentQuestion.AnswersType) {
                     case AnswersType.TextOnly:
-                        <GenericTestTextOnlyAnswerDisplayComponent />
+                        <GenericTestTextOnlyAnswerDisplayComponent  
+                            Text="@((answer as GenericTestTakingAnswerTextOnlyDto).Text)"
+                            IsMultichoice="Vm.CurrentQuestion.IsMultiChoice"  />
                         break;
                     case AnswersType.ImageOnly:
                         <GenericTestImageOnlyAnswerDisplayComponent />
@@ -47,5 +49,11 @@ else {
             }
             Vm = GenericTestTakingViewModel.FromTest(test);
         }
+    }
+    private void NextButtonClicked() {
+        //if its last question check for errors
+    }
+    private void PreviousButtonClicked() {
+        
     }
 }
