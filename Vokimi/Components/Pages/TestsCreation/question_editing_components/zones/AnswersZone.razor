@@ -16,11 +16,12 @@
     @foreach (var answer in Answers.Select((value, index) => new { value, index })) {
         <div class="answer">
             <label class="answer-number">#@(answer.index + 1)</label>
-          
-                <AnswerResultsViewComponents Results="@answer.value.RelatedResultIds"
-                                             AssignResultAction="(list, action)=>resultAssigningDialogRef.Open(list, action)" />
 
-           
+            <AnswerResultsViewComponents ResultNames="@answer.value.RelatedResults"
+                                         AssignResultAction="(rerenderAction)=>
+                            resultAssigningDialogRef.Open(answer.value.RelatedResults, rerenderAction)" />
+
+
 
             @switch (AnswersType) {
                 case AnswersType.TextOnly:

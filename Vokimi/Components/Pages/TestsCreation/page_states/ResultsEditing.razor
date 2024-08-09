@@ -8,21 +8,17 @@
 
 
 <form class="results-editing-form">
-    <ResultsSectionHeader Text="Saved Results:" CollapseAction="CollapseAllSavedResults" />
-    @foreach (var r in formData.SavedResults) {
+    <div class="results-section-label">
+        Results:
+        <div class="collapse-all-btn" @onclick="CollapseAllResultComponents">Collapse all</div>
+    </div>
+    @foreach (var r in resultForms) {
+
         <ResultEditingComponent @ref="AddSavedResultWrapperRef"
                                 ResultForm="r"
-                                RemoveResultAction="()=>{formData.SavedResults.Remove(r); StateHasChanged();}">
-            <label class="result-id-label">@r.StringId</label>
-        </ResultEditingComponent>
-    }
-    <ResultsSectionHeader Text="New Results:" CollapseAction="CollapseAllNotSavedResults" />
-    @foreach (var r in formData.NotSavedResults) {
-        <ResultEditingComponent @ref="AddNotSavedResultWrapperRef"
-                                ResultForm="r"
-                                RemoveResultAction="()=>{formData.NotSavedResults.Remove(r); StateHasChanged();}">
-            <label class="result-id-input-label">
-                Result id: <input @bind="r.ResultStringId" type="text" />
+                                RemoveResultAction="()=>{resultForms.Remove(r); StateHasChanged();}">
+            <label class="result-name-input-label">
+                Result Name: <input @bind="r.Name" type="text" />
             </label>
         </ResultEditingComponent>
     }
@@ -39,25 +35,22 @@
 
     [CascadingParameter(Name = "TestId")] public DraftTestId TestId { get; set; }
 
-    private TestResultsEditingForm formData = TestResultsEditingForm.Empty;
+    private List<ResultEditingForm> resultForms = [];
 
     ResultEditingComponent AddSavedResultWrapperRef
-    { set => savedResultsWrapperRefs.Add(value); }
-    private List<ResultEditingComponent> savedResultsWrapperRefs = new();
+    { set => resultEditingComponentRefs.Add(value); }
+    private List<ResultEditingComponent> resultEditingComponentRefs = new();
 
-    ResultEditingComponent AddNotSavedResultWrapperRef
-    { set => notSavedResultsWrapperRefs.Add(value); }
-    private List<ResultEditingComponent> notSavedResultsWrapperRefs = new();
 
     protected override async Task OnInitializedAsync() {
-        Err err = await FetchFormData();
+        Err err = await FetchResultForms();
         if (err.NotNone()) {
             errorMessage = err.Message;
         }
         await base.OnInitializedAsync();
     }
     private async void HandleSubmit() {
-        Err validationErr = ValidateForm(formData);
+        Err validationErr = ValidateForm();
         if (validationErr.NotNone()) {
             errorMessage = validationErr.Message;
             StateHasChanged();
@@ -65,7 +58,7 @@
         }
         using (var dbContext = dbContextFactory.CreateDbContext()) {
             Err savingErr = await BaseTestsCreationDbOperations
-                    .UpdateDraftTestResults(dbContext, TestId, formData.SavedResults, formData.NotSavedResults);
+                    .UpdateDraftTestResults(dbContext, TestId, resultForms);
 
             if (savingErr.NotNone()) {
                 errorMessage = savingErr.Message;
@@ -76,11 +69,10 @@
 
 
         errorMessage = string.Empty;
-        await FetchFormData();
+        await FetchResultForms();
 
         StateHasChanged();
-        //after fetching results all results become saved
-        var usedImageKeys = formData.SavedResults
+        var usedImageKeys = resultForms
             .Select(r => r.ImagePath)
             .Where(s => !string.IsNullOrEmpty(s));
         await vokimiStorageService.ClearUnusedDraftTestResultsImages(TestId, usedImageKeys);
@@ -88,67 +80,52 @@
 
 
     }
-    private async Task<Err> FetchFormData() {
+    private async Task<Err> FetchResultForms() {
         using (var dbContext = dbContextFactory.CreateDbContext()) {
             BaseDraftTest? test = await dbContext.DraftTestsSharedInfo.FirstOrDefaultAsync(t => t.Id == TestId);
             if (test is null) {
-                formData = TestResultsEditingForm.Empty;
                 return new Err("Error fetching results data");
             }
             else {
-                formData = TestResultsEditingForm.FromDraftTest(test);
+                resultForms = test.PossibleResults.Select(ResultEditingForm.FromDraftTestResult).ToList();
                 return Err.None;
             }
 
         }
     }
-    public void CollapseAllSavedResults() {
-        foreach (var wrapperRef in savedResultsWrapperRefs) {
+    public void CollapseAllResultComponents() {
+        foreach (var wrapperRef in resultEditingComponentRefs) {
             wrapperRef.Hide();
         }
     }
-    public void CollapseAllNotSavedResults() {
-        foreach (var wrapperRef in notSavedResultsWrapperRefs) {
-            wrapperRef.Hide();
-        }
-    }
-    private Err ValidateForm(TestResultsEditingForm form) {
-        List<string> usedResIds = form.SavedResults.Select(r => r.StringId).ToList();
-        for (int i = 0; i < form.NotSavedResults.Count; i++) {
-            if (string.IsNullOrWhiteSpace(form.NotSavedResults[i].ResultStringId)) {
-                return new Err("Error: Result id cannot be empty");
+    private Err ValidateForm() {
+        List<string> usedNames = [];
+        for (int i = 0; i < resultForms.Count(); i++) {
+            if (string.IsNullOrWhiteSpace(resultForms[i].Name)) {
+                return new Err("Error: Result name cannot be empty");
             }
-            string resErrorPref = $"New result error. Id: {form.NotSavedResults[i].ResultStringId}. ";
-            if (usedResIds.Contains(form.NotSavedResults[i].ResultStringId)) {
-                return new Err(resErrorPref + "There is already result with this id");
+            string resErrorPref = $"Result '{resultForms[i].Name}' has error: ";
+            if (usedNames.Contains(resultForms[i].Name)) {
+                return new Err(resErrorPref + "There is already result with this name");
             }
-            if (form.NotSavedResults[i].ResultStringId.Length < BaseTestCreationConsts.ResultIdMinCharacters) {
-                return new Err(resErrorPref + $"Result id cannot be less than {BaseTestCreationConsts.ResultIdMinCharacters} characters");
+            if (resultForms[i].Name.Length < BaseTestCreationConsts.ResultNameMinCharacters) {
+                return new Err(resErrorPref + $"Result name cannot be less than {BaseTestCreationConsts.ResultNameMinCharacters} characters");
             }
-            if (form.NotSavedResults[i].ResultStringId.Length > BaseTestCreationConsts.ResultIdMaxCharacters) {
-                return new Err(resErrorPref + $"Result id cannot be more than {BaseTestCreationConsts.ResultIdMaxCharacters} characters");
+            if (resultForms[i].Name.Length > BaseTestCreationConsts.ResultNameMaxCharacters) {
+                return new Err(resErrorPref + $"Result name cannot be more than {BaseTestCreationConsts.ResultNameMaxCharacters} characters");
             }
-            usedResIds.Add(form.NotSavedResults[i].ResultStringId);
-        }
-
-        Func<string, int> lengthGettingFunc = (s) => string.IsNullOrWhiteSpace(s) ? 0 : s.Length;
-        var resultsIdTextLength = form.SavedResults
-             .Select(r => (r.StringId, lengthGettingFunc(r.Text)))
-             .Concat(
-                 form.NotSavedResults.Select(r => (r.ResultStringId, lengthGettingFunc(r.Text)))
-             );
-
-        foreach (var (resultStringId, textLength) in resultsIdTextLength) {
+            usedNames.Add(resultForms[i].Name);
+            int textLength = string.IsNullOrWhiteSpace(resultForms[i].Text) ? 0 : resultForms[i].Text.Length;
             if (textLength < BaseTestCreationConsts.ResultMinTextLength || textLength > BaseTestCreationConsts.ResultMaxTextLength) {
-                return new Err($"Text of the result with id: '{resultStringId}' is {textLength} characters long. The length must be " +
+                return new Err(resErrorPref + $"Text of the result is {textLength} characters long. The length must be " +
                     $"from {BaseTestCreationConsts.ResultMinTextLength} to {BaseTestCreationConsts.ResultMaxTextLength} characters");
             }
-        }
 
+        }
         return Err.None;
     }
     private void AddNewResult() {
-        formData.AddNewResult();
+        resultForms.Add(ResultEditingForm.Empty);
         StateHasChanged();
     }
 }

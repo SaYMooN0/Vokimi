@@ -30,11 +30,8 @@ namespace Vokimi.src.data.db_operations
             using (var transaction = await db.Database.BeginTransactionAsync()) {
                 try {
                     ClearAnswersForDraftTestQuestion(db, question);
-                    List<DraftGenericTestAnswer> answers = new();
 
-                    Dictionary<string, DraftTestResultId> results = db.DraftTestResults
-                        .Where(t => t.TestId == question.DraftTestId)
-                        .ToDictionary(res => res.Name, res => res.Id);
+                    List<DraftGenericTestAnswer> answers = new();
 
                     foreach (var answerForm in newData.Answers) {
                         if (answerForm.Validate().NotNone())
@@ -45,19 +42,12 @@ namespace Vokimi.src.data.db_operations
                         ushort orderIndex = (ushort)newData.Answers.IndexOf(answerForm);
                         DraftGenericTestAnswer answer = DraftGenericTestAnswer.CreateNew(questionId, orderIndex, typeSpecificInfo.Id);
 
-                        foreach (string resultStringId in answerForm.RelatedResultIds) {
-                            if (results.TryGetValue(resultStringId, out DraftTestResultId resultId)) {
-                                DraftTestResult? result = await db.DraftTestResults.FirstOrDefaultAsync(i => i.Id == resultId);
+                        foreach (DraftTestResultId resultId in answerForm.RelatedResults.Keys) {
+                            DraftTestResult? result = await db.DraftTestResults.FirstOrDefaultAsync(i => i.Id == resultId);
+                            if (result is not null && result.TestTypeSpecificData is DraftGenericTestResultData resultData) {
 
-
-                                if (result is not null &&
-                                    result.TestTypeSpecificData is DraftGenericTestResultData resultData) {
-
-                                    answer.RelatedResultsData.Add(resultData);
-                                    resultData.AnswersLeadingToResult.Add(answer);
-                                }
-
-
+                                answer.RelatedResultsData.Add(resultData);
+                                resultData.AnswersLeadingToResult.Add(answer);
                             }
                         }
 

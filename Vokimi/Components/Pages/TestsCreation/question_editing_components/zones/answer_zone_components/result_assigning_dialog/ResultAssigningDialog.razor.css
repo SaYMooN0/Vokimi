@@ -1,38 +1,26 @@
 ﻿.dialog-content {
-    width: 800px;
-    display: grid;
-    grid-template-rows: auto 1fr auto auto;
+    position: relative;
+    padding: 30px;
+    min-width: 600px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-
-.bottom-btns-container {
-    justify-self: right;
-    align-self: end;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    margin: auto 10px 10px auto;
-    gap: 10px;
-    width: fit-content;
+.close-btn {
+    position: absolute;
+    right: 12px;
+    top: 12px;
+    background-color: var(--grey);
+    height: 30px;
+    padding: 5px;
+    box-sizing: border-box;
+    aspect-ratio: 1/1;
+    border-radius: 50%;
+    fill: white;
+    cursor: pointer;
 }
 
-    .bottom-btns-container div {
-        padding: 2px 0;
-        width: 120px;
-        font-family: Quicksand;
-        text-align: center;
-        border: 3px solid var(--primary);
-        border-radius: 6px;
-        color: var(--primary);
-        font-size: 22px;
-        font-weight: bolder;
-        cursor: pointer;
-        transition: all 0.16s ease-in-out;
+    .close-btn:hover {
+        background-color: var(--red-del);
     }
-
-        .bottom-btns-container div:hover {
-            letter-spacing: 2px;
-        }
-
-        .bottom-btns-container div:active {
-            transform: scale(0.96);
-        }

@@ -1,96 +1,50 @@
 ﻿@inject IDbContextFactory<VokimiDbContext> dbContextFactory
 
-
-
 <link rel="stylesheet" href="/css/result_assigning_dialog.css" />
 
 
 <BaseDialog DialogId="result-assigning-dialog" @ref="baseDialogRef">
     <div class="dialog-content">
-        @if (string.IsNullOrWhiteSpace(errorString)) {
-            @if (isResultCreationContent) {
-                <ResultCreationContent @ref="resultCreationContentRef"
-                                       AlreadyExistingResultIds="AllResultStringIdsForTest" />
-            }
-            else {
-                <ResultAssigningContent @ref="resultAssigningContentRef"
-                                        ChangeToResultCreating="()=>isResultCreationContent=true" />
-            }
-            <div class="bottom-btns-container">
-                <div @onclick="Close">Cancel</div>
-                <div @onclick="OnSaveClick">Save</div>
-            </div>
-
+        <svg class="close-btn" viewBox="0 0 384 512" @onclick="Close">
+            <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
+        </svg>
+        @if (isResultCreationContent) {
+            <ResultCreationContent />
         }
         else {
-            <p class="error-string">@errorString</p>
+            <CreatedResultsAssigningContent ChangeToResultCreating="()=>isResultCreationContent = true"
+                                            ResultIdsToChooseFrom="GetResultsToAssign" />
         }
     </div>
 </BaseDialog>
-
 @code {
     private BaseDialog baseDialogRef { get; set; }
-    private ResultCreationContent resultCreationContentRef { get; set; }
-    private ResultAssigningContent resultAssigningContentRef { get; set; }
     private bool isResultCreationContent = false;
-    private string errorString = "";
 
+    private Dictionary<DraftTestResultId, string> CurrentAnswerResultsRef = [];
+    private Dictionary<DraftTestResultId, string> AllTestResults = [];
 
     [CascadingParameter(Name = "TestId")] public DraftTestId TestId { get; set; }
 
-    private List<string> currentResultsListToModifyRef = [];
-
-    private async Task<List<string>> AllResultStringIdsForTest() {
-        using (VokimiDbContext db = dbContextFactory.CreateDbContext()) {
-            BaseDraftTest? test = await db.DraftTestsSharedInfo.FirstOrDefaultAsync(i => i.Id == TestId);
-            if (test is null) {
-                errorString = "Test not found";
-                StateHasChanged();
-                return [];
-            }
-            return test.PossibleResults.Select(r => r.Name).ToList();
-        }
-    }
-   
-
-    private Action RerenderResutsViewComponents;
-
-
-    public async Task Open(List<string> answerResultsToModify, Action rerenderResulViewComponent) {
+    public async Task Open(Dictionary<DraftTestResultId, string> answerResultsToModify, Action rerenderResulViewComponent) {
         isResultCreationContent = false;
-        errorString = string.Empty;
+        CurrentAnswerResultsRef = answerResultsToModify;
         StateHasChanged();
-
-        currentResultsListToModifyRef = answerResultsToModify;
-        RerenderResutsViewComponents = rerenderResulViewComponent;
-
-        var resulsToChooseFrom = (await AllResultStringIdsForTest())
-            .Where(r => !currentResultsListToModifyRef.Contains(r))
-            .ToList();
-        resultAssigningContentRef.UpdateDataOnOpen(resulsToChooseFrom);
-
         await baseDialogRef.OpenAsync();
     }
     private async void Close() =>
         await baseDialogRef.CloseAsync();
 
-
-    private async void OnSaveClick() {
-        string? newResId = isResultCreationContent ?
-            await resultCreationContentRef.SaveNewResult() :
-            resultAssigningContentRef.SaveResult();
-
-        if (string.IsNullOrEmpty(newResId)) { return; }
-
-        if (currentResultsListToModifyRef.Count() >= GenericTestCreationConsts.MaxResultsCountForAnswer) {
-            errorString = $"You can't assign more than {GenericTestCreationConsts.MaxResultsCountForAnswer} results to one answer";
-            StateHasChanged();
+    protected override async Task OnInitializedAsync() {
+        using (var db = dbContextFactory.CreateDbContext()) {
+            BaseDraftTest? test = await db.DraftTestsSharedInfo.FirstOrDefaultAsync(t => t.Id == TestId);
+            if (test is null) {
+                return;
+            }
+            AllTestResults = test.PossibleResults.ToDictionary(r => r.Id, r => r.Name);
         }
-        else {
-            currentResultsListToModifyRef.Add(newResId);
-            RerenderResutsViewComponents();
-            Close();
-        }
-
     }
+    private Dictionary<DraftTestResultId, string> GetResultsToAssign => AllTestResults
+        .Where(aR => !CurrentAnswerResultsRef.Keys.Contains(aR.Key))
+        .ToDictionary(r => r.Key, r => r.Value);
 }

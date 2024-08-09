@@ -1,0 +1,32 @@
+﻿
+<label class="choose-label">Choose id of the related result</label>
+<div class="possible-results-container">
+    <InputRadioGroup @bind-Value="ChosenResult" Name="@groupName">
+        @foreach (var result in ResultIdsToChooseFrom) {
+            string radioId = $"{groupName}-{result.Key}";
+            <div class="possible-result">
+                <InputRadio name="@groupName"
+                            value="@result.Key.Value" TValue="Guid"
+                            id="@radioId" />
+                <label for="@radioId">@result.Value</label>
+            </div>
+        }
+    </InputRadioGroup>
+
+    <div class="add-new-res-btn" @onclick="ChangeToResultCreating">Create New</div>
+</div>
+
+<div class="assign-btn" @onclick="@AssignResult">
+    Assign
+</div>
+@code {
+    private string groupName = $"result-{Guid.NewGuid()}";
+    private Guid? ChosenResult { get; set; } = null;
+
+    [Parameter] public Action ChangeToResultCreating { get; set; }
+    [Parameter] public Dictionary<DraftTestResultId, string> ResultIdsToChooseFrom { get; set; } = [];
+
+    private void AssignResult() {
+
+    }
+}

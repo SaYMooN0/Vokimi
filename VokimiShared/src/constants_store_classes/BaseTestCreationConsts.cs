@@ -9,10 +9,10 @@ namespace VokimiShared.src.constants_store_classes
             MaxTestDescriptionLength = 255;
         public const int
             MaxResultsForTestCount = 30,
-            ResultMaxTextLength = 500,
             ResultMinTextLength = 8,
-            ResultIdMaxCharacters = 12,
-            ResultIdMinCharacters = 5;
+            ResultMaxTextLength = 500,
+            ResultNameMinCharacters = 10,
+            ResultNameMaxCharacters = 60;
         public const int MaxImageSizeInBytes = 3145728;
         public static int MaxImageSizeInMB => MaxImageSizeInBytes / 1048576;
 

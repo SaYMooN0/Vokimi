@@ -69,7 +69,7 @@
                     TestPublishingDto publishingDto = await InitPublishingDto(draftTest, imgsToDeleteInCaseOfFailure);
 
 
-                    Dictionary<string, GenericTestResult> publishedResults =
+                    Dictionary<DraftTestResultId, GenericTestResult> publishedResults =
                         await PublishResults(draftTest.PossibleResults, db, publishingDto.Id, imgsToDeleteInCaseOfFailure);
 
                     List<GenericTestQuestion> publishedQuestions =
@@ -126,9 +126,10 @@
         }
         return publishingDto;
     }
-    private async Task<Dictionary<string, GenericTestResult>> PublishResults(
+    private async Task<Dictionary<DraftTestResultId, GenericTestResult>> PublishResults(
         ICollection<DraftTestResult> draftTestResults, VokimiDbContext db, TestId testId, List<string> imgsToDeleteInCaseOfFailure) {
-        Dictionary<string, GenericTestResult> publishedResults = [];
+
+        Dictionary<DraftTestResultId, GenericTestResult> publishedResults = [];
         foreach (var draftResult in draftTestResults) {
 
             string? resultImg = null;
@@ -146,14 +147,14 @@
 
             var resultToPublish = GenericTestResult.CreateNew(testId, draftResult.Name, draftResult.Text, resultImg);
             db.GenericTestResults.Add(resultToPublish);
-            publishedResults.Add(draftResult.Name, resultToPublish);
+            publishedResults.Add(draftResult.Id, resultToPublish);
         }
         return publishedResults;
 
     }
     private async Task<List<GenericTestQuestion>> PublishQuestions(
         ICollection<DraftGenericTestQuestion> questions, VokimiDbContext db, TestId testId,
-        Dictionary<string, GenericTestResult> publishedResults, List<string> imgsToDeleteInCaseOfFailure) {
+        Dictionary<DraftTestResultId, GenericTestResult> publishedResults, List<string> imgsToDeleteInCaseOfFailure) {
 
         List<GenericTestQuestion> publishedQuestions = [];
         ushort questionOrder = 0;
@@ -187,7 +188,7 @@
 
             foreach (var draftAnswer in draftQuestion.Answers) {
                 ushort order = draftQuestion.ShuffleAnswers ? (ushort)0 : draftAnswer.OrderInQuestion;
-                var relatedResultIds = draftAnswer.RelatedResultsData.Select(r => r.DraftTestResult.Name);
+                var relatedResultIds = draftAnswer.RelatedResultsData.Select(r => r.DraftTestResult.Id);
                 var relatedResults = publishedResults.Where(p => relatedResultIds.Contains(p.Key)).Select(p => p.Value).ToList();
                 var answerToPublish = GenericTestAnswer.CreateNew(questionToPublish.Id, order, draftAnswer.AdditionalInfoId, relatedResults);
 

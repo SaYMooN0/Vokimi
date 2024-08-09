@@ -6,10 +6,33 @@
     flex-direction: column;
     box-sizing: border-box;
 }
+.results-section-label {
+    margin: 6px 0;
+    width: 100%;
+    box-sizing: border-box;
+    padding-left: 20px;
+    font-family: Roboto;
+    font-size: 26px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.collapse-all-btn {
+    font-size: 21px;
+    color: var(--grey);
+    cursor: pointer;
+}
+
+    .collapse-all-btn:hover {
+        text-decoration: underline;
+    }
 
 .new-result-btn {
     align-self: end;
     background: var(--primary);
+    padding: 10px 20px;
+    border-radius: 6px;
     font-family: Roboto;
     color: white;
     cursor: pointer;
@@ -19,15 +42,7 @@
         background: var(--primary-hov);
     }
 
-.result-id-label {
-    font-family: Roboto;
-    font-size: 22px;
-    margin-left: 14px;
-    display: flex;
-    align-items: center;
-}
-
-.result-id-input-label {
+.result-name-input-label {
     font-family: Roboto;
     font-size: 20px;
     display: grid;
@@ -37,13 +52,13 @@
     box-sizing: border-box;
 }
 
-    .result-id-input-label input {
+    .result-name-input-label input {
         outline: none;
         border: 2px solid transparent;
         background-color: var(--back-2);
         border-radius: 6px;
     }
 
-        .result-id-input-label input:focus {
+        .result-name-input-label input:focus {
             border-color: var(--primary);
         }

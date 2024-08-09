@@ -13,11 +13,11 @@
     grid-template-columns: 1fr auto;
 }
 
-.result-id-label {
-    font-family: Roboto;
-    text-align: center;
-    font-size: 18px;
-}
+    .chosen-result label {
+        font-family: Roboto;
+        text-align: center;
+        font-size: 18px;
+    }
 
 .remove-result-btn {
     box-sizing: border-box;

@@ -54,24 +54,24 @@ namespace VokimiShared.src.models.form_classes
         private static ushort ExtractMaxAnswersCount(DraftGenericTestQuestion q) =>
            q.MultipleChoiceData is not null ? q.MultipleChoiceData.MaxAnswers : (ushort)3;
         private static List<BaseAnswerForm> ExtractAnswers(DraftGenericTestQuestion q) {
-            List<BaseAnswerForm> answers =[];
+            List<BaseAnswerForm> answers = [];
 
             foreach (var answer in q.Answers.OrderBy(a => a.OrderInQuestion)) {
-                var resultStringIds = answer.RelatedResultsData.Select(r => r.DraftTestResult.Name).ToList();
+                var results = answer.RelatedResultsData.ToDictionary(r => r.DraftTestResult.Id, r => r.DraftTestResult.Name);
 
                 BaseAnswerForm form = q.AnswersType switch {
                     AnswersType.ImageOnly => new ImageOnlyAnswerForm {
                         ImagePath = (answer.AdditionalInfo as ImageOnlyAnswerAdditionalInfo)?.ImagePath,
-                        RelatedResultIds = resultStringIds
+                        RelatedResults = results
                     },
                     AnswersType.TextAndImage => new TextAndImageAnswerForm {
                         Text = (answer.AdditionalInfo as TextAndImageAnswerAdditionalInfo)?.Text,
                         ImagePath = (answer.AdditionalInfo as TextAndImageAnswerAdditionalInfo)?.ImagePath,
-                        RelatedResultIds = resultStringIds
+                        RelatedResults = results
                     },
                     AnswersType.TextOnly => new TextOnlyAnswerForm {
                         Text = (answer.AdditionalInfo as TextOnlyAnswerAdditionalInfo)?.Text,
-                        RelatedResultIds = resultStringIds
+                        RelatedResults = results
                     },
                     _ => throw new InvalidOperationException("Unknown answer type")
                 };

@@ -50,9 +50,9 @@ namespace Vokimi.src.data.context_configuration.model_builder_extensions
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Id).HasConversion(v => v.Value, v => new DraftTestResultId(v));
 
-                entity.Property(x => x.Name).IsRequired();
-                entity.Property(x => x.Text).IsRequired();
-                entity.Property(x => x.ImagePath).IsRequired(false);
+                entity.Property(x => x.Name);
+                entity.Property(x => x.Text);
+                entity.Property(x => x.ImagePath);
 
                 entity.HasOne(x => x.TestTypeSpecificData)
                     .WithOne(x => x.DraftTestResult)

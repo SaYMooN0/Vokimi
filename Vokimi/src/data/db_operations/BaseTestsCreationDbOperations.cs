@@ -13,7 +13,6 @@ using VokimiShared.src.models.db_classes.users;
 using VokimiShared.src.models.db_entities_ids;
 using VokimiShared.src.models.form_classes;
 using VokimiShared.src.models.form_classes.draft_tests_answers_form;
-using VokimiShared.src.models.form_classes.result_editing;
 
 namespace Vokimi.src.data.db_operations
 {
@@ -70,7 +69,7 @@ namespace Vokimi.src.data.db_operations
         }
 
         internal static async Task<Err> UpdateDraftTestMainInfo(VokimiDbContext db, DraftTestMainInfoId mainInfoId, string newName, string? newDescription, Language newLang, TestPrivacy newPrivacy) {
-            DraftTestMainInfo? info = await  db.DraftTestMainInfo.FirstOrDefaultAsync(mi => mi.Id == mainInfoId);
+            DraftTestMainInfo? info = await db.DraftTestMainInfo.FirstOrDefaultAsync(mi => mi.Id == mainInfoId);
             if (info is null) {
                 return new Err("Unknown test, please refresh the page");
             }
@@ -161,7 +160,7 @@ namespace Vokimi.src.data.db_operations
             return Err.None;
         }
 
-        internal static async Task<Err> UpdateDraftTestResults(VokimiDbContext db, DraftTestId testId, List<ResultWithSaveIdForm> savedResults, List<NotSavedResultForm> notSavedResults) {
+        internal static async Task<Err> UpdateDraftTestResults(VokimiDbContext db, DraftTestId testId, List<ResultEditingForm> results) {
             using (var transaction = await db.Database.BeginTransactionAsync()) {
                 try {
                     BaseDraftTest? test = await db.DraftTestsSharedInfo.FirstOrDefaultAsync(i => i.Id == testId);
@@ -171,20 +170,24 @@ namespace Vokimi.src.data.db_operations
 
                     List<DraftTestResult> resultsToRemove = new();
 
-                    ImmutableDictionary<DraftTestResultId, ResultWithSaveIdForm> savedResultsIds = savedResults.ToImmutableDictionary(r => r.Id, r => r);
+                    ImmutableDictionary<DraftTestResultId, ResultEditingForm> savedResults = results
+                        .Where(r => r.Id.Value != Guid.Empty)
+                        .ToImmutableDictionary(r => r.Id, r => r);
 
                     foreach (var r in test.PossibleResults) {
-                        if (savedResultsIds.TryGetValue(r.Id, out ResultWithSaveIdForm newData)) {
-                            r.Update(newData.Text, newData.ImagePath);
+                        if (savedResults.TryGetValue(r.Id, out var newData)) {
+                            r.Update(newData.Name, newData.Text, newData.ImagePath);
                         }
                         else {
                             resultsToRemove.Add(r);
                         }
                     }
+                    var notSavedResults = results.Where(r => r.Id.Value == Guid.Empty);
                     foreach (var newRes in notSavedResults) {
                         var resultTypeSpecificDataId = await CreateEmptyDraftTestResultData(db, test.Template);
 
-                        DraftTestResult r = DraftTestResult.CreateNew(newRes.ResultStringId, testId, newRes.Text, newRes.ImagePath, resultTypeSpecificDataId);
+                        DraftTestResult r = DraftTestResult.CreateNew(
+                            testId, newRes.Name, newRes.Text, newRes.ImagePath, resultTypeSpecificDataId);
                         test.PossibleResults.Add(r);
                     }
 
