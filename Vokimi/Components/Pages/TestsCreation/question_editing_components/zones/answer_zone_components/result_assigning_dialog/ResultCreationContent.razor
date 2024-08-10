@@ -1,1 +1,40 @@
-﻿
+﻿@inject IDbContextFactory<VokimiDbContext> dbContextFactory
+
+<input @bind="resultName" placeholder="Type new result name..." name="@Guid.NewGuid()" class="result-name-input" />
+<p class="error-string">@errorMessage</p>
+<div class="save-new-res-btn" @onclick="SaveNewResult">Save</div>
+
+@code {
+    [Parameter] public Func<Task> ChangeToResultAssigning { get; set; }
+    [Parameter] public IEnumerable<string> CreatedTestResultsNames { get; set; } = [];
+    [CascadingParameter(Name = "TestId")] public DraftTestId TestId { get; set; }
+
+    private string errorMessage;
+    private string resultName;
+
+    private async Task SaveNewResult() {
+        errorMessage = string.Empty;
+        resultName = resultName.Trim();
+        if (
+            string.IsNullOrWhiteSpace(resultName) ||
+            resultName.Length > BaseTestCreationConsts.ResultNameMaxCharacters ||
+            resultName.Length < BaseTestCreationConsts.ResultNameMinCharacters) {
+
+            errorMessage = $"Result name must be between {BaseTestCreationConsts.ResultNameMinCharacters} and {BaseTestCreationConsts.ResultNameMaxCharacters} characters";
+            return;
+        }
+        if (CreatedTestResultsNames.Contains(resultName)) {
+            errorMessage = "Result with this name already exists";
+            return;
+        }
+        using (VokimiDbContext dbContext = dbContextFactory.CreateDbContext()) {
+            Err err = await BaseTestsCreationDbOperations.CreateNewDraftTestResult(dbContext, TestId, resultName);
+            if (err.NotNone()) {
+                errorMessage = "Unable to create new result. Please try again later.";
+                return;
+            }
+        }
+        await ChangeToResultAssigning();
+
+    }
+}

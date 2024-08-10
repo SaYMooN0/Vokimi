@@ -83,25 +83,23 @@ namespace Vokimi.src.data.db_operations
             return Err.None;
         }
 
-        internal static async Task<Err> CreateNewDraftTestResult(VokimiDbContext db, DraftTestId testId, string resultId) {
+        internal static async Task<Err> CreateNewDraftTestResult(VokimiDbContext db, DraftTestId testId, string resultName) {
             BaseDraftTest? test = await db.DraftTestsSharedInfo.FirstOrDefaultAsync(i => i.Id == testId);
             if (test is null) {
                 return new Err("Unknown test");
             }
+            if (test.PossibleResults.Select(r => r.Name).Contains(resultName)) {
+                return new Err("Result with this name already exists");
+            }
 
             var specificDataId = await CreateEmptyDraftTestResultData(db, test.Template);
-            var result = DraftTestResult.CreateNew(resultId, testId, specificDataId);
+            var result = DraftTestResult.CreateNew(resultName, testId, specificDataId);
 
-            using (var transaction = await db.Database.BeginTransactionAsync()) {
-                try {
-                    test.PossibleResults.Add(result);
-
-                    await db.SaveChangesAsync();
-                    await transaction.CommitAsync();
-                } catch (Exception ex) {
-                    await transaction.RollbackAsync();
-                    return new Err("Server error. Please try again later.");
-                }
+            try {
+                test.PossibleResults.Add(result);
+                await db.SaveChangesAsync();
+            } catch (Exception ex) {
+                return new Err("Server error. Please try again later.");
             }
 
             return Err.None;

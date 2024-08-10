@@ -1,0 +1,31 @@
+
+.result-name-input {
+    justify-self: center;
+    margin-top: 60px;
+    width: 80%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 2px solid var(--back-2);
+    border-radius: 60px;
+    font-size: 24px;
+    outline: none;
+}
+
+    .result-name-input:focus {
+        outline: 1px solid var(--primary);
+        border-color: var(--primary);
+    }
+
+.error-string {
+    margin-top: auto;
+    justify-self: center;
+    font-family: Roboto;
+    color: var(--red-del);
+    font-size: 18px;
+}
+
+.save-new-res-btn {
+    padding: 10px 20px;
+    background-color: var(--primary);
+    cursor: pointer;
+}

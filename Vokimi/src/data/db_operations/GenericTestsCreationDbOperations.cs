@@ -134,9 +134,11 @@ namespace Vokimi.src.data.db_operations
                         db.DraftGenericTestQuestions.Update(questionToMoveDown);
                     }
                     questionToMoveUp.UpdateOrderInTest((ushort)(questionToMoveUpCurrentOrder - 1));
-
                     db.DraftGenericTestQuestions.Update(questionToMoveUp);
+
                     await db.SaveChangesAsync();
+                    await transaction.CommitAsync();
+
                 } catch (Exception ex) {
                     await transaction.RollbackAsync();
                 }
@@ -165,9 +167,10 @@ namespace Vokimi.src.data.db_operations
                         db.DraftGenericTestQuestions.Update(questionToMoveUp);
                     }
                     questionToMoveDown.UpdateOrderInTest((ushort)(questionToMoveDownCurrentOrder + 1));
-
                     db.DraftGenericTestQuestions.Update(questionToMoveDown);
+                    
                     await db.SaveChangesAsync();
+                    await transaction.CommitAsync();
                 } catch (Exception ex) {
                     await transaction.RollbackAsync();
                 }

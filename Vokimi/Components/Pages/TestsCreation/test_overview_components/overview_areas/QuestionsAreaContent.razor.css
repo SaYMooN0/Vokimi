@@ -20,14 +20,36 @@
 }
 
 .question-view-component {
+    margin-top:10px;
     min-height: 120px;
     padding: 10px;
     box-sizing: border-box;
     border-radius: 10px;
     display: grid;
-    grid-template-columns:40px 1fr auto;
+    grid-template-columns: 40px 1fr auto;
     box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgb(67, 58, 178, 0.10) 0px 0px 0px 1px;
 }
+
+.question-order-buttons {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+    .question-order-buttons svg {
+        cursor: pointer;
+    }
+
+    .question-order-buttons path {
+        fill: var(--grey);
+    }
+
+    .question-order-buttons svg:hover path {
+        fill: var(--primary-hov);
+    }
 
 .question-info {
     display: grid;

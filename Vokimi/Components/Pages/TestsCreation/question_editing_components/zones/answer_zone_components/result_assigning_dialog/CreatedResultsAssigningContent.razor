@@ -1,5 +1,4 @@
-﻿
-<label class="choose-label">Choose id of the related result</label>
+﻿<label class="choose-label">Choose id of the related result</label>
 <div class="possible-results-container">
     <InputRadioGroup @bind-Value="ChosenResult" Name="@groupName">
         @foreach (var result in ResultIdsToChooseFrom) {
@@ -13,20 +12,34 @@
         }
     </InputRadioGroup>
 
-    <div class="add-new-res-btn" @onclick="ChangeToResultCreating">Create New</div>
+    <div class="create-res-btn" @onclick="ChangeToResultCreating">Create New</div>
 </div>
-
-<div class="assign-btn" @onclick="@AssignResult">
+<p></p>
+<div class="assign-btn" @onclick="@AssignResultBtnPressed">
     Assign
 </div>
 @code {
+    private string errorString = "";
     private string groupName = $"result-{Guid.NewGuid()}";
     private Guid? ChosenResult { get; set; } = null;
 
+
     [Parameter] public Action ChangeToResultCreating { get; set; }
     [Parameter] public Dictionary<DraftTestResultId, string> ResultIdsToChooseFrom { get; set; } = [];
+    [Parameter] public Action<DraftTestResultId, string> AssignResult { get; set; }
 
-    private void AssignResult() {
-
+    private void AssignResultBtnPressed() {
+        if (ChosenResult == null || ChosenResult == Guid.Empty) {
+            errorString = "Choose the result first";
+            return;
+        }
+        DraftTestResultId chosenResultId = new(ChosenResult.Value);
+        if (ResultIdsToChooseFrom.TryGetValue(chosenResultId, out string resultName)) {
+            AssignResult(chosenResultId, resultName);
+        }
+        else {
+            errorString = "Unable to assign result";
+            return;
+        }
     }
 }

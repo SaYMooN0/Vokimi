@@ -9,10 +9,11 @@
             <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
         </svg>
         @if (isResultCreationContent) {
-            <ResultCreationContent />
+            <ResultCreationContent ChangeToResultAssigning="ChangeFromResultCreationToAssigning" />
         }
         else {
-            <CreatedResultsAssigningContent ChangeToResultCreating="()=>isResultCreationContent = true"
+            <CreatedResultsAssigningContent AssignResult="AssignResult"
+                                            ChangeToResultCreating="()=>isResultCreationContent = true"
                                             ResultIdsToChooseFrom="GetResultsToAssign" />
         }
     </div>
@@ -23,12 +24,14 @@
 
     private Dictionary<DraftTestResultId, string> CurrentAnswerResultsRef = [];
     private Dictionary<DraftTestResultId, string> AllTestResults = [];
+    private Action RerenderResultViewComponent { get; set; }
 
     [CascadingParameter(Name = "TestId")] public DraftTestId TestId { get; set; }
 
     public async Task Open(Dictionary<DraftTestResultId, string> answerResultsToModify, Action rerenderResulViewComponent) {
         isResultCreationContent = false;
         CurrentAnswerResultsRef = answerResultsToModify;
+        RerenderResultViewComponent = rerenderResulViewComponent;
         StateHasChanged();
         await baseDialogRef.OpenAsync();
     }
@@ -36,15 +39,29 @@
         await baseDialogRef.CloseAsync();
 
     protected override async Task OnInitializedAsync() {
+        await FetchAllTestResults();
+    }
+    private async Task FetchAllTestResults() {
         using (var db = dbContextFactory.CreateDbContext()) {
             BaseDraftTest? test = await db.DraftTestsSharedInfo.FirstOrDefaultAsync(t => t.Id == TestId);
             if (test is null) {
+                AllTestResults = [];
                 return;
             }
             AllTestResults = test.PossibleResults.ToDictionary(r => r.Id, r => r.Name);
         }
+        StateHasChanged();
+    }
+    private async Task ChangeFromResultCreationToAssigning() {
+        isResultCreationContent = false;
+        await FetchAllTestResults();
     }
     private Dictionary<DraftTestResultId, string> GetResultsToAssign => AllTestResults
         .Where(aR => !CurrentAnswerResultsRef.Keys.Contains(aR.Key))
         .ToDictionary(r => r.Key, r => r.Value);
+    private void AssignResult(DraftTestResultId id, string name) {
+        CurrentAnswerResultsRef.Add(id, name);
+        RerenderResultViewComponent();
+        Close();
+    }
 }
