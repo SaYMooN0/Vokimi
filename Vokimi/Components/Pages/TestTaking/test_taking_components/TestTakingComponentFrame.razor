@@ -59,7 +59,7 @@
 
     private void NextButtonClicked() {
         errorMessage = string.Empty;
-        Err err = GoToPreviousQuestion();
+        Err err = GoToNextQuestion();
         if (err.NotNone()) {
             errorMessage = err.ToString();
         }

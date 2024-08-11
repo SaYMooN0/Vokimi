@@ -14,7 +14,7 @@
     </div>
     @foreach (var r in resultForms) {
 
-        <ResultEditingComponent @ref="AddSavedResultWrapperRef"
+        <ResultEditingComponent @ref="ResultEditingComponentsRefs"
                                 ResultForm="r"
                                 RemoveResultAction="()=>{resultForms.Remove(r); StateHasChanged();}">
             <label class="result-name-input-label">
@@ -37,7 +37,7 @@
 
     private List<ResultEditingForm> resultForms = [];
 
-    ResultEditingComponent AddSavedResultWrapperRef
+    ResultEditingComponent ResultEditingComponentsRefs
     { set => resultEditingComponentRefs.Add(value); }
     private List<ResultEditingComponent> resultEditingComponentRefs = new();
 

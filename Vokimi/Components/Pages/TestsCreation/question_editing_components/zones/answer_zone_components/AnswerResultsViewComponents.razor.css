@@ -5,27 +5,62 @@
     justify-content: center;
     align-items: center;
     gap: 7px;
+    width: 180px;
 }
 
 .chosen-result {
-    width: 100%;
+    width: inherit;
     display: grid;
-    grid-template-columns: 1fr auto;
+    gap: 6px;
+    grid-template-columns: 150px 24px;
+    align-items: center;
+    position: relative;
 }
 
-    .chosen-result label {
-        font-family: Roboto;
-        text-align: center;
-        font-size: 18px;
-    }
+.result-label {
+    font-family: Roboto;
+    text-align: center;
+    font-size: 16px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    z-index: 1;
+}
+
+.result-label-tooltip {
+    position: absolute;
+    opacity: 0.4;
+    visibility:hidden;
+    left: 50%;
+    transform: translateX(-40%);
+    bottom: 70%;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 17px;
+    z-index: 10;
+    max-width: 300px;
+    min-width: 220px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    background-color: white;
+    color: black;
+    font-family: Roboto;
+    word-break: break-word;
+    transition: opacity 0.1s, bottom 0.17s;
+}
+
+.chosen-result:hover .result-label-tooltip {
+    visibility: visible;
+    opacity: 1;
+    bottom: 120%;
+}
 
 .remove-result-btn {
+    aspect-ratio: 1/1;
     box-sizing: border-box;
     padding: 2px;
     border-radius: 26%;
     background: var(--grey);
-    height: 24px;
-    aspect-ratio: 1/1;
+    height: 100%;
     fill: white;
     cursor: pointer;
     transition: all 0.18s ease-in;
@@ -40,12 +75,12 @@
     }
 
 .add-new-result-btn {
-    width: 94%;
+    width: 92%;
     background-color: var(--primary);
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 2px;
+    gap: 4%;
     padding: 4px 0;
     border-radius: 4px;
     color: white;
@@ -62,7 +97,7 @@
 
     .add-new-result-btn:hover {
         background-color: var(--primary-hov);
-        gap: 4px;
+        gap: 8%;
         width: 98%;
     }
 

@@ -4,28 +4,31 @@
     <TestTakingComponentFrame ArrowsType="Vm.ArrowIcons"
                               CurrentQuestionNumber="Vm.CurrentQuestionNumber"
                               QuestionsCount="Vm.TotalNumberOfQuestions"
-                              QuestionText="@Vm.CurrentQuestion.Text">
+                              QuestionText="@Vm.CurrentQuestion.Text"
+                              GoToNextQuestion="GoToNextQuestion"
+                              GoToPreviousQuestion="GoToPreviousQuestion">
         <AnswersContent>
             @foreach (var answer in Vm.CurrentQuestion.Answers) {
-                @switch (Vm.CurrentQuestion.AnswersType) {
-                    case AnswersType.TextOnly:
-                        <GenericTestTextOnlyAnswerDisplayComponent  
-                            Text="@((answer as GenericTestTakingAnswerTextOnlyDto).Text)"
-                            IsMultichoice="Vm.CurrentQuestion.IsMultiChoice"  />
-                        break;
-                    case AnswersType.ImageOnly:
-                        <GenericTestImageOnlyAnswerDisplayComponent />
-                        break;
-                    case AnswersType.TextAndImage:
-                        <GenericTestTextAndImageAnswerDisplayComponent />
-                        break;
-                    default:
-                        <div>
-                            Unexpected err
-                        </div>
-                        break;
+                <AnswerWrapper IsMultichoice="Vm.CurrentQuestion.IsMultiChoice">
+                    @switch (Vm.CurrentQuestion.AnswersType) {
+                        case AnswersType.TextOnly:
+                            <GenericTestTextOnlyAnswerDisplayComponent Text="@((answer as GenericTestTakingAnswerTextOnlyDto).Text)" />
+                            break;
+                        case AnswersType.ImageOnly:
+                            <GenericTestImageOnlyAnswerDisplayComponent Image="@((answer as GenericTestTakingAnswerImageOnlyDto).Image)" />
+                            break;
+                        case AnswersType.TextAndImage:
+                            <GenericTestTextAndImageAnswerDisplayComponent Text="@((answer as GenericTestTakingAnswerTextAndImageDto).Text)"
+                                                                           Image="@((answer as GenericTestTakingAnswerTextAndImageDto).Image)" />
+                            break;
+                        default:
+                            <div>
+                                Unexpected err
+                            </div>
+                            break;
 
-                }
+                    }
+                </AnswerWrapper>
             }
         </AnswersContent>
     </TestTakingComponentFrame>
@@ -50,10 +53,12 @@ else {
             Vm = GenericTestTakingViewModel.FromTest(test);
         }
     }
-    private void NextButtonClicked() {
-        //if its last question check for errors
+    private Err GoToNextQuestion() {
+        return Err.None;
+        //if its last question, check for errors
     }
-    private void PreviousButtonClicked() {
-        
+    private Err GoToPreviousQuestion() {
+        return Err.None;
+
     }
 }

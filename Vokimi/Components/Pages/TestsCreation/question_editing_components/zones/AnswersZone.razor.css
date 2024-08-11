@@ -63,7 +63,7 @@
     min-height: 120px;
     width: 98%;
     display: grid;
-    grid-template-columns: auto 164px 1fr auto;
+    grid-template-columns: auto auto 1fr auto;
 }
 
 .answer-number {
