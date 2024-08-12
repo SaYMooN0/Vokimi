@@ -1,0 +1,20 @@
+﻿<div class="txt-and-img-answers-container">
+    @foreach (var answer in Answers) {
+        <div class="answer-display">
+            @answer.Image
+            @answer.Text
+            <IsChosenAnswerInput InputsGroupName="@inputsGroupName"
+                                 IsMultichoice="@IsMultichoice" />
+        </div>
+    }
+</div>
+@code {
+    [Parameter] public IEnumerable<GenericTestTakingAnswerTextAndImageDto> Answers { get; set; }
+    [Parameter] public bool IsMultichoice { get; set; }
+
+    private string inputsGroupName;
+
+    protected override void OnParametersSet() {
+        inputsGroupName = $"answers-group-{Guid.NewGuid()}";
+    }
+}

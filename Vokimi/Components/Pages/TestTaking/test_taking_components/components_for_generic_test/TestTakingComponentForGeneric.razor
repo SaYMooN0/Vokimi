@@ -2,33 +2,32 @@
 
 @if (string.IsNullOrEmpty(initError)) {
     <TestTakingComponentFrame ArrowsType="Vm.ArrowIcons"
-                              CurrentQuestionNumber="Vm.CurrentQuestionNumber"
-                              QuestionsCount="Vm.TotalNumberOfQuestions"
-                              QuestionText="@Vm.CurrentQuestion.Text"
                               GoToNextQuestion="GoToNextQuestion"
                               GoToPreviousQuestion="GoToPreviousQuestion">
+        <QuestionNumberText>Question @(Vm.CurrentQuestionNumber + 1) / @Vm.TotalNumberOfQuestions</QuestionNumberText>
+        <CurrentQuestionText>@Vm.CurrentQuestion.Text</CurrentQuestionText>
         <AnswersContent>
-            @foreach (var answer in Vm.CurrentQuestion.Answers) {
-                <AnswerWrapper IsMultichoice="Vm.CurrentQuestion.IsMultiChoice">
-                    @switch (Vm.CurrentQuestion.AnswersType) {
-                        case AnswersType.TextOnly:
-                            <GenericTestTextOnlyAnswerDisplayComponent Text="@((answer as GenericTestTakingAnswerTextOnlyDto).Text)" />
-                            break;
-                        case AnswersType.ImageOnly:
-                            <GenericTestImageOnlyAnswerDisplayComponent Image="@((answer as GenericTestTakingAnswerImageOnlyDto).Image)" />
-                            break;
-                        case AnswersType.TextAndImage:
-                            <GenericTestTextAndImageAnswerDisplayComponent Text="@((answer as GenericTestTakingAnswerTextAndImageDto).Text)"
-                                                                           Image="@((answer as GenericTestTakingAnswerTextAndImageDto).Image)" />
-                            break;
-                        default:
-                            <div>
-                                Unexpected err
-                            </div>
-                            break;
+            @switch (Vm.CurrentQuestion.AnswersType) {
+                case AnswersType.TextOnly:
+                    <GenericTestTextOnlyAnswersDisplayComponent IsMultichoice="Vm.CurrentQuestion.IsMultiChoice"
+                                                                Answers="@(Vm.CurrentQuestion.Answers
+                                                                .Select(a=>(a as GenericTestTakingAnswerTextOnlyDto)))"
+                                                                 />
+                    break;
+                case AnswersType.ImageOnly:
+                    <GenericTestImageOnlyAnswersDisplayComponent Answers="@(Vm.CurrentQuestion.Answers
+                                                                .Select(a=>(a as GenericTestTakingAnswerImageOnlyDto)))" />
+                    break;
+                case AnswersType.TextAndImage:
+                    <GenericTestTextAndImageAnswersDisplayComponent Answers="@(Vm.CurrentQuestion.Answers
+                                                                .Select(a=>(a as GenericTestTakingAnswerTextAndImageDto)))" />
+                    break;
+                default:
+                    <div>
+                        Unexpected err
+                    </div>
+                    break;
 
-                    }
-                </AnswerWrapper>
             }
         </AnswersContent>
     </TestTakingComponentFrame>
@@ -38,7 +37,7 @@ else {
 }
 @code {
     [CascadingParameter(Name = "TestId")] public TestId TestId { get; set; }
-    private Dictionary<ushort, List<GenericTestAnswerId>> chosenAnswers = [];
+
     GenericTestTakingViewModel Vm = GenericTestTakingViewModel.Empty;
     private string? initError = null;
 
@@ -54,11 +53,30 @@ else {
         }
     }
     private Err GoToNextQuestion() {
+        SaveCurrentSelectedAnswers();
+        if (Vm.CurrentQuestionNumber < Vm.TotalNumberOfQuestions - 1) {
+            Vm.CurrentQuestionNumber++;
+        }
+        else {
+            //move to conclusion if exists
+        }
         return Err.None;
         //if its last question, check for errors
     }
     private Err GoToPreviousQuestion() {
+        SaveCurrentSelectedAnswers();
+        if (Vm.CurrentQuestionNumber > 0) {
+            Vm.CurrentQuestionNumber--;
+        }
+
         return Err.None;
+    }
+    private void SaveCurrentSelectedAnswers() {
+       //helper class
+    }
+
+    private void LoadCurrentSelectedAnswers() {
+        //helper class
 
     }
 }

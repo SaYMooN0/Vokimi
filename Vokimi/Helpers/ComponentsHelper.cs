@@ -2,7 +2,7 @@
 using Vokimi.Components.Pages.TestTaking.ArrowButtonIcons;
 using VokimiShared.src.enums;
 
-namespace Vokimi.Components
+namespace Vokimi.Helpers
 {
     public static class ComponentsHelper
     {

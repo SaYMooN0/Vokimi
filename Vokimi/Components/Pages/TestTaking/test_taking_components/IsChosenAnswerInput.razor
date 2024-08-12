@@ -1,0 +1,19 @@
+﻿<div class="is-chosen-answer-input">
+    @if (IsMultichoice) {
+        <input type="checkbox" @onclick="ToggleSelection" />
+    }
+    else {
+        <input class="radio-input" type="radio" name="@InputsGroupName" @onclick="ToggleSelection" />
+    }
+</div>
+
+@code {
+    [Parameter] public string InputsGroupName { get; set; }
+    [Parameter] public bool IsMultichoice { get; set; }
+    [Parameter] public bool IsSelected { get; set; }
+    [Parameter] public EventCallback<bool> OnSelectionChanged { get; set; }
+
+    private async Task ToggleSelection() {
+        await OnSelectionChanged.InvokeAsync(!IsSelected);
+    }
+}

@@ -1,0 +1,30 @@
+﻿<div class="txt-only-answers-container">
+    @foreach (var answer in Answers) {
+        <p>
+            <IsChosenAnswerInput IsMultichoice="@IsMultichoice"
+                                 InputsGroupName="@inputsGroupName"
+                                 OnSelectionChanged="@((isSelected) => OnAnswerSelectionChanged(answer.Id, isSelected))" />
+            @answer.Text
+        </p>
+    }
+</div>
+
+@code {
+    [Parameter] public IEnumerable<GenericTestTakingAnswerTextOnlyDto> Answers { get; set; }
+    [Parameter] public bool IsMultichoice { get; set; }
+
+    private string inputsGroupName;
+
+    protected override void OnParametersSet() {
+        inputsGroupName = $"answers-group-{Guid.NewGuid()}";
+    }
+
+    private void OnAnswerSelectionChanged(GenericTestAnswerId answerId, bool isSelected) {
+        if (isSelected) {
+            // SelectedAnswers.Add(answerId);
+        }
+        else {
+            // SelectedAnswers.Remove(answerId);
+        }
+    }
+}

@@ -72,12 +72,12 @@ namespace Vokimi.PageViewModels
             };
 
     }
-    internal abstract record class GenericTestTakingAnswerDto(GenericTestAnswerId Id, ushort OrderInQuestion);
-    internal record class GenericTestTakingAnswerTextOnlyDto(GenericTestAnswerId Id, ushort OrderInQuestion, string Text)
+    public abstract record class GenericTestTakingAnswerDto(GenericTestAnswerId Id, ushort OrderInQuestion);
+    public record class GenericTestTakingAnswerTextOnlyDto(GenericTestAnswerId Id, ushort OrderInQuestion, string Text)
         : GenericTestTakingAnswerDto(Id, OrderInQuestion);
-    internal record class GenericTestTakingAnswerImageOnlyDto(GenericTestAnswerId Id, ushort OrderInQuestion, string Image)
+    public record class GenericTestTakingAnswerImageOnlyDto(GenericTestAnswerId Id, ushort OrderInQuestion, string Image)
         : GenericTestTakingAnswerDto(Id, OrderInQuestion);
-    internal record class GenericTestTakingAnswerTextAndImageDto(GenericTestAnswerId Id, ushort OrderInQuestion, string Text, string Image)
+    public record class GenericTestTakingAnswerTextAndImageDto(GenericTestAnswerId Id, ushort OrderInQuestion, string Text, string Image)
         : GenericTestTakingAnswerDto(Id, OrderInQuestion);
 
 }

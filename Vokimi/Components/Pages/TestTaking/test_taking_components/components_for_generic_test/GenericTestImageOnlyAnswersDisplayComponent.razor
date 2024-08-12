@@ -1,0 +1,10 @@
+﻿<div class="answers-container">
+    @foreach (var answer in Answers) {
+
+    }
+</div>
+@code {
+    [Parameter] public IEnumerable<GenericTestTakingAnswerImageOnlyDto> Answers { get; set; }
+    [Parameter] public bool IsMultichoice { get; set; }
+
+}
