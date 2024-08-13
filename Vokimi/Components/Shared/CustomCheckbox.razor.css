@@ -1,8 +1,8 @@
-﻿.checkbox-container input {
+﻿.check-box-input input {
     display: none;
 }
 
-.checkbox-container {
+.check-box-input {
     display: block;
     position: relative;
     cursor: pointer;
@@ -22,7 +22,7 @@
     transition: all 0.25s;
 }
 
-.checkbox-container input:checked ~ .checkmark {
+.check-box-input input:checked ~ .checkmark {
     background-color: var(--primary);
 }
 
@@ -39,7 +39,7 @@
     transition: all 0.25s, border-width 0.1s;
 }
 
-.checkbox-container input:checked ~ .checkmark:after {
+.check-box-input input:checked ~ .checkmark:after {
     left: 0.45em;
     top: 0.25em;
     width: 0.25em;

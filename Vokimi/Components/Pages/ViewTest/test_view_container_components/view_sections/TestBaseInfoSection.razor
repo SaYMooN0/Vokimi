@@ -1,7 +1,7 @@
 ﻿<div class="base-info-section">
     <div class="type-and-lang-container">
-        <div class="test-type">@Template</div>
-        <div class="test-lang">@TestLang.FullName()</div>
+        <div class="test-type">Template: @Template</div>
+        <div class="test-lang">Language: @TestLang.FullName()</div>
     </div>
     @if (!string.IsNullOrEmpty(Description)) {
         <div class="test-description">@Description</div>

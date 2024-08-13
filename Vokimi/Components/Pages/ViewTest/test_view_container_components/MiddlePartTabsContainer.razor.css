@@ -2,34 +2,31 @@
 .middle-part-tabs-container {
     display: flex;
     flex-direction: column;
-    border: 1px solid var(--grey);
-    border-radius: 8px;
     overflow: hidden;
+    border-radius: 8px;
+    background-color: var(--back-2);
+    padding: 4px;
 }
 
 .tab-links-container {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    border-bottom: 1px solid var(--grey);
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
+    padding: 0 10px;
 }
 
 .tab-link {
-    padding: 12px 0;
+    margin: 8px 0;
+    padding: 4px 8px;
     text-align: center;
     cursor: pointer;
     font-size: 16px;
     font-family: Roboto;
-    border-right: 1px solid var(--grey);
+    border-bottom: 2px solid transparent;
 }
 
-    .tab-link:last-child {
-        border-right: none;
-    }
-
 .tab-link-active {
-    text-decoration: underline;
-    text-decoration-thickness: 2px;
-    text-decoration-color: var(--primary);
+    border-color: var(--primary);
 }
 
 .tabs-contents-container {

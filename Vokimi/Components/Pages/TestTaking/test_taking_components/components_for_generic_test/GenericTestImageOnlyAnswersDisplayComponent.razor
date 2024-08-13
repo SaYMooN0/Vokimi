@@ -6,5 +6,7 @@
 @code {
     [Parameter] public IEnumerable<GenericTestTakingAnswerImageOnlyDto> Answers { get; set; }
     [Parameter] public bool IsMultichoice { get; set; }
+    [Parameter] public HashSet<GenericTestAnswerId> SelectedAnswersRef { get; set; } = [];
+
 
 }

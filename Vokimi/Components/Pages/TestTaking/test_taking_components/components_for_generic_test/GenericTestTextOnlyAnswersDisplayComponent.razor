@@ -3,7 +3,8 @@
         <p>
             <IsChosenAnswerInput IsMultichoice="@IsMultichoice"
                                  InputsGroupName="@inputsGroupName"
-                                 OnSelectionChanged="@((isSelected) => OnAnswerSelectionChanged(answer.Id, isSelected))" />
+                                 IsSelected="@SelectedAnswersRef.Contains(answer.Id)"
+                                 OnclickAction="@((isSelected) => OnAnswerSelectionChanged(answer.Id, isSelected))" />
             @answer.Text
         </p>
     }
@@ -12,19 +13,25 @@
 @code {
     [Parameter] public IEnumerable<GenericTestTakingAnswerTextOnlyDto> Answers { get; set; }
     [Parameter] public bool IsMultichoice { get; set; }
+    [Parameter] public HashSet<GenericTestAnswerId> SelectedAnswersRef { get; set; } = [];
 
     private string inputsGroupName;
 
     protected override void OnParametersSet() {
         inputsGroupName = $"answers-group-{Guid.NewGuid()}";
+        //LoadAnswersFromCookies
     }
 
-    private void OnAnswerSelectionChanged(GenericTestAnswerId answerId, bool isSelected) {
-        if (isSelected) {
-            // SelectedAnswers.Add(answerId);
-        }
-        else {
-            // SelectedAnswers.Remove(answerId);
+    private void OnAnswerSelectionChanged(GenericTestAnswerId answerId, bool prevSelectedState) {
+        if (IsMultichoice) {
+            if (prevSelectedState) {
+                SelectedAnswersRef.Add(answerId);
+            } else {
+                SelectedAnswersRef.Remove(answerId);
+            }
+
+        } else {
+            SelectedAnswersRef = [answerId];
         }
     }
 }

@@ -2,3 +2,19 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
 }
+
+    .type-and-lang-container div {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+.tags-container {
+    margin: 10px;
+    padding: 8px;
+    border-radius: 4px;
+    background-color: var(--back);
+}
+
+.tag-display {
+}

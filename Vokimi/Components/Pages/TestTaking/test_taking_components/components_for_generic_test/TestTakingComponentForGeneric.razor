@@ -7,32 +7,39 @@
         <QuestionNumberText>Question @(Vm.CurrentQuestionNumber + 1) / @Vm.TotalNumberOfQuestions</QuestionNumberText>
         <CurrentQuestionText>@Vm.CurrentQuestion.Text</CurrentQuestionText>
         <AnswersContent>
-            @switch (Vm.CurrentQuestion.AnswersType) {
-                case AnswersType.TextOnly:
-                    <GenericTestTextOnlyAnswersDisplayComponent IsMultichoice="Vm.CurrentQuestion.IsMultiChoice"
-                                                                Answers="@(Vm.CurrentQuestion.Answers
-                                                                .Select(a=>(a as GenericTestTakingAnswerTextOnlyDto)))"
-                                                                 />
-                    break;
-                case AnswersType.ImageOnly:
-                    <GenericTestImageOnlyAnswersDisplayComponent Answers="@(Vm.CurrentQuestion.Answers
-                                                                .Select(a=>(a as GenericTestTakingAnswerImageOnlyDto)))" />
-                    break;
-                case AnswersType.TextAndImage:
-                    <GenericTestTextAndImageAnswersDisplayComponent Answers="@(Vm.CurrentQuestion.Answers
-                                                                .Select(a=>(a as GenericTestTakingAnswerTextAndImageDto)))" />
-                    break;
-                default:
-                    <div>
-                        Unexpected err
-                    </div>
-                    break;
-
-            }
+            <div class="answers-content">
+                <label class="answers-count-to-choose">
+                    @AnswersToChooseLabel(Vm.CurrentQuestion.MinAnswersCount, Vm.CurrentQuestion.MaxAnswersCount)
+                </label>
+                @switch (Vm.CurrentQuestion.AnswersType) {
+                    case AnswersType.TextOnly:
+                        <GenericTestTextOnlyAnswersDisplayComponent IsMultichoice="Vm.CurrentQuestion.IsMultiChoice"
+                                                                    Answers="@(Vm.CurrentQuestion.Answers
+                                                                    .Select(a=>(a as GenericTestTakingAnswerTextOnlyDto)))"
+                                                                    SelectedAnswersRef="selectedAnswersRef" />
+                        break;
+                    case AnswersType.ImageOnly:
+                        <GenericTestImageOnlyAnswersDisplayComponent IsMultichoice="Vm.CurrentQuestion.IsMultiChoice"
+                                                                     Answers="@(Vm.CurrentQuestion.Answers
+                                                                     .Select(a=>(a as GenericTestTakingAnswerImageOnlyDto)))"
+                                                                     SelectedAnswersRef="selectedAnswersRef" />
+                        break;
+                    case AnswersType.TextAndImage:
+                        <GenericTestTextAndImageAnswersDisplayComponent IsMultichoice="Vm.CurrentQuestion.IsMultiChoice"
+                                                                        Answers="@(Vm.CurrentQuestion.Answers
+                                                                        .Select(a=>(a as GenericTestTakingAnswerTextAndImageDto)))"
+                                                                        SelectedAnswersRef="selectedAnswersRef" />
+                        break;
+                    default:
+                        <div>
+                            Unexpected err
+                        </div>
+                        break;
+                }
+            </div>
         </AnswersContent>
     </TestTakingComponentFrame>
-}
-else {
+} else {
     <h2 class="init-error-message">@initError</h2>
 }
 @code {
@@ -40,6 +47,7 @@ else {
 
     GenericTestTakingViewModel Vm = GenericTestTakingViewModel.Empty;
     private string? initError = null;
+    private HashSet<GenericTestAnswerId> selectedAnswersRef = [];
 
     protected override async Task OnInitializedAsync() {
         await base.OnInitializedAsync();
@@ -52,31 +60,47 @@ else {
             Vm = GenericTestTakingViewModel.FromTest(test);
         }
     }
+
     private Err GoToNextQuestion() {
-        SaveCurrentSelectedAnswers();
         if (Vm.CurrentQuestionNumber < Vm.TotalNumberOfQuestions - 1) {
+            if (selectedAnswersRef.Count > Vm.CurrentQuestion.MaxAnswersCount ||
+                selectedAnswersRef.Count < Vm.CurrentQuestion.MinAnswersCount) {
+                return new Err(AnswersToChooseLabel(Vm.CurrentQuestion.MinAnswersCount, Vm.CurrentQuestion.MaxAnswersCount));
+            }
+            Err savingErr = SaveCurrentSelectedAnswers();
+            if (savingErr.NotNone()) {
+                return savingErr;
+            }
             Vm.CurrentQuestionNumber++;
-        }
-        else {
+            LoadCurrentSelectedAnswers();
+        } else {
             //move to conclusion if exists
         }
         return Err.None;
         //if its last question, check for errors
     }
     private Err GoToPreviousQuestion() {
-        SaveCurrentSelectedAnswers();
         if (Vm.CurrentQuestionNumber > 0) {
             Vm.CurrentQuestionNumber--;
+            LoadCurrentSelectedAnswers();
         }
 
         return Err.None;
     }
-    private void SaveCurrentSelectedAnswers() {
-       //helper class
+    private Err SaveCurrentSelectedAnswers() {
+
+        //helper class
+        return Err.None;
     }
 
     private void LoadCurrentSelectedAnswers() {
         //helper class
 
+
     }
+    private string AnswersToChooseLabel(int minCount, int maxCount) =>
+        minCount != maxCount ?
+            $"Choose from {minCount} to {maxCount} answers"
+            : minCount == 1 ? "Choose only 1 answer" : $"Choose {minCount} answers";
+
 }

@@ -11,6 +11,7 @@
 @code {
     [Parameter] public IEnumerable<GenericTestTakingAnswerTextAndImageDto> Answers { get; set; }
     [Parameter] public bool IsMultichoice { get; set; }
+    [Parameter] public HashSet<GenericTestAnswerId> SelectedAnswersRef { get; set; } = [];
 
     private string inputsGroupName;
 

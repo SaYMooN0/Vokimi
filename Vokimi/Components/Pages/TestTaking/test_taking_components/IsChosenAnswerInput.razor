@@ -1,9 +1,11 @@
-﻿<div class="is-chosen-answer-input">
+﻿<div class="is-chosen-answer-input" @onclick="()=>OnclickAction(IsSelected)">
     @if (IsMultichoice) {
-        <input type="checkbox" @onclick="ToggleSelection" />
-    }
-    else {
-        <input class="radio-input" type="radio" name="@InputsGroupName" @onclick="ToggleSelection" />
+        <label class="check-box-input" @(IsSelected ? "checked" : "" )>
+            <input type="checkbox" name="@InputsGroupName">
+            <div class="checkmark"></div>
+        </label>
+    } else {
+        <input class="radio-input" type="radio" name="@InputsGroupName" @(IsSelected ? "checked" : "" ) />
     }
 </div>
 
@@ -11,9 +13,5 @@
     [Parameter] public string InputsGroupName { get; set; }
     [Parameter] public bool IsMultichoice { get; set; }
     [Parameter] public bool IsSelected { get; set; }
-    [Parameter] public EventCallback<bool> OnSelectionChanged { get; set; }
-
-    private async Task ToggleSelection() {
-        await OnSelectionChanged.InvokeAsync(!IsSelected);
-    }
+    [Parameter] public Action<bool> OnclickAction { get; set; }
 }
