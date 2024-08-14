@@ -1,4 +1,6 @@
-﻿<div class="txt-only-answers-container">
+﻿@inject IHttpContextAccessor httpContextAccessor
+
+<div class="txt-only-answers-container">
     @foreach (var answer in Answers) {
         <p>
             <IsChosenAnswerInput IsMultichoice="@IsMultichoice"
@@ -14,24 +16,31 @@
     [Parameter] public IEnumerable<GenericTestTakingAnswerTextOnlyDto> Answers { get; set; }
     [Parameter] public bool IsMultichoice { get; set; }
     [Parameter] public HashSet<GenericTestAnswerId> SelectedAnswersRef { get; set; } = [];
+    [Parameter] public GenericTestQuestionId QuestionId { get; set; }
+    [CascadingParameter(Name = "TestId")] public TestId TestId { get; set; }
 
     private string inputsGroupName;
 
     protected override void OnParametersSet() {
         inputsGroupName = $"answers-group-{Guid.NewGuid()}";
-        //LoadAnswersFromCookies
+        SelectedAnswersRef.Clear();
+        foreach (var a in TestTakingHelper.LoadSelectedAnswersFromCookie(httpContextAccessor.HttpContext, TestId.Value, QuestionId.Value)) {
+            SelectedAnswersRef.Add(a);
+        }
+        StateHasChanged();
     }
 
     private void OnAnswerSelectionChanged(GenericTestAnswerId answerId, bool prevSelectedState) {
         if (IsMultichoice) {
             if (prevSelectedState) {
-                SelectedAnswersRef.Add(answerId);
-            } else {
                 SelectedAnswersRef.Remove(answerId);
+            } else {
+                SelectedAnswersRef.Add(answerId);
             }
 
         } else {
-            SelectedAnswersRef = [answerId];
+            SelectedAnswersRef.Clear();
+            SelectedAnswersRef.Add(answerId);
         }
     }
 }

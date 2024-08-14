@@ -1,11 +1,11 @@
 ﻿<div class="is-chosen-answer-input" @onclick="()=>OnclickAction(IsSelected)">
     @if (IsMultichoice) {
-        <label class="check-box-input" @(IsSelected ? "checked" : "" )>
+        <label class="check-box-input" checked="@IsSelected">
             <input type="checkbox" name="@InputsGroupName">
             <div class="checkmark"></div>
         </label>
     } else {
-        <input class="radio-input" type="radio" name="@InputsGroupName" @(IsSelected ? "checked" : "" ) />
+        <input class="radio-input" type="radio" name="@InputsGroupName" checked="@IsSelected" />
     }
 </div>
 

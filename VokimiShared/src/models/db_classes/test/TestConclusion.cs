@@ -10,8 +10,8 @@ namespace VokimiShared.src.models.db_classes.tests
         public string Text { get; private set; }
         public string? AdditionalImage { get; private set; }
         public bool Feedback { get; private set; }
-        public string? FeedbackText { get; private set; }
-        public uint? MaxCharactersForFeedback { get; private set; }
+        public string FeedbackText { get; private set; }
+        public uint MaxCharactersForFeedback { get; private set; }
         public static TestConclusion CreateNew(ConclusionCreationForm data) => new() {
             Id = new(),
             Text = data.Text,

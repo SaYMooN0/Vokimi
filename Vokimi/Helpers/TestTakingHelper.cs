@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.JSInterop;
 using System.Linq;
 using VokimiShared.src;
 using VokimiShared.src.models.db_entities_ids;
@@ -7,8 +8,8 @@ namespace Vokimi.Helpers
 {
     public class TestTakingHelper
     {
-        public static string CookieName(Guid testId, Guid questionId) => $"test-taking|{testId}|{questionId}";
-        public static Err SaveSelectedAnswersToCookie(HttpContext http,
+        private static string CookieName(Guid testId, Guid questionId) => $"test-taking|{testId}|{questionId}";
+        public async static Task<Err> SaveSelectedAnswersToCookie(IJSRuntime JSRuntime,
                                                        Guid testId,
                                                        Guid questionId,
                                                        IEnumerable<GenericTestAnswerId> selectedAnswers) {
@@ -17,8 +18,7 @@ namespace Vokimi.Helpers
             var cookieValue = $"{questionId}|{string.Join("!", selectedAnswers)}";
 
             try {
-
-                http.Response.Cookies.Append(cookieName, cookieValue, new CookieOptions { Expires = DateTimeOffset.Now.AddDays(7) });
+                await JSRuntime.InvokeVoidAsync("setCookie", cookieName, cookieValue, 7);
             } catch { return new Err("Unable to save answers"); }
             return Err.None;
         }

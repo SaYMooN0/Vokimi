@@ -1,9 +1,11 @@
 ﻿@inject IDbContextFactory<VokimiDbContext> dbContextFactory
+@inject IJSRuntime jsRuntime
+@inject IHttpContextAccessor httpContextAccessor
 
 @if (string.IsNullOrEmpty(initError)) {
-    <TestTakingComponentFrame ArrowsType="Vm.ArrowIcons"
-                              GoToNextQuestion="GoToNextQuestion"
-                              GoToPreviousQuestion="GoToPreviousQuestion">
+    <TestTakingAnswersDisplayFrame ArrowsType="Vm.ArrowIcons"
+                                   GoToNextQuestion="GoToNextQuestion"
+                                   GoToPreviousQuestion="GoToPreviousQuestion">
         <QuestionNumberText>Question @(Vm.CurrentQuestionNumber + 1) / @Vm.TotalNumberOfQuestions</QuestionNumberText>
         <CurrentQuestionText>@Vm.CurrentQuestion.Text</CurrentQuestionText>
         <AnswersContent>
@@ -38,7 +40,7 @@
                 }
             </div>
         </AnswersContent>
-    </TestTakingComponentFrame>
+    </TestTakingAnswersDisplayFrame>
 } else {
     <h2 class="init-error-message">@initError</h2>
 }
@@ -47,60 +49,79 @@
 
     GenericTestTakingViewModel Vm = GenericTestTakingViewModel.Empty;
     private string? initError = null;
-    private HashSet<GenericTestAnswerId> selectedAnswersRef = [];
+    private HashSet<GenericTestAnswerId> selectedAnswersRef { get; set; } = [];
+    private bool isConclusionState = false;
+
 
     protected override async Task OnInitializedAsync() {
         await base.OnInitializedAsync();
         using (var dbContext = dbContextFactory.CreateDbContext()) {
+            isConclusionState = false;
             TestGenericType? test = await dbContext.TestsGenericType.FirstOrDefaultAsync(t => t.Id == TestId);
             if (test is null) {
                 initError = "Test not found";
                 return;
             }
             Vm = GenericTestTakingViewModel.FromTest(test);
+            StateHasChanged();
         }
     }
 
-    private Err GoToNextQuestion() {
-        if (Vm.CurrentQuestionNumber < Vm.TotalNumberOfQuestions - 1) {
-            if (selectedAnswersRef.Count > Vm.CurrentQuestion.MaxAnswersCount ||
-                selectedAnswersRef.Count < Vm.CurrentQuestion.MinAnswersCount) {
-                return new Err(AnswersToChooseLabel(Vm.CurrentQuestion.MinAnswersCount, Vm.CurrentQuestion.MaxAnswersCount));
-            }
-            Err savingErr = SaveCurrentSelectedAnswers();
-            if (savingErr.NotNone()) {
-                return savingErr;
-            }
-            Vm.CurrentQuestionNumber++;
-            LoadCurrentSelectedAnswers();
-        } else {
-            //move to conclusion if exists
+    private async Task<Err> GoToNextQuestion() {
+        if (selectedAnswersRef.Count > Vm.CurrentQuestion.MaxAnswersCount ||
+            selectedAnswersRef.Count < Vm.CurrentQuestion.MinAnswersCount) {
+            return new Err(AnswersToChooseLabel(Vm.CurrentQuestion.MinAnswersCount, Vm.CurrentQuestion.MaxAnswersCount));
         }
+        Err savingErr = await SaveCurrentSelectedAnswers();
+        if (savingErr.NotNone()) {
+            return savingErr;
+        }
+        if (Vm.CurrentQuestionNumber < Vm.TotalNumberOfQuestions - 1) {
+            Vm.CurrentQuestionNumber++;
+        } else {
+            Err beforeConclusionErr = CheckAllQuestionsAnswersForErrs();
+            if (beforeConclusionErr.NotNone()) {
+                return beforeConclusionErr;
+            }
+            isConclusionState = true;
+        }
+        selectedAnswersRef = [];
+        StateHasChanged();
         return Err.None;
-        //if its last question, check for errors
     }
     private Err GoToPreviousQuestion() {
         if (Vm.CurrentQuestionNumber > 0) {
             Vm.CurrentQuestionNumber--;
-            LoadCurrentSelectedAnswers();
         }
 
         return Err.None;
     }
-    private Err SaveCurrentSelectedAnswers() {
-
-        //helper class
-        return Err.None;
-    }
-
-    private void LoadCurrentSelectedAnswers() {
-        //helper class
+    private async Task<Err> SaveCurrentSelectedAnswers() =>
+         await TestTakingHelper.SaveSelectedAnswersToCookie(jsRuntime,
+                                                      TestId.Value,
+                                                      Vm.CurrentQuestion.Id.Value,
+                                                      selectedAnswersRef);
 
 
-    }
+
     private string AnswersToChooseLabel(int minCount, int maxCount) =>
         minCount != maxCount ?
             $"Choose from {minCount} to {maxCount} answers"
             : minCount == 1 ? "Choose only 1 answer" : $"Choose {minCount} answers";
 
+    private Err CheckAllQuestionsAnswersForErrs() {
+        var getAnswersFromCookies = (GenericTestQuestionId qId) =>
+            TestTakingHelper.LoadSelectedAnswersFromCookie(httpContextAccessor.HttpContext, TestId.Value, qId.Value);
+
+        for (int i = 0; i < Vm.Questions.Count(); i++) {
+            var question = Vm.Questions[i];
+            int answersCount = getAnswersFromCookies(question.Id).Count;
+            if (answersCount < question.MinAnswersCount || answersCount > question.MaxAnswersCount) {
+                return new Err($"Err in question {i + 1}: {AnswersToChooseLabel(question.MinAnswersCount, question.MaxAnswersCount)}");
+            }
+        }
+        return Err.None;
+    }
 }
+
+

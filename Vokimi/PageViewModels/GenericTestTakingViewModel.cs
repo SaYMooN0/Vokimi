@@ -15,7 +15,7 @@ namespace Vokimi.PageViewModels
         internal ArrowIconType ArrowIcons { get; init; }
         internal GenericTestTakingQuestionDto CurrentQuestion =>
             CurrentQuestionNumber >= Questions.Length ?
-            new(string.Empty, AnswersType.TextOnly, 0, 0, []) :
+            new(string.Empty, new(Guid.Empty), AnswersType.TextOnly, 0, 0, []) :
             Questions[CurrentQuestionNumber];
         internal static GenericTestTakingViewModel FromTest(TestGenericType test) => new() {
             CurrentQuestionNumber = 0,
@@ -33,6 +33,7 @@ namespace Vokimi.PageViewModels
 
     internal record class GenericTestTakingQuestionDto(
         string Text,
+        GenericTestQuestionId Id,
         AnswersType AnswersType,
         ushort MinAnswersCount,
         ushort MaxAnswersCount,
@@ -41,6 +42,7 @@ namespace Vokimi.PageViewModels
         internal bool IsMultiChoice => MinAnswersCount != 1 || MaxAnswersCount != 1;
         internal static GenericTestTakingQuestionDto FromGenericTestQuestion(GenericTestQuestion question) => new(
             question.Text,
+            question.Id,
             question.AnswersType,
             question.MultiChoiceQuestionData is null ? (ushort)1 : question.MultiChoiceQuestionData.MinAnswersCount,
             question.MultiChoiceQuestionData is null ? (ushort)1 : question.MultiChoiceQuestionData.MaxAnswersCount,

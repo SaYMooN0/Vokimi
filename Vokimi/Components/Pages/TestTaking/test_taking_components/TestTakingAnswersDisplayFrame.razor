@@ -45,7 +45,7 @@
     [Parameter] public RenderFragment QuestionNumberText { get; set; }
     [Parameter] public RenderFragment CurrentQuestionText { get; set; }
 
-    [Parameter] public Func<Err> GoToNextQuestion { get; set; }
+    [Parameter] public Func<Task<Err>> GoToNextQuestion { get; set; }
     [Parameter] public Func<Err> GoToPreviousQuestion { get; set; }
 
     private string errorMessage = string.Empty;
@@ -58,9 +58,9 @@
         StateHasChanged();
     }
 
-    private void NextButtonClicked() {
+    private async Task NextButtonClicked() {
         errorMessage = string.Empty;
-        Err err = GoToNextQuestion();
+        Err err = await GoToNextQuestion();
         if (err.NotNone()) {
             errorMessage = err.ToString();
         }

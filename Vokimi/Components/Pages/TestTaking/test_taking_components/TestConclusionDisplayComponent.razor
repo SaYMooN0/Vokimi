@@ -1,0 +1,58 @@
+﻿@inject IDbContextFactory<VokimiDbContext> dbContextFactory
+@page "/con"
+
+<div class="conclusion-container">
+    <p class="conclusion-text">@Vm.Text</p>
+    @if (!string.IsNullOrEmpty(Vm.Image)) {
+        <img class="conclusion-image" src="@Vm.Image" />
+    }
+    @if (Vm.AnyFeedback) {
+        <p class="feedback-text">@Vm.FeedbackText</p>
+        <textarea class="feedback-input default-textarea" maxlength="@Vm.MaxFeedbackLength" />
+    }
+    <div class="go-to-res-btn">Go To Result</div>
+</div>
+
+
+@code {
+    [CascadingParameter(Name = "TestId")] public TestId TestId { get; set; }
+    [Parameter] public Func<Task> GoToResults { get; set; }
+    private TestConclusionViewModel Vm;
+
+    protected override void OnInitialized() {
+        TestId = new TestId(new Guid("e2df58f5-d972-425b-8273-0310b6d9606c"));
+
+        using (var db = dbContextFactory.CreateDbContext()) {
+
+            BaseTest test = db.TestsSharedInfo.FirstOrDefault(t => t.Id == TestId);
+            if (test is null) {
+                GoToResults().Wait();
+                return;
+            }
+            if (test.Conclusion is null) {
+                GoToResults().Wait();
+                return;
+            }
+            Vm = TestConclusionViewModel.FromTestConclusion(test.Conclusion);
+
+        }
+    }
+    record class TestConclusionViewModel(
+        string Text,
+        string? Image,
+        bool AnyFeedback,
+        string FeedbackText,
+        uint MaxFeedbackLength
+    )
+    {
+        public static TestConclusionViewModel FromTestConclusion(TestConclusion testConclusion) =>
+            new TestConclusionViewModel(
+                testConclusion.Text,
+                testConclusion.AdditionalImage,
+                testConclusion.Feedback,
+                testConclusion.FeedbackText,
+                testConclusion.MaxCharactersForFeedback
+            );
+
+    }
+}
